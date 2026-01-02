@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Check your Kundli Milan and compatibility score. Free Vedic astrology compatibility matching using Ashtakoot method.">
+    <title>Compatibility Matching - Kundli Milan | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .compatibility-form {
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            gap: var(--space-lg);
+            align-items: start;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .partner-card {
+            background: var(--background-card);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .partner-card h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--gold);
+            padding-top: 100px;
+        }
+        .compatibility-result {
+            display: none;
+            margin-top: var(--space-xxl);
+        }
+        .compatibility-result.active {
+            display: block;
+        }
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(var(--gold) var(--score-percent), var(--background-card) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-xl);
+            position: relative;
+        }
+        .score-circle::before {
+            content: '';
+            width: 160px;
+            height: 160px;
+            background: var(--background);
+            border-radius: 50%;
+            position: absolute;
+        }
+        .score-value {
+            position: relative;
+            z-index: 1;
+            font-size: 3rem;
+            font-family: var(--font-heading);
+            color: var(--gold);
+        }
+        .score-value span {
+            font-size: 1.5rem;
+        }
+        .guna-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto var(--space-xl);
+            border-collapse: collapse;
+        }
+        .guna-table th,
+        .guna-table td {
+            padding: var(--space-md);
+            text-align: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .guna-table th {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .guna-table td {
+            color: var(--text-muted);
+        }
+        .guna-table .score-good {
+            color: #4CAF50;
+        }
+        .guna-table .score-medium {
+            color: #FFC107;
+        }
+        .guna-table .score-low {
+            color: #f44336;
+        }
+        .result-summary {
+            background: var(--background-card);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .result-summary h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-md);
+        }
+        .result-summary p {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        @media (max-width: 768px) {
+            .compatibility-form {
+                grid-template-columns: 1fr;
+            }
+            .vs-divider {
+                padding: var(--space-md) 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link active">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Kundli Matching</h1>
+            <p>Check your compatibility score using the traditional Vedic Ashtakoot method (36 Gunas).</p>
+        </div>
+    </section>
+
+    <!-- Compatibility Form -->
+    <section class="section">
+        <div class="container">
+            <form id="compatibility-form" class="compatibility-form">
+                <div class="partner-card">
+                    <h3>Partner 1</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="name1">Name</label>
+                        <input type="text" id="name1" class="form-input" placeholder="Enter name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="dob1">Date of Birth</label>
+                        <input type="date" id="dob1" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="time1">Time of Birth</label>
+                        <input type="time" id="time1" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="place1">Place of Birth</label>
+                        <input type="text" id="place1" class="form-input" placeholder="Enter city" required>
+                    </div>
+                </div>
+
+                <div class="vs-divider">VS</div>
+
+                <div class="partner-card">
+                    <h3>Partner 2</h3>
+                    <div class="form-group">
+                        <label class="form-label" for="name2">Name</label>
+                        <input type="text" id="name2" class="form-input" placeholder="Enter name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="dob2">Date of Birth</label>
+                        <input type="date" id="dob2" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="time2">Time of Birth</label>
+                        <input type="time" id="time2" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="place2">Place of Birth</label>
+                        <input type="text" id="place2" class="form-input" placeholder="Enter city" required>
+                    </div>
+                </div>
+
+                <div style="grid-column: 1 / -1; text-align: center; margin-top: var(--space-lg);">
+                    <button type="submit" class="btn btn-primary btn-large">Check Compatibility</button>
+                </div>
+            </form>
+
+            <!-- Compatibility Result -->
+            <div id="compatibility-result" class="compatibility-result">
+                <h2 class="section-title">Compatibility Report</h2>
+                <p class="section-description" id="partner-names">Partner 1 & Partner 2</p>
+
+                <div class="score-circle" id="score-circle" style="--score-percent: 0%;">
+                    <div class="score-value" id="total-score">0<span>/36</span></div>
+                </div>
+
+                <table class="guna-table">
+                    <thead>
+                        <tr>
+                            <th>Guna</th>
+                            <th>Maximum</th>
+                            <th>Obtained</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guna-scores">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
+
+                <div class="result-summary">
+                    <h3 id="result-verdict">Compatibility Result</h3>
+                    <p id="result-description">Based on the Ashtakoot Guna Milan, the compatibility score indicates...</p>
+                </div>
+
+                <div style="text-align: center; margin-top: var(--space-xl);">
+                    <a href="consultation.html" class="btn btn-primary">Get Detailed Analysis</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Kundli Matching -->
+    <section class="section why-vedic">
+        <div class="container">
+            <h2 class="section-title">About Ashtakoot Guna Milan</h2>
+            <p class="section-description">The traditional Vedic method analyzes 8 aspects of compatibility</p>
+
+            <div class="features-grid" style="margin-top: var(--space-xl);">
+                <div class="feature-card">
+                    <h3>Varna (1 Point)</h3>
+                    <p>Spiritual compatibility and ego levels. Measures the basic matching of temperaments.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Vashya (2 Points)</h3>
+                    <p>Mutual attraction and control in relationship. Determines power dynamics between partners.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Tara (3 Points)</h3>
+                    <p>Destiny and luck compatibility. Indicates health and well-being of the relationship.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Yoni (4 Points)</h3>
+                    <p>Physical and sexual compatibility. Important for intimacy and mutual satisfaction.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Graha Maitri (5 Points)</h3>
+                    <p>Mental compatibility and friendship. Based on Moon sign planetary rulers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Gana (6 Points)</h3>
+                    <p>Temperament matching. Classifies as Deva, Manushya, or Rakshasa temperament.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Bhakoot (7 Points)</h3>
+                    <p>Emotional compatibility and family welfare. Affects prosperity and children.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Nadi (8 Points)</h3>
+                    <p>Health and genetic compatibility. Most important factor for progeny and health.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/compatibility.js"></script>
+</body>
+</html>

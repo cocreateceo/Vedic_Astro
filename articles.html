@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn Vedic astrology - articles on planets, houses, nakshatras, yogas, doshas, and remedies.">
+    <title>Learn Vedic Astrology - Articles & Guides | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .article-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-bottom: var(--space-xl);
+        }
+        .category-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: var(--font-body);
+        }
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--gold);
+            color: var(--text-dark);
+            border-color: var(--gold);
+        }
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+        .article-card {
+            background: var(--background-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all var(--transition-normal);
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-glow);
+        }
+        .article-image {
+            height: 180px;
+            background: linear-gradient(135deg, var(--purple-dark), var(--background));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .article-content {
+            padding: var(--space-lg);
+        }
+        .article-category {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-sm);
+        }
+        .article-title {
+            font-family: var(--font-heading);
+            color: var(--white);
+            margin-bottom: var(--space-sm);
+            font-size: 1.1rem;
+        }
+        .article-excerpt {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-md);
+        }
+        .article-link {
+            color: var(--gold);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .featured-article {
+            grid-column: span 3;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: linear-gradient(135deg, rgba(107, 63, 160, 0.3), rgba(22, 33, 62, 0.9));
+        }
+        .featured-article .article-image {
+            height: 100%;
+            min-height: 300px;
+        }
+        .featured-article .article-content {
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .featured-article .article-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-md);
+        }
+        .topic-section {
+            margin-top: var(--space-xxl);
+        }
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+        .topic-card {
+            background: var(--background-card);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all var(--transition-normal);
+        }
+        .topic-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+        .topic-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+        }
+        .topic-card h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-sm);
+        }
+        .topic-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        @media (max-width: 1024px) {
+            .articles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .featured-article {
+                grid-column: span 2;
+            }
+            .topic-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            .featured-article {
+                grid-column: span 1;
+                grid-template-columns: 1fr;
+            }
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link active">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Learn Vedic Astrology</h1>
+            <p>Explore comprehensive guides on planets, houses, nakshatras, and astrological concepts.</p>
+        </div>
+    </section>
+
+    <!-- Topics Overview -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Explore Topics</h2>
+            <div class="topic-grid">
+                <a href="#planets" class="topic-card">
+                    <div class="topic-icon">☉</div>
+                    <h3>The 9 Planets</h3>
+                    <p>Learn about Navagrahas - Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, and Ketu</p>
+                </a>
+                <a href="#houses" class="topic-card">
+                    <div class="topic-icon">⌂</div>
+                    <h3>12 Houses</h3>
+                    <p>Understand the Bhavas and their significance in birth chart interpretation</p>
+                </a>
+                <a href="#nakshatras" class="topic-card">
+                    <div class="topic-icon">★</div>
+                    <h3>27 Nakshatras</h3>
+                    <p>Explore the lunar mansions and their profound influence on personality</p>
+                </a>
+                <a href="#yogas" class="topic-card">
+                    <div class="topic-icon">⚛</div>
+                    <h3>Yogas & Doshas</h3>
+                    <p>Discover powerful planetary combinations and their effects</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles Section -->
+    <section class="section" style="background: var(--background-light);">
+        <div class="container">
+            <h2 class="section-title">Featured Articles</h2>
+
+            <div class="article-categories">
+                <button class="category-btn active">All</button>
+                <button class="category-btn">Planets</button>
+                <button class="category-btn">Houses</button>
+                <button class="category-btn">Nakshatras</button>
+                <button class="category-btn">Yogas</button>
+                <button class="category-btn">Remedies</button>
+            </div>
+
+            <div class="articles-grid">
+                <!-- Featured Article -->
+                <article class="article-card featured-article">
+                    <div class="article-image">🌙</div>
+                    <div class="article-content">
+                        <span class="article-category">Fundamentals</span>
+                        <h2 class="article-title">Introduction to Vedic Astrology: A Complete Guide</h2>
+                        <p class="article-excerpt">Discover the ancient science of Jyotish Shastra. Learn how Vedic astrology differs from Western astrology, the significance of the Moon sign, and how to read your birth chart for deeper self-understanding.</p>
+                        <a href="#" class="article-link">Read Full Article →</a>
+                    </div>
+                </article>
+
+                <!-- Planets Articles -->
+                <article class="article-card" id="planets">
+                    <div class="article-image">☉</div>
+                    <div class="article-content">
+                        <span class="article-category">Planets</span>
+                        <h3 class="article-title">Sun (Surya) in Vedic Astrology</h3>
+                        <p class="article-excerpt">The Sun represents soul, father, authority, and vitality. Learn how its placement affects your personality and life path.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">☽</div>
+                    <div class="article-content">
+                        <span class="article-category">Planets</span>
+                        <h3 class="article-title">Moon (Chandra) - The Mind & Emotions</h3>
+                        <p class="article-excerpt">The Moon governs mind, emotions, and mother. Discover why your Moon sign is crucial in Vedic astrology.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">♂</div>
+                    <div class="article-content">
+                        <span class="article-category">Planets</span>
+                        <h3 class="article-title">Mars (Mangal) - Energy & Courage</h3>
+                        <p class="article-excerpt">Mars represents energy, courage, and siblings. Understand Manglik Dosha and its remedies.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Houses Articles -->
+                <article class="article-card" id="houses">
+                    <div class="article-image">1</div>
+                    <div class="article-content">
+                        <span class="article-category">Houses</span>
+                        <h3 class="article-title">The First House - Lagna (Ascendant)</h3>
+                        <p class="article-excerpt">The first house represents self, personality, and physical body. Learn why it's the foundation of your entire chart.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">7</div>
+                    <div class="article-content">
+                        <span class="article-category">Houses</span>
+                        <h3 class="article-title">The Seventh House - Marriage & Partnership</h3>
+                        <p class="article-excerpt">This house governs marriage, business partnerships, and public dealings. Essential for relationship analysis.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">10</div>
+                    <div class="article-content">
+                        <span class="article-category">Houses</span>
+                        <h3 class="article-title">The Tenth House - Career & Status</h3>
+                        <p class="article-excerpt">The karma bhava reveals your career path, public reputation, and relationship with authority figures.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Nakshatras Articles -->
+                <article class="article-card" id="nakshatras">
+                    <div class="article-image">✧</div>
+                    <div class="article-content">
+                        <span class="article-category">Nakshatras</span>
+                        <h3 class="article-title">Understanding the 27 Nakshatras</h3>
+                        <p class="article-excerpt">Explore the lunar mansions that provide deeper personality insights than zodiac signs alone.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">⟡</div>
+                    <div class="article-content">
+                        <span class="article-category">Nakshatras</span>
+                        <h3 class="article-title">Nakshatra Compatibility in Marriage</h3>
+                        <p class="article-excerpt">Learn how nakshatra matching works and which combinations are most compatible for marriage.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <!-- Yogas Articles -->
+                <article class="article-card" id="yogas">
+                    <div class="article-image">⚡</div>
+                    <div class="article-content">
+                        <span class="article-category">Yogas</span>
+                        <h3 class="article-title">Raj Yoga - Combinations for Success</h3>
+                        <p class="article-excerpt">Discover the powerful planetary combinations that indicate wealth, power, and success in life.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">💎</div>
+                    <div class="article-content">
+                        <span class="article-category">Remedies</span>
+                        <h3 class="article-title">Gemstone Remedies in Vedic Astrology</h3>
+                        <p class="article-excerpt">Learn which gemstones to wear based on your birth chart for planetary strengthening.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">🙏</div>
+                    <div class="article-content">
+                        <span class="article-category">Remedies</span>
+                        <h3 class="article-title">Mantras for Planetary Pacification</h3>
+                        <p class="article-excerpt">Powerful mantras for each planet to reduce malefic effects and enhance beneficial influences.</p>
+                        <a href="#" class="article-link">Read More →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

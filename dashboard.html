@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your personalized Vedic astrology dashboard with daily and weekly reports.">
+    <title>My Dashboard - Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-xl);
+            padding: 120px 0 var(--space-xl);
+        }
+        .welcome-section {
+            flex: 1;
+        }
+        .welcome-section h1 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        .welcome-section p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .user-chart-mini {
+            width: 200px;
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+            text-align: center;
+        }
+        .user-chart-mini h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-sm);
+        }
+        .mini-chart-svg {
+            width: 100%;
+            height: auto;
+        }
+        .chart-info-mini {
+            margin-top: var(--space-sm);
+            font-size: 0.8rem;
+        }
+        .chart-info-mini .sign-symbol {
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+        .chart-info-mini .sign-name {
+            color: var(--text);
+            display: block;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-xl);
+        }
+        .report-tabs {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        .report-tab {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: var(--font-body);
+        }
+        .report-tab.active {
+            background: var(--gold);
+            color: var(--text-dark);
+            border-color: var(--gold);
+        }
+        .report-content {
+            display: none;
+        }
+        .report-content.active {
+            display: block;
+        }
+        .report-card {
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+        }
+        .report-card h2 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .report-date {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-lg);
+        }
+        .report-section {
+            margin-bottom: var(--space-xl);
+        }
+        .report-section h3 {
+            color: var(--white);
+            margin-bottom: var(--space-md);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .report-section p {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        .transit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+        .transit-item {
+            background: rgba(212, 175, 55, 0.05);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        .transit-planet {
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: var(--space-xs);
+        }
+        .transit-sign {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        .rating-label {
+            min-width: 80px;
+            color: var(--text-muted);
+        }
+        .rating-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rating-fill {
+            height: 100%;
+            background: var(--gradient-gold);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .rating-value {
+            min-width: 40px;
+            text-align: right;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .sidebar-widget {
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        .sidebar-widget h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-md);
+            font-size: 1rem;
+        }
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .quick-stat:last-child {
+            border-bottom: none;
+        }
+        .quick-stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .quick-stat-value {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .full-chart-link {
+            display: block;
+            text-align: center;
+            color: var(--gold);
+            margin-top: var(--space-md);
+            font-size: 0.9rem;
+        }
+        .dasha-widget .dasha-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .dasha-widget .current {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .remedy-list {
+            list-style: none;
+        }
+        .remedy-list li {
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+        .remedy-list li::before {
+            content: '💎';
+            flex-shrink: 0;
+        }
+        .user-menu {
+            position: relative;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background-card);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: var(--radius-md);
+            min-width: 180px;
+            padding: var(--space-sm) 0;
+            display: none;
+            z-index: 100;
+        }
+        .user-dropdown.active {
+            display: block;
+        }
+        .user-dropdown a {
+            display: block;
+            padding: var(--space-sm) var(--space-md);
+            color: var(--text-muted);
+            transition: all var(--transition-fast);
+        }
+        .user-dropdown a:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .transit-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+            }
+            .user-chart-mini {
+                width: 100%;
+            }
+        }
+        /* Edit Birth Details Styles */
+        .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: background var(--transition-fast);
+        }
+        .edit-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+        .edit-field {
+            margin-bottom: var(--space-md);
+        }
+        .edit-field label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+        }
+        .edit-field input {
+            width: 100%;
+            padding: var(--space-sm);
+            background: var(--background);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .edit-field input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        .edit-buttons {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+        .save-btn {
+            flex: 1;
+            padding: var(--space-sm);
+            background: var(--gold);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-dark);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .save-btn:hover {
+            background: var(--gold-light);
+        }
+        .cancel-btn {
+            padding: var(--space-sm) var(--space-md);
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .cancel-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .success-toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation with User Menu -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">My Kundli</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item user-menu">
+                    <div class="user-avatar" id="user-avatar" onclick="toggleUserMenu()">U</div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="dashboard.html">My Dashboard</a>
+                        <a href="profile.html">Profile Settings</a>
+                        <a href="#" onclick="logout(); return false;">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Header with Mini Chart -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1 id="welcome-text">Welcome back!</h1>
+                <p id="current-date"></p>
+            </div>
+            <div class="user-chart-mini">
+                <h3>Your Rashi Chart</h3>
+                <div id="mini-chart"></div>
+                <div class="chart-info-mini">
+                    <span class="sign-symbol" id="user-moon-symbol">♈</span>
+                    <span class="sign-name" id="user-moon-sign">Mesha (Aries)</span>
+                </div>
+                <a href="kundli.html" class="full-chart-link">View Full Chart →</a>
+            </div>
+        </div>
+
+        <!-- Report Tabs -->
+        <div class="report-tabs">
+            <button class="report-tab active" data-report="daily">Today's Report</button>
+            <button class="report-tab" data-report="weekly">Weekly Forecast</button>
+            <button class="report-tab" data-report="monthly">Monthly Overview</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Main Report Content -->
+            <div class="reports-main">
+                <!-- Daily Report -->
+                <div id="daily-report" class="report-content active">
+                    <div class="report-card">
+                        <h2>☀️ Daily Vedic Horoscope</h2>
+                        <p class="report-date" id="daily-date"></p>
+
+                        <!-- Day Ratings -->
+                        <div class="report-section">
+                            <h3>📊 Day Overview</h3>
+                            <div class="rating-bar">
+                                <span class="rating-label">Overall</span>
+                                <div class="rating-track"><div class="rating-fill" id="overall-rating" style="width: 75%"></div></div>
+                                <span class="rating-value">75%</span>
+                            </div>
+                            <div class="rating-bar">
+                                <span class="rating-label">Career</span>
+                                <div class="rating-track"><div class="rating-fill" id="career-rating" style="width: 80%"></div></div>
+                                <span class="rating-value">80%</span>
+                            </div>
+                            <div class="rating-bar">
+                                <span class="rating-label">Love</span>
+                                <div class="rating-track"><div class="rating-fill" id="love-rating" style="width: 70%"></div></div>
+                                <span class="rating-value">70%</span>
+                            </div>
+                            <div class="rating-bar">
+                                <span class="rating-label">Health</span>
+                                <div class="rating-track"><div class="rating-fill" id="health-rating" style="width: 85%"></div></div>
+                                <span class="rating-value">85%</span>
+                            </div>
+                            <div class="rating-bar">
+                                <span class="rating-label">Finance</span>
+                                <div class="rating-track"><div class="rating-fill" id="finance-rating" style="width: 65%"></div></div>
+                                <span class="rating-value">65%</span>
+                            </div>
+                        </div>
+
+                        <!-- General Prediction -->
+                        <div class="report-section">
+                            <h3>🌟 Today's Prediction</h3>
+                            <p id="daily-prediction">Loading your personalized prediction...</p>
+                        </div>
+
+                        <!-- Career & Work -->
+                        <div class="report-section">
+                            <h3>💼 Career & Work</h3>
+                            <p id="daily-career">Loading...</p>
+                        </div>
+
+                        <!-- Love & Relationships -->
+                        <div class="report-section">
+                            <h3>❤️ Love & Relationships</h3>
+                            <p id="daily-love">Loading...</p>
+                        </div>
+
+                        <!-- Health & Wellness -->
+                        <div class="report-section">
+                            <h3>🏃 Health & Wellness</h3>
+                            <p id="daily-health">Loading...</p>
+                        </div>
+
+                        <!-- Current Transits -->
+                        <div class="report-section">
+                            <h3>🪐 Current Planetary Transits</h3>
+                            <div class="transit-grid" id="transit-grid">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Report -->
+                <div id="weekly-report" class="report-content">
+                    <div class="report-card">
+                        <h2>📅 Weekly Vedic Forecast</h2>
+                        <p class="report-date" id="weekly-date"></p>
+
+                        <div class="report-section">
+                            <h3>🌟 Week Overview</h3>
+                            <p id="weekly-overview">Loading your weekly forecast...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>📈 Best Days This Week</h3>
+                            <p id="weekly-best-days">Loading...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>⚠️ Challenging Days</h3>
+                            <p id="weekly-challenges">Loading...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>💼 Career Outlook</h3>
+                            <p id="weekly-career">Loading...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>❤️ Relationship Focus</h3>
+                            <p id="weekly-relationships">Loading...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>💰 Financial Guidance</h3>
+                            <p id="weekly-finance">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Report -->
+                <div id="monthly-report" class="report-content">
+                    <div class="report-card">
+                        <h2>🗓️ Monthly Vedic Overview</h2>
+                        <p class="report-date" id="monthly-date"></p>
+
+                        <div class="report-section">
+                            <h3>🌟 Month at a Glance</h3>
+                            <p id="monthly-overview">Loading your monthly forecast...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>🎯 Key Focus Areas</h3>
+                            <p id="monthly-focus">Loading...</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h3>🪐 Major Planetary Events</h3>
+                            <p id="monthly-events">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Widgets -->
+            <div class="reports-sidebar">
+                <!-- Birth Details -->
+                <div class="sidebar-widget">
+                    <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                        Your Birth Details
+                        <button onclick="toggleBirthEdit()" class="edit-btn" id="edit-birth-btn" title="Edit Birth Details">✏️</button>
+                    </h3>
+
+                    <!-- Display Mode -->
+                    <div id="birth-display">
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Date of Birth</span>
+                            <span class="quick-stat-value" id="sidebar-dob">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Time of Birth</span>
+                            <span class="quick-stat-value" id="sidebar-tob">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Place of Birth</span>
+                            <span class="quick-stat-value" id="sidebar-pob">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Timezone</span>
+                            <span class="quick-stat-value" id="sidebar-timezone">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Moon Sign</span>
+                            <span class="quick-stat-value" id="sidebar-moon">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Sun Sign</span>
+                            <span class="quick-stat-value" id="sidebar-sun">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Ascendant</span>
+                            <span class="quick-stat-value" id="sidebar-asc">-</span>
+                        </div>
+                        <div class="quick-stat">
+                            <span class="quick-stat-label">Nakshatra</span>
+                            <span class="quick-stat-value" id="sidebar-nak">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode -->
+                    <div id="birth-edit" style="display: none;">
+                        <form id="birth-edit-form">
+                            <div class="edit-field">
+                                <label for="edit-dob">Date of Birth</label>
+                                <input type="date" id="edit-dob" required>
+                            </div>
+                            <div class="edit-field">
+                                <label for="edit-tob">Time of Birth</label>
+                                <input type="time" id="edit-tob" required>
+                            </div>
+                            <div class="edit-field">
+                                <label for="edit-pob">Place of Birth</label>
+                                <input type="text" id="edit-pob" placeholder="City, Country" required>
+                            </div>
+                            <div class="edit-field">
+                                <label for="edit-timezone">Timezone</label>
+                                <select id="edit-timezone" required>
+                                    <option value="">Select Timezone</option>
+                                    <optgroup label="India">
+                                        <option value="Asia/Kolkata">India (IST) UTC+5:30</option>
+                                    </optgroup>
+                                    <optgroup label="Americas">
+                                        <option value="America/New_York">Eastern Time UTC-5</option>
+                                        <option value="America/Chicago">Central Time UTC-6</option>
+                                        <option value="America/Denver">Mountain Time UTC-7</option>
+                                        <option value="America/Los_Angeles">Pacific Time UTC-8</option>
+                                        <option value="America/Sao_Paulo">Sao Paulo UTC-3</option>
+                                    </optgroup>
+                                    <optgroup label="Europe">
+                                        <option value="Europe/London">London UTC+0</option>
+                                        <option value="Europe/Paris">Paris/Berlin UTC+1</option>
+                                        <option value="Europe/Moscow">Moscow UTC+3</option>
+                                    </optgroup>
+                                    <optgroup label="Asia">
+                                        <option value="Asia/Dubai">Dubai UTC+4</option>
+                                        <option value="Asia/Karachi">Pakistan UTC+5</option>
+                                        <option value="Asia/Dhaka">Bangladesh UTC+6</option>
+                                        <option value="Asia/Singapore">Singapore UTC+8</option>
+                                        <option value="Asia/Hong_Kong">Hong Kong UTC+8</option>
+                                        <option value="Asia/Tokyo">Japan UTC+9</option>
+                                    </optgroup>
+                                    <optgroup label="Australia">
+                                        <option value="Australia/Sydney">Sydney UTC+10</option>
+                                        <option value="Pacific/Auckland">New Zealand UTC+12</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="edit-buttons">
+                                <button type="submit" class="save-btn">Save & Recalculate</button>
+                                <button type="button" onclick="toggleBirthEdit()" class="cancel-btn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Dasha -->
+                <div class="sidebar-widget dasha-widget">
+                    <h3>Vimshottari Dasha</h3>
+                    <div class="dasha-item current">
+                        <span>Current: <span id="current-dasha">-</span></span>
+                    </div>
+                    <div class="dasha-item">
+                        <span>Sub-period: <span id="current-antardasha">-</span></span>
+                    </div>
+                </div>
+
+                <!-- Lucky Elements -->
+                <div class="sidebar-widget">
+                    <h3>Today's Lucky Elements</h3>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Number</span>
+                        <span class="quick-stat-value" id="lucky-number">-</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Color</span>
+                        <span class="quick-stat-value" id="lucky-color">-</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Time</span>
+                        <span class="quick-stat-value" id="lucky-time">-</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-label">Direction</span>
+                        <span class="quick-stat-value" id="lucky-direction">-</span>
+                    </div>
+                </div>
+
+                <!-- Remedies -->
+                <div class="sidebar-widget">
+                    <h3>Today's Remedies</h3>
+                    <ul class="remedy-list" id="remedy-list">
+                        <li>Loading remedies...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: var(--space-xxl);">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/horoscope-data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

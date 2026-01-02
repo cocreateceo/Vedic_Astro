@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Get your free daily, weekly, monthly and yearly Vedic horoscope predictions based on your Moon sign.">
+    <title>Free Horoscopes - Daily, Weekly & Monthly | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="horoscopes.html" class="nav-link active">Horoscopes</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="horoscopes.html#daily">Daily Horoscope</a></li>
+                        <li><a href="horoscopes.html#weekly">Weekly Horoscope</a></li>
+                        <li><a href="horoscopes.html#monthly">Monthly Horoscope</a></li>
+                        <li><a href="horoscopes.html#yearly">2025 Horoscope</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Vedic Horoscopes</h1>
+            <p>Discover what the stars have in store for you with our authentic Vedic astrology predictions based on your Moon sign.</p>
+        </div>
+    </section>
+
+    <!-- Horoscope Type Selection -->
+    <section class="section">
+        <div class="container">
+            <div class="tabs" id="horoscope-tabs">
+                <button class="tab-btn active" data-tab="daily">Daily</button>
+                <button class="tab-btn" data-tab="weekly">Weekly</button>
+                <button class="tab-btn" data-tab="monthly">Monthly</button>
+                <button class="tab-btn" data-tab="yearly">2025</button>
+            </div>
+
+            <!-- Zodiac Selection -->
+            <h3 class="section-subtitle">Select Your Moon Sign</h3>
+            <div class="zodiac-grid horoscope-zodiac-grid">
+                <button class="zodiac-item zodiac-btn active" data-sign="aries">
+                    <span class="zodiac-symbol">♈</span>
+                    <span class="zodiac-name">Mesha</span>
+                    <span class="zodiac-english">Aries</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="taurus">
+                    <span class="zodiac-symbol">♉</span>
+                    <span class="zodiac-name">Vrishabha</span>
+                    <span class="zodiac-english">Taurus</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="gemini">
+                    <span class="zodiac-symbol">♊</span>
+                    <span class="zodiac-name">Mithuna</span>
+                    <span class="zodiac-english">Gemini</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="cancer">
+                    <span class="zodiac-symbol">♋</span>
+                    <span class="zodiac-name">Karka</span>
+                    <span class="zodiac-english">Cancer</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="leo">
+                    <span class="zodiac-symbol">♌</span>
+                    <span class="zodiac-name">Simha</span>
+                    <span class="zodiac-english">Leo</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="virgo">
+                    <span class="zodiac-symbol">♍</span>
+                    <span class="zodiac-name">Kanya</span>
+                    <span class="zodiac-english">Virgo</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="libra">
+                    <span class="zodiac-symbol">♎</span>
+                    <span class="zodiac-name">Tula</span>
+                    <span class="zodiac-english">Libra</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="scorpio">
+                    <span class="zodiac-symbol">♏</span>
+                    <span class="zodiac-name">Vrishchika</span>
+                    <span class="zodiac-english">Scorpio</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="sagittarius">
+                    <span class="zodiac-symbol">♐</span>
+                    <span class="zodiac-name">Dhanu</span>
+                    <span class="zodiac-english">Sagittarius</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="capricorn">
+                    <span class="zodiac-symbol">♑</span>
+                    <span class="zodiac-name">Makara</span>
+                    <span class="zodiac-english">Capricorn</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="aquarius">
+                    <span class="zodiac-symbol">♒</span>
+                    <span class="zodiac-name">Kumbha</span>
+                    <span class="zodiac-english">Aquarius</span>
+                </button>
+                <button class="zodiac-item zodiac-btn" data-sign="pisces">
+                    <span class="zodiac-symbol">♓</span>
+                    <span class="zodiac-name">Meena</span>
+                    <span class="zodiac-english">Pisces</span>
+                </button>
+            </div>
+
+            <!-- Horoscope Display -->
+            <div class="horoscope-display">
+                <div class="horoscope-card card">
+                    <div class="card-header">
+                        <div class="horoscope-header">
+                            <span class="horoscope-sign-symbol" id="current-sign-symbol">♈</span>
+                            <div>
+                                <h2 id="current-sign-name">Mesha (Aries)</h2>
+                                <p class="horoscope-date" id="horoscope-date">December 26, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="horoscope-content" id="horoscope-content">
+                            <p>Today brings dynamic energy to your endeavors. Mars, your ruling planet, supports bold initiatives, but practice patience in dealings with authority figures. Financial matters require careful attention this afternoon.</p>
+                            <p>Romance is favored in the evening hours. Singles may encounter someone intriguing through friends or social gatherings. Those in relationships should plan quality time together.</p>
+                            <p>Health-wise, channel excess energy into physical activities. Avoid impulsive decisions, especially regarding major purchases or commitments.</p>
+                        </div>
+
+                        <div class="horoscope-highlights">
+                            <div class="highlight-item">
+                                <span class="highlight-label">Lucky Number</span>
+                                <span class="highlight-value">7</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-label">Lucky Color</span>
+                                <span class="highlight-value">Red</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-label">Lucky Time</span>
+                                <span class="highlight-value">4:00 PM - 6:00 PM</span>
+                            </div>
+                            <div class="highlight-item">
+                                <span class="highlight-label">Mood</span>
+                                <span class="highlight-value">Energetic</span>
+                            </div>
+                        </div>
+
+                        <div class="horoscope-ratings">
+                            <div class="rating-item">
+                                <span class="rating-label">Love</span>
+                                <div class="rating-stars">★★★★☆</div>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Career</span>
+                                <div class="rating-stars">★★★★★</div>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Health</span>
+                                <div class="rating-stars">★★★☆☆</div>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Finance</span>
+                                <div class="rating-stars">★★★★☆</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Don't Know Your Moon Sign? -->
+    <section class="section cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Don't Know Your Moon Sign?</h2>
+                <p>Generate your free Vedic birth chart to discover your Moon sign and get personalized predictions.</p>
+                <a href="kundli.html" class="btn btn-primary btn-large">Generate Free Kundli</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights, horoscopes, and spiritual guidance.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                        <li><a href="articles.html#planets">Planets</a></li>
+                        <li><a href="articles.html#houses">Houses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Use</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/horoscopes.js"></script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate your free Vedic birth chart (Kundli) with planetary positions, houses, Dasha periods, and detailed interpretations.">
+    <title>Free Kundli - Vedic Birth Chart Generator | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .kundli-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+        .kundli-result {
+            display: none;
+            margin-top: var(--space-xl);
+        }
+        .kundli-result.active {
+            display: block;
+        }
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        .chart-box {
+            background: var(--background-card);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .chart-title {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: var(--space-md);
+        }
+        .planet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-lg);
+        }
+        .planet-table th,
+        .planet-table td {
+            padding: var(--space-sm) var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .planet-table th {
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .planet-table td {
+            color: var(--text-muted);
+        }
+        .basic-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+        .info-card {
+            background: var(--background-card);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .info-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+        }
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+        .dasha-section {
+            background: var(--background-card);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .dasha-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        .dasha-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: var(--radius-md);
+        }
+        .dasha-planet {
+            font-weight: 500;
+            color: var(--text);
+        }
+        .dasha-period {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .dasha-current {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--gold);
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+            .basic-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link active">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Free Kundli Generator</h1>
+            <p>Create your complete Vedic birth chart with planetary positions, house placements, and Dasha periods.</p>
+        </div>
+    </section>
+
+    <!-- Kundli Form -->
+    <section class="section">
+        <div class="container">
+            <div class="kundli-form-container">
+                <form id="kundli-form" class="card">
+                    <div class="card-header">
+                        <h2>Enter Birth Details</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" for="name">Full Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select id="gender" class="form-select" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="birth-date">Date of Birth</label>
+                                <input type="date" id="birth-date" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="birth-time">Time of Birth</label>
+                                <input type="time" id="birth-time" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="birth-place">Place of Birth</label>
+                            <input type="text" id="birth-place" class="form-input" placeholder="Enter city name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="chart-style">Chart Style</label>
+                            <select id="chart-style" class="form-select">
+                                <option value="north">North Indian</option>
+                                <option value="south">South Indian</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Kundli</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Kundli Result -->
+            <div id="kundli-result" class="kundli-result">
+                <h2 class="section-title" id="result-name">Birth Chart</h2>
+
+                <!-- Basic Info -->
+                <div class="basic-info-grid">
+                    <div class="info-card">
+                        <span class="info-label">Moon Sign (Rashi)</span>
+                        <span class="info-value" id="moon-sign">-</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Nakshatra</span>
+                        <span class="info-value" id="birth-nakshatra">-</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Ascendant (Lagna)</span>
+                        <span class="info-value" id="ascendant">-</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Sun Sign</span>
+                        <span class="info-value" id="sun-sign">-</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Tithi</span>
+                        <span class="info-value" id="birth-tithi">-</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">Yoga</span>
+                        <span class="info-value" id="birth-yoga">-</span>
+                    </div>
+                </div>
+
+                <!-- Chart Style Toggle -->
+                <div style="text-align: center; margin-bottom: var(--space-lg);">
+                    <div class="tabs">
+                        <button type="button" class="tab-btn active" id="north-btn" onclick="switchChartStyle('north')">North Indian</button>
+                        <button type="button" class="tab-btn" id="south-btn" onclick="switchChartStyle('south')">South Indian</button>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3 class="chart-title">Rashi Chart (D1)</h3>
+                        <div id="rashi-chart" class="kundli-chart"></div>
+                    </div>
+                    <div class="chart-box">
+                        <h3 class="chart-title">Navamsa Chart (D9)</h3>
+                        <div id="navamsa-chart" class="kundli-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Planetary Positions -->
+                <div class="chart-box" style="margin-bottom: var(--space-xl);">
+                    <h3 class="chart-title">Planetary Positions</h3>
+                    <table class="planet-table">
+                        <thead>
+                            <tr>
+                                <th>Planet</th>
+                                <th>Sign</th>
+                                <th>Degree</th>
+                                <th>House</th>
+                                <th>Nakshatra</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planet-positions">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Dasha Periods -->
+                <div class="dasha-section">
+                    <h3 class="chart-title">Vimshottari Dasha</h3>
+                    <p style="text-align: center; color: var(--text-muted); margin-bottom: var(--space-lg);">Major planetary periods in your life</p>
+                    <div class="dasha-list" id="dasha-list">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="text-align: center; margin-top: var(--space-xl);">
+                    <button onclick="window.print()" class="btn btn-secondary">Print Kundli</button>
+                    <a href="consultation.html" class="btn btn-primary">Get Detailed Analysis</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/kundli.js"></script>
+</body>
+</html>

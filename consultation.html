@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Book a personal consultation with our expert Vedic astrologers for detailed birth chart analysis and life guidance.">
+    <title>Astrology Consultation - Talk to Expert | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .consultation-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xxl);
+        }
+        .consult-card {
+            background: var(--background-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+        .consult-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-glow);
+        }
+        .consult-card.popular {
+            border-color: var(--gold);
+            position: relative;
+        }
+        .popular-badge {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: var(--gold);
+            color: var(--text-dark);
+            padding: 5px 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        .consult-header {
+            padding: var(--space-xl);
+            text-align: center;
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .consult-header h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        .consult-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+        .consult-price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .consult-body {
+            padding: var(--space-xl);
+        }
+        .consult-features {
+            margin-bottom: var(--space-xl);
+        }
+        .consult-features li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+        }
+        .consult-features li::before {
+            content: '✓';
+            color: var(--gold);
+            font-weight: bold;
+        }
+        .consult-card .btn {
+            width: 100%;
+        }
+        .astrologers-section {
+            margin-top: var(--space-xxl);
+        }
+        .astrologer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+        .astrologer-card {
+            background: var(--background-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all var(--transition-normal);
+        }
+        .astrologer-card:hover {
+            border-color: var(--gold);
+        }
+        .astrologer-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--primary));
+            margin: 0 auto var(--space-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--white);
+        }
+        .astrologer-name {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-xs);
+        }
+        .astrologer-specialty {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: var(--space-sm);
+        }
+        .astrologer-rating {
+            color: var(--gold);
+            margin-bottom: var(--space-sm);
+        }
+        .astrologer-experience {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .booking-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+        .how-it-works {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+        .step-card {
+            text-align: center;
+            padding: var(--space-lg);
+        }
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto var(--space-md);
+        }
+        .step-card h4 {
+            color: var(--white);
+            margin-bottom: var(--space-sm);
+        }
+        .step-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        @media (max-width: 1024px) {
+            .consultation-options {
+                grid-template-columns: 1fr;
+            }
+            .astrologer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .how-it-works {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .astrologer-grid {
+                grid-template-columns: 1fr;
+            }
+            .how-it-works {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav active">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Expert Consultation</h1>
+            <p>Get personalized guidance from experienced Vedic astrologers for life's important decisions.</p>
+        </div>
+    </section>
+
+    <!-- Consultation Options -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Choose Your Consultation</h2>
+            <p class="section-description">Select the service that best fits your needs</p>
+
+            <div class="consultation-options">
+                <!-- Basic Consultation -->
+                <div class="consult-card">
+                    <div class="consult-header">
+                        <h3>Basic Reading</h3>
+                        <div class="consult-price">$29<span>/session</span></div>
+                    </div>
+                    <div class="consult-body">
+                        <ul class="consult-features">
+                            <li>15-minute voice call</li>
+                            <li>Birth chart overview</li>
+                            <li>Current planetary transits</li>
+                            <li>Answer 2-3 questions</li>
+                            <li>Basic remedies</li>
+                        </ul>
+                        <button class="btn btn-secondary">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- Detailed Consultation -->
+                <div class="consult-card popular">
+                    <div class="popular-badge">Popular</div>
+                    <div class="consult-header">
+                        <h3>Detailed Analysis</h3>
+                        <div class="consult-price">$79<span>/session</span></div>
+                    </div>
+                    <div class="consult-body">
+                        <ul class="consult-features">
+                            <li>45-minute video call</li>
+                            <li>Complete birth chart analysis</li>
+                            <li>Dasha & transit predictions</li>
+                            <li>Answer all your questions</li>
+                            <li>Personalized remedies</li>
+                            <li>PDF report included</li>
+                        </ul>
+                        <button class="btn btn-primary">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- Premium Consultation -->
+                <div class="consult-card">
+                    <div class="consult-header">
+                        <h3>Premium Package</h3>
+                        <div class="consult-price">$149<span>/package</span></div>
+                    </div>
+                    <div class="consult-body">
+                        <ul class="consult-features">
+                            <li>90-minute video session</li>
+                            <li>Comprehensive life analysis</li>
+                            <li>Career, marriage & health focus</li>
+                            <li>Muhurat for important events</li>
+                            <li>Detailed remedial guidance</li>
+                            <li>30-page detailed report</li>
+                            <li>1 follow-up session (15 min)</li>
+                        </ul>
+                        <button class="btn btn-secondary">Book Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How It Works -->
+            <h3 class="section-subtitle" style="margin-top: var(--space-xxl);">How It Works</h3>
+            <div class="how-it-works">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Select Service</h4>
+                    <p>Choose the consultation type that matches your needs</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Share Details</h4>
+                    <p>Provide your birth date, time, and place for accurate analysis</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Book Slot</h4>
+                    <p>Select a convenient time and make payment</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Get Guidance</h4>
+                    <p>Connect with the astrologer and receive personalized insights</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Astrologers -->
+    <section class="section astrologers-section" style="background: var(--background-light);">
+        <div class="container">
+            <h2 class="section-title">Our Expert Astrologers</h2>
+            <p class="section-description">Consult with experienced and verified Vedic astrologers</p>
+
+            <div class="astrologer-grid">
+                <div class="astrologer-card">
+                    <div class="astrologer-avatar">👨‍🦳</div>
+                    <h3 class="astrologer-name">Pt. Raghunath Sharma</h3>
+                    <p class="astrologer-specialty">Vedic Astrology, Career & Finance</p>
+                    <div class="astrologer-rating">★★★★★ (4.9)</div>
+                    <p class="astrologer-experience">25+ years experience</p>
+                </div>
+
+                <div class="astrologer-card">
+                    <div class="astrologer-avatar">👩</div>
+                    <h3 class="astrologer-name">Dr. Lakshmi Iyer</h3>
+                    <p class="astrologer-specialty">Relationship, Marriage & Compatibility</p>
+                    <div class="astrologer-rating">★★★★★ (4.8)</div>
+                    <p class="astrologer-experience">18+ years experience</p>
+                </div>
+
+                <div class="astrologer-card">
+                    <div class="astrologer-avatar">👨</div>
+                    <h3 class="astrologer-name">Acharya Vishnu Das</h3>
+                    <p class="astrologer-specialty">Kundli Analysis & Remedies</p>
+                    <div class="astrologer-rating">★★★★☆ (4.7)</div>
+                    <p class="astrologer-experience">20+ years experience</p>
+                </div>
+
+                <div class="astrologer-card">
+                    <div class="astrologer-avatar">👩‍🦰</div>
+                    <h3 class="astrologer-name">Jyotishi Meera Devi</h3>
+                    <p class="astrologer-specialty">Health, Children & Education</p>
+                    <div class="astrologer-rating">★★★★★ (4.9)</div>
+                    <p class="astrologer-experience">15+ years experience</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Form -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Book Your Session</h2>
+            <p class="section-description">Fill in your details and we'll get back to you within 24 hours</p>
+
+            <form class="booking-form card">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="book-name">Full Name</label>
+                            <input type="text" id="book-name" class="form-input" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="book-email">Email</label>
+                            <input type="email" id="book-email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="book-phone">Phone</label>
+                            <input type="tel" id="book-phone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="book-service">Service Type</label>
+                            <select id="book-service" class="form-select" required>
+                                <option value="">Select Service</option>
+                                <option value="basic">Basic Reading - $29</option>
+                                <option value="detailed">Detailed Analysis - $79</option>
+                                <option value="premium">Premium Package - $149</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="book-dob">Date of Birth</label>
+                            <input type="date" id="book-dob" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="book-tob">Time of Birth</label>
+                            <input type="time" id="book-tob" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="book-pob">Place of Birth</label>
+                        <input type="text" id="book-pob" class="form-input" placeholder="City, Country" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="book-concern">Your Main Concern</label>
+                        <textarea id="book-concern" class="form-input" rows="4" placeholder="Describe what you'd like to discuss..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Booking Request</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Check today's Panchang - Tithi, Nakshatra, Yoga, Karana, Sunrise, Sunset, and auspicious timings.">
+    <title>Daily Panchang - Hindu Calendar | Vedic_Astro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .panchang-main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-xl);
+        }
+        .panchang-details {
+            background: var(--background-card);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .panchang-date-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+        .panchang-date-header h2 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: var(--space-sm);
+        }
+        .panchang-date-header p {
+            color: var(--text-muted);
+        }
+        .panchang-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        .panchang-item-large {
+            background: rgba(212, 175, 55, 0.05);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        .panchang-item-large .label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-sm);
+        }
+        .panchang-item-large .value {
+            font-size: 1.3rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .panchang-item-large .time {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+        .timings-section {
+            margin-top: var(--space-xl);
+        }
+        .timings-section h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+        .timing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+        }
+        .timing-item {
+            background: rgba(212, 175, 55, 0.05);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        .timing-item .label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+        }
+        .timing-item .value {
+            color: var(--text);
+            font-weight: 500;
+        }
+        .timing-item.good {
+            border-left: 3px solid #4CAF50;
+        }
+        .timing-item.avoid {
+            border-left: 3px solid #f44336;
+        }
+        .sidebar-card {
+            background: var(--background-card);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            margin-bottom: var(--space-lg);
+        }
+        .sidebar-card h3 {
+            font-family: var(--font-heading);
+            color: var(--gold);
+            margin-bottom: var(--space-md);
+            font-size: 1.1rem;
+        }
+        .muhurta-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .muhurta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .muhurta-name {
+            color: var(--text);
+        }
+        .muhurta-time {
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+        .festival-item {
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+        }
+        .date-picker {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-bottom: var(--space-xl);
+        }
+        @media (max-width: 768px) {
+            .panchang-main-grid {
+                grid-template-columns: 1fr;
+            }
+            .timing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                <span class="logo-text">Vedic_Astro</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="horoscopes.html" class="nav-link">Horoscopes</a></li>
+                <li class="nav-item"><a href="kundli.html" class="nav-link">Free Kundli</a></li>
+                <li class="nav-item"><a href="zodiac.html" class="nav-link">Zodiac Signs</a></li>
+                <li class="nav-item"><a href="compatibility.html" class="nav-link">Compatibility</a></li>
+                <li class="nav-item"><a href="panchang.html" class="nav-link active">Panchang</a></li>
+                <li class="nav-item"><a href="articles.html" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="consultation.html" class="nav-link btn-nav">Consult Now</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Daily Panchang</h1>
+            <p>The Hindu almanac provides auspicious timings and cosmic information for daily activities.</p>
+        </div>
+    </section>
+
+    <!-- Panchang Content -->
+    <section class="section">
+        <div class="container">
+            <!-- Date Picker -->
+            <div class="date-picker">
+                <input type="date" id="panchang-date-input" class="form-input" style="max-width: 200px;">
+                <button onclick="updatePanchang()" class="btn btn-primary">Get Panchang</button>
+            </div>
+
+            <div class="panchang-main-grid">
+                <!-- Main Panchang Details -->
+                <div class="panchang-details">
+                    <div class="panchang-date-header">
+                        <h2 id="display-date">December 26, 2025</h2>
+                        <p id="hindu-date">Paush Shukla Dashami, Vikram Samvat 2082</p>
+                    </div>
+
+                    <div class="panchang-row">
+                        <div class="panchang-item-large">
+                            <span class="label">Tithi</span>
+                            <span class="value" id="tithi-value">Shukla Dashami</span>
+                            <span class="time" id="tithi-time">Till 08:45 AM</span>
+                        </div>
+                        <div class="panchang-item-large">
+                            <span class="label">Nakshatra</span>
+                            <span class="value" id="nakshatra-value">Uttara Phalguni</span>
+                            <span class="time" id="nakshatra-time">Till 02:30 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="panchang-row">
+                        <div class="panchang-item-large">
+                            <span class="label">Yoga</span>
+                            <span class="value" id="yoga-value">Shubha</span>
+                            <span class="time" id="yoga-time">Till 11:20 AM</span>
+                        </div>
+                        <div class="panchang-item-large">
+                            <span class="label">Karana</span>
+                            <span class="value" id="karana-value">Balava</span>
+                            <span class="time" id="karana-time">Till 08:45 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="panchang-row">
+                        <div class="panchang-item-large">
+                            <span class="label">Sunrise</span>
+                            <span class="value" id="sunrise-value">6:48 AM</span>
+                        </div>
+                        <div class="panchang-item-large">
+                            <span class="label">Sunset</span>
+                            <span class="value" id="sunset-value">5:32 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="panchang-row">
+                        <div class="panchang-item-large">
+                            <span class="label">Moonrise</span>
+                            <span class="value" id="moonrise-value">2:15 PM</span>
+                        </div>
+                        <div class="panchang-item-large">
+                            <span class="label">Moonset</span>
+                            <span class="value" id="moonset-value">3:45 AM</span>
+                        </div>
+                    </div>
+
+                    <!-- Auspicious & Inauspicious Timings -->
+                    <div class="timings-section">
+                        <h3>Auspicious & Inauspicious Timings</h3>
+                        <div class="timing-grid">
+                            <div class="timing-item good">
+                                <span class="label">Abhijit Muhurta</span>
+                                <span class="value" id="abhijit">11:45 AM - 12:30 PM</span>
+                            </div>
+                            <div class="timing-item good">
+                                <span class="label">Amrit Kalam</span>
+                                <span class="value" id="amrit">07:20 AM - 09:00 AM</span>
+                            </div>
+                            <div class="timing-item good">
+                                <span class="label">Brahma Muhurta</span>
+                                <span class="value" id="brahma">05:00 AM - 05:48 AM</span>
+                            </div>
+                            <div class="timing-item avoid">
+                                <span class="label">Rahu Kalam</span>
+                                <span class="value" id="rahu">09:00 AM - 10:30 AM</span>
+                            </div>
+                            <div class="timing-item avoid">
+                                <span class="label">Yamaganda</span>
+                                <span class="value" id="yamaganda">01:30 PM - 03:00 PM</span>
+                            </div>
+                            <div class="timing-item avoid">
+                                <span class="label">Gulika Kalam</span>
+                                <span class="value" id="gulika">06:00 AM - 07:30 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="panchang-sidebar">
+                    <!-- Shubh Muhurat -->
+                    <div class="sidebar-card">
+                        <h3>Shubh Muhurat</h3>
+                        <div class="muhurta-list">
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Marriage</span>
+                                <span class="muhurta-time">No Muhurat Today</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Griha Pravesh</span>
+                                <span class="muhurta-time">10:00 AM - 12:00 PM</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Vehicle Purchase</span>
+                                <span class="muhurta-time">11:00 AM - 01:00 PM</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Property Dealing</span>
+                                <span class="muhurta-time">08:00 AM - 10:00 AM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Choghadiya -->
+                    <div class="sidebar-card">
+                        <h3>Day Choghadiya</h3>
+                        <div class="muhurta-list">
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Udveg</span>
+                                <span class="muhurta-time">06:48 - 08:12</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Char</span>
+                                <span class="muhurta-time">08:12 - 09:36</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Labh</span>
+                                <span class="muhurta-time">09:36 - 11:00</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Amrit</span>
+                                <span class="muhurta-time">11:00 - 12:24</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Kaal</span>
+                                <span class="muhurta-time">12:24 - 13:48</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Shubh</span>
+                                <span class="muhurta-time">13:48 - 15:12</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Rog</span>
+                                <span class="muhurta-time">15:12 - 16:36</span>
+                            </div>
+                            <div class="muhurta-item">
+                                <span class="muhurta-name">Udveg</span>
+                                <span class="muhurta-time">16:36 - 17:32</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Festivals -->
+                    <div class="sidebar-card">
+                        <h3>Upcoming Festivals</h3>
+                        <div class="festival-item">New Year - Jan 1, 2026</div>
+                        <div class="festival-item">Makar Sankranti - Jan 14, 2026</div>
+                        <div class="festival-item">Republic Day - Jan 26, 2026</div>
+                        <div class="festival-item">Vasant Panchami - Feb 2, 2026</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="images/logo.svg" alt="Vedic_Astro" class="logo-img">
+                        <span class="logo-text">Vedic_Astro</span>
+                    </a>
+                    <p>Your trusted source for authentic Vedic astrology insights.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="horoscopes.html">Horoscopes</a></li>
+                        <li><a href="kundli.html">Free Kundli</a></li>
+                        <li><a href="compatibility.html">Compatibility</a></li>
+                        <li><a href="panchang.html">Panchang</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="zodiac.html">Zodiac Signs</a></li>
+                        <li><a href="articles.html">Articles</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Set default date to today
+        document.getElementById('panchang-date-input').valueAsDate = new Date();
+
+        // Update display date
+        const today = new Date();
+        document.getElementById('display-date').textContent = today.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        function updatePanchang() {
+            const dateInput = document.getElementById('panchang-date-input');
+            const selectedDate = new Date(dateInput.value);
+
+            document.getElementById('display-date').textContent = selectedDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // In a real app, this would fetch actual panchang data
+            alert('Panchang updated for ' + selectedDate.toDateString());
+        }
+    </script>
+</body>
+</html>
