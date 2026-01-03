@@ -1,0 +1,27 @@
+{
+  "name": "vedic-astro",
+  "version": "1.0.0",
+  "description": "Vedic Astrology Web Application - Static Site",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "deploy": "sst deploy --stage production",
+    "deploy:dev": "sst deploy --stage dev",
+    "remove": "sst remove --stage production",
+    "remove:dev": "sst remove --stage dev"
+  },
+  "keywords": [
+    "vedic-astrology",
+    "horoscope",
+    "birth-chart",
+    "kundli"
+  ],
+  "author": "Vedic Astro",
+  "license": "Proprietary",
+  "dependencies": {
+    "sst": "^3.17.25"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
