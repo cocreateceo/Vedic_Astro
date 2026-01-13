@@ -5,7 +5,15 @@
       "Bash(wc:*)",
       "Bash(cd:*)",
       "Bash(python3:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git -C \"/mnt/c/Shri Hari Hari/Projects/Vedic_Transform/vedic-transform\" remote -v)",
+      "Bash(npm install)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(npx sst:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)"
     ]
   }
 }
