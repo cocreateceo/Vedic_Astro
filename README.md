@@ -192,6 +192,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment guide.
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - AWS deployment guide
 - **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Project status and features
 - **[LEARNING_DOC.md](LEARNING_DOC.md)** - Technical learnings and insights
+- **[documents/DEVELOPMENT_GUIDE.md](documents/DEVELOPMENT_GUIDE.md)** - Comprehensive development guide (classical texts, libraries, architecture)
 
 ## License
 

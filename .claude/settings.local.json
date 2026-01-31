@@ -13,7 +13,21 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git config:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(aws cloudfront:*)",
+      "Bash(aws s3 ls:*)",
+      "Bash(aws cloudformation list-stacks:*)",
+      "Bash(aws s3api get-bucket-website:*)",
+      "Bash(aws lambda list-functions:*)",
+      "Bash(aws s3api get-bucket-policy:*)",
+      "Bash(aws route53 list-hosted-zones:*)",
+      "Bash(aws acm list-certificates:*)",
+      "Bash(aws route53 list-resource-record-sets:*)",
+      "Bash(while read bucket)",
+      "Bash(do echo \"=== $bucket ===\")",
+      "Bash(done)",
+      "Bash(for bucket in \"v-production-vedictransformsitecdnredirectbucketbucket-skuwkdtc\" \"vedic-astro-production-vedicastrositeassetsbucket-bazorfnz\" \"vedic-tr-production-landingpagecdnredirectbucketbucket-brmwwdwe\" \"vedic-tr-production-landingpagecdnredirectbucketbucket-sfmkauzv\" \"vedic-transf-production-vedictransformsiteassetsbucket-kvfokwnv\" \"vedic-transform-production-landingpageassetsbucket-zncfedms\" \"vedic-wellness-store\")",
+      "Bash(do echo \"=== $bucket ===\" aws s3 ls \"s3://$bucket/\" --profile sunwaretech --region us-east-1)"
     ]
   }
 }
