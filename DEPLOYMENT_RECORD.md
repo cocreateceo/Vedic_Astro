@@ -25,7 +25,7 @@
 | Detail | Value |
 |--------|-------|
 | **AWS Account ID** | 611670815873 |
-| **IAM User** | gopi@sunwaretechnologies.com |
+| **IAM User** | cocreateceo |
 | **AWS Region** | us-east-1 (US East - N. Virginia) |
 | **Stage** | production |
 
@@ -521,7 +521,7 @@ aws cloudwatch put-metric-alarm \
 
 ## Contact & Support
 
-**AWS Account:** gopi@sunwaretechnologies.com
+**AWS Account:** cocreateceo
 **SST Documentation:** https://sst.dev/docs
 **AWS Support:** https://console.aws.amazon.com/support
 
