@@ -5,6 +5,9 @@ import Link from 'next/link';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { computeFullChart } from '@/lib/kundli-calc';
 import { generateNorthIndianChart } from '@/lib/chart-svg';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
+import BirthTimePicker from '@/components/ui/BirthTimePicker';
+import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 export default function QuickKundli() {
   const [result, setResult] = useState<{ chartSvg: string; moonSign: string; moonSymbol: string; nakshatra: string; ascendant: string; ascSymbol: string } | null>(null);
@@ -45,15 +48,15 @@ export default function QuickKundli() {
               </div>
               <div>
                 <label className="text-text-muted text-sm block mb-1">Date of Birth</label>
-                <input type="date" name="qk-dob" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow transition-colors" />
+                <BirthDatePicker name="qk-dob" required />
               </div>
               <div>
                 <label className="text-text-muted text-sm block mb-1">Time of Birth</label>
-                <input type="time" name="qk-time" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow transition-colors" />
+                <BirthTimePicker name="qk-time" required />
               </div>
               <div>
                 <label className="text-text-muted text-sm block mb-1">Place of Birth</label>
-                <input type="text" name="qk-place" placeholder="City, Country" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow transition-colors" />
+                <CityAutocomplete name="qk-place" required />
               </div>
               <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all">
                 Generate Preview

@@ -5,6 +5,9 @@ import { computeFullChart, calculateNavamsaSign, signNames, hindiSignNames, sign
 const AUTH_KEY = 'vedic_astro_user';
 const USERS_KEY = 'vedic_astro_users';
 
+// Bump this whenever the astronomy engine is updated so cached charts get recalculated
+const CHART_ENGINE_VERSION = 2;
+
 export function initUsersStorage(): void {
   if (typeof window === 'undefined') return;
   if (!localStorage.getItem(USERS_KEY)) {
@@ -130,7 +133,19 @@ export function calculateVedicChart(dob: string, tob: string, pob: string): Vedi
     nakshatraPada: fc.moonData.nakshatraPada,
     planets,
     birthDetails: { date: dob, time: tob, place: pob },
+    engineVersion: CHART_ENGINE_VERSION,
   };
+}
+
+/** Recalculate chart if it was computed with an older engine version */
+export function migrateChartIfNeeded(): User | null {
+  const currentUser = getCurrentUser();
+  if (!currentUser?.vedicChart || !currentUser.dob || !currentUser.tob || !currentUser.pob) return null;
+
+  if (currentUser.vedicChart.engineVersion === CHART_ENGINE_VERSION) return null;
+
+  // Recalculate with current engine
+  return updateBirthDetails(currentUser.dob, currentUser.tob, currentUser.pob, currentUser.timezone || 'Asia/Kolkata');
 }
 
 export function refreshHoroscope(): User | null {
@@ -139,7 +154,8 @@ export function refreshHoroscope(): User | null {
 
   const today = new Date().toISOString().split('T')[0];
   const horoscope = currentUser.horoscope;
-  const needsRefresh = !horoscope || horoscope.date !== today || !horoscope.weekly || !horoscope.monthly || !horoscope.panchanga;
+  const needsRefresh = !horoscope || horoscope.date !== today || !horoscope.weekly || !horoscope.monthly || !horoscope.panchanga
+    || (horoscope.weekly?.dayHighlights && !horoscope.weekly.dayHighlights[0]?.detailed);
   if (!needsRefresh) return currentUser;
 
   const newHoroscope = generatePersonalizedHoroscope(currentUser.vedicChart, new Date());

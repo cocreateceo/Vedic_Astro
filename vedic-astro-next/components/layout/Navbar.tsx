@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useSignTheme } from '@/hooks/useSignTheme';
-import { VISUAL_THEME_KEYS, VISUAL_THEMES, SIGN_PALETTES } from '@/lib/sign-themes';
+import { VISUAL_THEME_KEYS, VISUAL_THEMES, SIGN_PALETTES, isVisualThemeKey, isSignKey } from '@/lib/sign-themes';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
@@ -133,7 +133,17 @@ export default function Navbar() {
                 title="Change theme"
               >
                 <span className="w-4 h-4 rounded-full border-2 border-sign-primary" style={{ background: `var(--sign-primary)` }} />
-                <span className="hidden md:inline text-xs">Theme</span>
+                <span className="hidden md:inline text-xs truncate max-w-[90px]">
+                  {overrideKey
+                    ? isVisualThemeKey(overrideKey)
+                      ? VISUAL_THEMES[overrideKey].name
+                      : isSignKey(overrideKey)
+                        ? SIGN_PALETTES[overrideKey].name
+                        : 'Theme'
+                    : userSignKey
+                      ? SIGN_PALETTES[userSignKey].name
+                      : VISUAL_THEMES['vedic-ember'].name}
+                </span>
               </button>
               {themeOpen && (
                 <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[220px] shadow-lg border border-sign-primary/10 z-50 max-h-[400px] overflow-y-auto">

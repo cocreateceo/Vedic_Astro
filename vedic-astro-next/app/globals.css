@@ -93,20 +93,20 @@ body {
   --sign-glass-to: rgba(42,26,16,0.88);
 }
 
-/* Sacred Fire - Crimson Flames */
+/* Sacred Fire / Yagna - Havan Vermillion & Saffron */
 [data-sign-theme="sacred-fire"] {
-  --sign-primary: #F01040;
-  --sign-secondary: #FF4060;
-  --sign-dark: #B80C30;
-  --sign-glow-rgb: 240,16,64;
-  --sign-cosmic-bg: #140408;
-  --sign-surface: #2e1018;
-  --sign-bg-light: #381420;
-  --sign-card-bg: #3e1824;
-  --sign-nav-bg: rgba(20,4,8,0.95);
-  --sign-nav-scroll: rgba(20,4,8,0.98);
-  --sign-glass-from: rgba(62,24,36,0.88);
-  --sign-glass-to: rgba(50,16,26,0.88);
+  --sign-primary: #E85820;
+  --sign-secondary: #FFB848;
+  --sign-dark: #B83E10;
+  --sign-glow-rgb: 232,88,32;
+  --sign-cosmic-bg: #120804;
+  --sign-surface: #2A1408;
+  --sign-bg-light: #341A0C;
+  --sign-card-bg: #3A2010;
+  --sign-nav-bg: rgba(18,8,4,0.95);
+  --sign-nav-scroll: rgba(18,8,4,0.98);
+  --sign-glass-from: rgba(58,32,16,0.88);
+  --sign-glass-to: rgba(46,22,10,0.88);
 }
 
 /* Temple Gold - Classic Golden */
@@ -181,6 +181,80 @@ body {
 }
 [data-sign-theme="sacred-light"] .glass-card:hover {
   box-shadow: 0 4px 30px rgba(192,120,32,0.15);
+}
+
+/* Cosmic Temple - Temple Gopuram Against Starfield */
+[data-sign-theme="cosmic-temple"] {
+  --sign-primary: #7B2FBE;
+  --sign-secondary: #C490FF;
+  --sign-dark: #5A1D90;
+  --sign-glow-rgb: 123,47,190;
+  --sign-cosmic-bg: #0A0612;
+  --sign-surface: #1A1028;
+  --sign-bg-light: #221436;
+  --sign-card-bg: #281840;
+  --sign-nav-bg: rgba(10,6,18,0.95);
+  --sign-nav-scroll: rgba(10,6,18,0.98);
+  --sign-glass-from: rgba(40,24,64,0.88);
+  --sign-glass-to: rgba(30,16,52,0.88);
+}
+
+/* Celestial Universe - Deep Space Nebulae */
+[data-sign-theme="celestial-universe"] {
+  --sign-primary: #D946EF;
+  --sign-secondary: #67E8F9;
+  --sign-dark: #A020C0;
+  --sign-glow-rgb: 217,70,239;
+  --sign-cosmic-bg: #060210;
+  --sign-surface: #120820;
+  --sign-bg-light: #180E2A;
+  --sign-card-bg: #1E1232;
+  --sign-nav-bg: rgba(6,2,16,0.95);
+  --sign-nav-scroll: rgba(6,2,16,0.98);
+  --sign-glass-from: rgba(30,18,50,0.88);
+  --sign-glass-to: rgba(22,12,40,0.88);
+}
+
+/* Ancient Palm Leaf - Aged Parchment & Sepia (Light Theme) */
+[data-sign-theme="palm-leaf"] {
+  --sign-primary: #8B6914;
+  --sign-secondary: #B8922A;
+  --sign-dark: #6B4E0A;
+  --sign-glow-rgb: 139,105,20;
+  --sign-cosmic-bg: #F5EDD4;
+  --sign-surface: #EDE3C8;
+  --sign-bg-light: #E4D8B8;
+  --sign-card-bg: #FBF6EA;
+  --sign-nav-bg: rgba(245,237,212,0.95);
+  --sign-nav-scroll: rgba(245,237,212,0.98);
+  --sign-glass-from: rgba(251,246,234,0.92);
+  --sign-glass-to: rgba(237,227,200,0.92);
+  --sign-text-primary: #2C1E08;
+  --sign-text-muted: #6B5830;
+}
+
+/* Palm Leaf light theme: glass card shadows */
+[data-sign-theme="palm-leaf"] .glass-card {
+  box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+}
+[data-sign-theme="palm-leaf"] .glass-card:hover {
+  box-shadow: 0 4px 30px rgba(139,105,20,0.15);
+}
+
+/* Divine Deity - Multi-Deity Saffron Gold & Rose */
+[data-sign-theme="divine-deity"] {
+  --sign-primary: #E8A020;
+  --sign-secondary: #FF7EB3;
+  --sign-dark: #C08010;
+  --sign-glow-rgb: 232,160,32;
+  --sign-cosmic-bg: #100808;
+  --sign-surface: #241410;
+  --sign-bg-light: #2E1A14;
+  --sign-card-bg: #361E18;
+  --sign-nav-bg: rgba(16,8,8,0.95);
+  --sign-nav-scroll: rgba(16,8,8,0.98);
+  --sign-glass-from: rgba(54,30,24,0.88);
+  --sign-glass-to: rgba(44,22,16,0.88);
 }
 
 /* ===== Zodiac Sign Themes (auto-applied on login) ===== */

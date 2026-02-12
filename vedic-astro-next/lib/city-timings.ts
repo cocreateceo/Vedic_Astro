@@ -134,7 +134,7 @@ export function detectCity(): CityData {
 }
 
 // City name aliases (old colonial names → modern names)
-const CITY_ALIASES: Record<string, string> = {
+export const CITY_ALIASES: Record<string, string> = {
   'bangalore': 'Bengaluru',
   'bombay': 'Mumbai',
   'madras': 'Chennai',

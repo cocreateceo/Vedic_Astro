@@ -425,10 +425,100 @@ const tithiPredictions: Record<string, string> = {
  * Generates a PanchangaPrediction object by looking up weekday, nakshatra,
  * and tithi predictions for the given birth data.
  */
+// ---------------------------------------------------------------------------
+// 4. Karanam (Half-Tithi) Predictions
+// ---------------------------------------------------------------------------
+
+const karanamPredictions: Record<string, string> = {
+  Bava: `You are born in Bava Karanam, ruled by Simha (Lion). Bava is a Chara (movable) Karanam, indicating a dynamic and action-oriented personality. According to Muhurta Chintamani, those born in Bava Karanam are blessed with leadership qualities, a commanding presence, and an instinct for initiating new ventures. You possess a natural courage that drives you to take the first step where others hesitate. Your temperament is fiery and ambitious, well suited for positions of authority, entrepreneurship, and pioneering work. You thrive in environments that reward initiative and bold decision-making, and your innate sense of direction ensures that even in challenging circumstances, you find a path forward.`,
+
+  Balava: `You are born in Balava Karanam, ruled by Vyaghra (Tiger). As a Chara Karanam, Balava bestows a powerful, agile, and perceptive nature. Brihat Samhita associates Balava-born individuals with fierce determination tempered by strategic intelligence. You possess the ability to assess situations rapidly and act with precision. Your personality carries an air of quiet authority—others recognize your strength without you needing to assert it overtly. You excel in competitive fields, sports, strategic planning, and any domain where quick reflexes and sharp judgment are valued. Your protective instincts make you a natural guardian of family and community.`,
+
+  Kaulava: `You are born in Kaulava Karanam, ruled by Varaha (Boar). Kaulava is a Chara Karanam associated with persistence, groundedness, and resourcefulness. Those born under this Karanam possess an extraordinary capacity for sustained effort. According to classical texts, Kaulava-born individuals are dependable, practical, and skilled at turning limited resources into abundant outcomes. You have a natural affinity for agriculture, food industries, real estate, and any profession that requires patience and diligence. Your social nature draws people to you, and you find fulfillment in building community and nurturing cooperative ventures.`,
+
+  Taitila: `You are born in Taitila Karanam, ruled by Gardabha (Donkey). Despite its humble symbol, Taitila is a highly auspicious Chara Karanam in Vedic tradition. It signifies endurance, service, and unwavering dedication. According to Muhurta Shastra, Taitila-born individuals possess remarkable stamina—both physical and mental—and can carry heavy responsibilities with grace. You are hardworking, reliable, and fundamentally honest in your dealings. Your success comes through consistent effort rather than sudden windfalls, and this steady approach builds a foundation that withstands the test of time. Fields like logistics, transportation, public service, and healthcare suit your nature.`,
+
+  Garija: `You are born in Garija Karanam (also called Gara), ruled by Gaja (Elephant). Garija is a Chara Karanam symbolizing wisdom, memory, and majestic presence. In Vedic tradition, the elephant represents Ganesha's vehicle and is associated with auspiciousness, intelligence, and removal of obstacles. Those born in Garija Karanam possess a dignified bearing, excellent memory, and the ability to navigate complex situations with patience and wisdom. You are naturally inclined toward education, philosophy, counseling, and administrative roles. Your measured approach to life earns you respect, and your capacity for forgiveness and magnanimity sets you apart as a natural leader.`,
+
+  Vanija: `You are born in Vanija Karanam, ruled by Ashva (Horse). Vanija is a Chara Karanam associated with commerce, speed, and freedom. The horse symbol indicates a love of travel, movement, and exploration. According to classical Jyotish texts, Vanija-born individuals are naturally gifted in trade, commerce, and financial dealings. You possess an intuitive understanding of value and exchange, and your quick thinking enables you to seize opportunities that others miss. Your restless spirit craves new experiences and challenges, making you well suited for careers in trade, travel, sales, marketing, and any field that rewards agility and commercial acumen.`,
+
+  Vishti: `You are born in Vishti Karanam (also called Bhadra), the only inauspicious Karanam among the seven rotating ones. Ruled by Mesha (Ram), Vishti is a Sthira (fixed) Karanam associated with obstacles, conflicts, and intensity. However, Parashari Jyotish teaches that those born in Vishti Karanam possess an extraordinary ability to overcome adversity. Your life path involves transforming challenges into strengths. You carry a fierce independence and an unwillingness to accept defeat that, when channeled constructively, leads to remarkable achievements. Tantric practices, crisis management, defense, and transformative healing are domains where your energy finds its highest expression. The key is to cultivate patience and direct your formidable willpower toward constructive goals.`,
+
+  Shakuni: `You are born in Shakuni Karanam, one of the four Sthira (fixed) Karanams that occur only once in a lunar month. Ruled by Pakshi (Bird), Shakuni signifies sharp perception, freedom, and elevated perspective. Those born in this Karanam possess a keen observational ability—you notice details that others overlook and can perceive patterns from a higher vantage point. Your intuitive intelligence and ability to read situations make you well suited for investigation, research, astrology, and strategic advisory roles. You value your independence deeply and resist being confined by convention.`,
+
+  Chatushpada: `You are born in Chatushpada Karanam, a rare Sthira Karanam ruled by Pashupati (Lord of Animals). This Karanam occurs only once per lunar month and signifies stability, animal magnetism, and connection to nature. Those born under Chatushpada possess a grounded and steady temperament. You have a natural affinity with animals and the natural world, and you may find fulfillment in veterinary science, agriculture, environmental work, or any field connected to the earth. Your four-footed symbol represents stability and balance, and you bring these qualities to everything you undertake.`,
+
+  Naga: `You are born in Naga Karanam, a rare Sthira Karanam ruled by Sarpa (Serpent). In Vedic tradition, the serpent represents Kundalini energy, transformation, and hidden wisdom. Those born in Naga Karanam possess a magnetic, mysterious quality that draws others to them. You have deep intuitive abilities and a natural inclination toward mystical or occult knowledge. Your personality carries layers of complexity, and you reveal your true nature only to those you trust completely. Fields like psychology, research, medicine (especially pharmacology), and spiritual practices suit your Naga nature.`,
+
+  Kimstughna: `You are born in Kimstughna Karanam, the rarest of the four Sthira Karanams, occurring only once per lunar cycle at Shukla Pratipada. According to classical texts, Kimstughna means "what can harm?" — indicating a nature that is resilient against negativity and misfortune. Those born in this Karanam are considered protected by a subtle divine grace. You possess a calm confidence and an ability to emerge unscathed from situations that would overwhelm others. This Karanam favors spiritual pursuits, charitable work, and activities that serve the greater good. Your presence has a stabilizing effect on those around you.`,
+};
+
+// ---------------------------------------------------------------------------
+// 5. Nithya Yoga (Sun-Moon Angular Combination) Predictions
+// ---------------------------------------------------------------------------
+
+const nithyaYogaPredictions: Record<string, string> = {
+  Vishkambha: `You are born in Vishkambha Yoga, the first of the 27 Nithya Yogas. Vishkambha means "support" or "pillar," and those born under this Yoga serve as foundational pillars in their family and community. According to Brihat Parashara Hora Shastra, Vishkambha-born individuals are wealthy, scholarly, and triumph over their adversaries. You possess a commanding presence and natural authority that inspires confidence in others. Your resilience in the face of challenges is remarkable, and you have the ability to bear heavy responsibilities without faltering. Success in government service, administration, and leadership roles is strongly indicated.`,
+
+  Priti: `You are born in Priti Yoga, the Yoga of love and affection. Priti means "pleasure" or "delight," and this Yoga blesses you with a naturally attractive personality, a warm heart, and the ability to form deep emotional connections. According to Phaladeepika, those born in Priti Yoga enjoy material comforts, harmonious relationships, and success in artistic or creative endeavors. Your love of beauty, culture, and refinement influences every aspect of your life. You attract affection effortlessly and are gifted in diplomacy and relationship-building. Careers in arts, hospitality, luxury goods, counseling, and entertainment are highly favorable.`,
+
+  Ayushman: `You are born in Ayushman Yoga, the Yoga of longevity and vitality. Ayushman means "blessed with long life," and this is considered one of the most auspicious Nithya Yogas. Those born under Ayushman enjoy robust health, strong constitution, and a zest for living that persists through all stages of life. Classical texts describe Ayushman-born individuals as popular, spirited, and blessed with the capacity to overcome illness. You possess an innate optimism and physical resilience that serve you well throughout life. Careers in healthcare, sports, fitness, and wellness are naturally aligned with your energy.`,
+
+  Saubhagya: `You are born in Saubhagya Yoga, the Yoga of good fortune. Saubhagya means "auspiciousness" or "marital bliss," and this Yoga bestows a life marked by prosperity, harmonious partnerships, and social respect. According to Brihat Jataka, those born in Saubhagya Yoga are virtuous, intelligent, and enjoy the favor of rulers and people in authority. Your natural charm and ethical character attract good fortune in both personal and professional spheres. Marriage and partnerships are especially blessed, and you find success through collaboration and mutual support.`,
+
+  Shobhana: `You are born in Shobhana Yoga, the Yoga of beauty and radiance. Shobhana means "splendor," and this Yoga graces you with an attractive appearance, refined tastes, and an appreciation for all things beautiful. Classical Jyotish texts describe Shobhana-born individuals as pleasure-loving, sensually aware, and gifted with an aesthetic sensibility that influences their entire outlook. You are drawn to art, music, fashion, architecture, and design. Your personal magnetism and sense of style set you apart in social settings, and you have a natural ability to create beauty and harmony in your environment.`,
+
+  Atiganda: `You are born in Atiganda Yoga, which indicates a personality marked by intensity and emotional depth. Atiganda means "great knot" or "obstacle," but in Vedic understanding, this signifies the capacity to untangle complex problems. While this Yoga can bring challenges—particularly in relationships and financial matters—it simultaneously bestows remarkable problem-solving abilities and resilience. Those born under Atiganda are often drawn to fields that deal with complexity: law, detective work, research, psychology, or engineering. Your ability to persist through difficulties where others give up is your greatest asset.`,
+
+  Sukarma: `You are born in Sukarma Yoga, the Yoga of good deeds and righteous action. Sukarma means "virtuous work," and this Yoga blesses you with a strong moral compass, a generous nature, and the inclination to serve others. According to classical texts, Sukarma-born individuals find their greatest fulfillment through ethical conduct and humanitarian work. You possess a natural talent for organizing charitable efforts and community service. Your reputation for integrity attracts trustworthy friends and loyal colleagues, and your good deeds create a virtuous cycle of karmic rewards throughout life.`,
+
+  Dhriti: `You are born in Dhriti Yoga, the Yoga of steadfastness and determination. Dhriti means "firmness" or "courage," and this Yoga endows you with an unwavering resolve that sees you through even the most challenging circumstances. Brihat Parashara Hora Shastra describes Dhriti-born individuals as wealthy, charitable, and blessed with a stable temperament. You are the person others turn to in times of crisis because your calm demeanor and clear thinking inspire confidence. Financial stability comes naturally to you, and you excel in fields requiring patience, discipline, and long-term commitment.`,
+
+  Shula: `You are born in Shula Yoga, named after Shiva's trident. Shula means "spear" or "pain," but in spiritual terms, it represents the piercing insight that cuts through illusion. Those born under Shula Yoga possess a sharp intellect, direct communication style, and the ability to see through pretense. While this Yoga can indicate periods of difficulty or health challenges, it simultaneously bestows the courage and spiritual depth to transform suffering into wisdom. You are drawn to healing professions, spiritual practice, and any field where penetrating insight is valued. Worship of Lord Shiva is particularly beneficial.`,
+
+  Ganda: `You are born in Ganda Yoga, which signifies complexity and transformative potential. Ganda means "knot" and represents the karmic entanglements that, when consciously resolved, lead to profound personal growth. Those born under this Yoga face a life path that requires navigating challenges with wisdom and patience. However, the very process of overcoming these challenges develops extraordinary inner strength. You are likely drawn to problem-solving, research, crisis intervention, or spiritual healing. The key to harnessing Ganda Yoga's power is maintaining a spiritual practice and cultivating equanimity.`,
+
+  Vriddhi: `You are born in Vriddhi Yoga, the Yoga of growth and prosperity. Vriddhi means "increase" or "progress," and this is among the most favorable Nithya Yogas. Those born under Vriddhi experience a life characterized by steady upward growth in all areas—wealth, knowledge, family, and spiritual understanding. According to Phaladeepika, Vriddhi-born individuals are intelligent, blessed with expanding fortunes, and possess the ability to multiply whatever resources they touch. You have a natural gift for investment, education, and any endeavor where growth and accumulation are the primary objectives.`,
+
+  Dhruva: `You are born in Dhruva Yoga, the Yoga of stability and permanence. Dhruva means "fixed" or "pole star," and this Yoga bestows a steady, reliable, and enduring nature. Like the North Star that guides travelers, you serve as a point of reference and stability for those around you. According to classical texts, Dhruva-born individuals enjoy lasting wealth, stable health, and long-term success in their chosen fields. Real estate, agriculture, government service, and any career requiring consistency and dependability are highly favorable. Your commitments are firm, and your word is your bond.`,
+
+  Vyaghata: `You are born in Vyaghata Yoga, which signifies striking power and the ability to overcome obstacles through direct action. Vyaghata means "beating" or "destroying obstacles," and those born under this Yoga possess a forceful personality that commands respect. While this Yoga can indicate a combative temperament, it also bestows the courage and determination needed to remove barriers that stand in the way of progress. You excel in competitive environments, sports, law enforcement, military service, and any field where decisive action creates results.`,
+
+  Harshana: `You are born in Harshana Yoga, the Yoga of joy and delight. Harshana means "happiness," and this Yoga blesses you with an optimistic outlook, a cheerful disposition, and the ability to find joy in simple pleasures. According to Brihat Parashara Hora Shastra, Harshana-born individuals are intelligent, learned, and skilled in various arts and sciences. Your natural enthusiasm is infectious, lifting the spirits of everyone around you. Careers in entertainment, education, motivational speaking, and the creative arts are especially favorable. You have a gift for making complex subjects accessible and enjoyable.`,
+
+  Vajra: `You are born in Vajra Yoga, the Yoga of the thunderbolt. Vajra means "diamond" or "thunderbolt," symbolizing both indestructible hardness and sudden illumination. Those born under Vajra Yoga possess a powerful personality marked by resilience, strength, and the capacity for sudden breakthroughs. According to classical texts, Vajra-born individuals are brave, decisive, and capable of withstanding tremendous pressure. You may experience life as a series of dramatic turning points rather than gradual progressions. Military strategy, engineering, gemology, metallurgy, and transformative healing are fields aligned with your Vajra nature.`,
+
+  Siddhi: `You are born in Siddhi Yoga, the Yoga of accomplishment and spiritual attainment. Siddhi means "perfection" or "supernatural power," and this is one of the most auspicious Nithya Yogas. Those born under Siddhi are destined to achieve mastery in their chosen field. According to Phaladeepika, Siddhi-born individuals are scholarly, skilled in arts, and blessed with the ability to bring projects to successful completion. You have a natural inclination toward perfection and excellence that drives you to develop your skills to the highest level. Teaching, research, medicine, and spiritual practice are particularly favorable.`,
+
+  Vyatipata: `You are born in Vyatipata Yoga, which carries transformative energy of great intensity. Vyatipata means "great fall" or "calamity" in its literal sense, but spiritually it represents the dissolution of ego that precedes genuine awakening. Those born under this Yoga possess a profound capacity for transformation and regeneration. Life may present dramatic challenges, but your ability to rise from adversity and emerge stronger is remarkable. You are drawn to deep healing work, crisis counseling, hospice care, spiritual direction, and any field where comfort is provided during transformation.`,
+
+  Variyan: `You are born in Variyan Yoga, the Yoga of excellence and superiority. Variyan means "most excellent" or "supreme," and this Yoga bestows exceptional abilities in whatever domain you choose to focus upon. According to classical texts, Variyan-born individuals are comfortable, happy, and skilled in their profession. You possess a natural confidence born of genuine competence, and others look to you as an authority in your area of expertise. Leadership positions, consulting, academic excellence, and specialized professional work are strongly indicated.`,
+
+  Parigha: `You are born in Parigha Yoga, the Yoga of the iron gate or barrier. Parigha means "obstruction," but in Vedic understanding, barriers serve as both protections and tests. Those born under Parigha Yoga develop extraordinary resilience through facing and overcoming repeated obstacles. Your life path teaches that every closed door conceals a greater opportunity. According to classical texts, Parigha-born individuals eventually achieve wealth and fame through persistent effort. Security services, fortification, defense architecture, and protective professions align with your nature.`,
+
+  Shiva: `You are born in Shiva Yoga, one of the most auspicious Nithya Yogas, blessed by Lord Shiva's grace. Shiva means "auspicious" or "benevolent," and this Yoga bestows spiritual depth, material prosperity, and social respect. According to Brihat Parashara Hora Shastra, Shiva-born individuals are learned, wealthy, engaged in agriculture or trade, and devoted to spiritual practice. You possess a rare combination of worldly competence and spiritual awareness that enables you to navigate both material and transcendent realms with equal facility. Religious leadership, business, and healing work are strongly favorable.`,
+
+  Siddha: `You are born in Siddha Yoga, the Yoga of the accomplished one. Siddha means "one who has attained," and this highly auspicious Yoga indicates a soul that carries wisdom and skill from previous incarnations. According to classical texts, Siddha-born individuals are eloquent, virtuous, and naturally successful in their endeavors. You possess an intuitive understanding of how things work—whether in business, relationships, or spiritual practice—that gives you an advantage in everything you undertake. Teaching, medicine, law, and spiritual counseling are particularly favorable career paths.`,
+
+  Sadhya: `You are born in Sadhya Yoga, the Yoga of accomplishment. Sadhya means "that which can be achieved," and this Yoga blesses you with the ability to bring goals to fruition. According to Phaladeepika, Sadhya-born individuals are well-mannered, accomplished, and skilled in sacred rituals. You possess a practical wisdom that enables you to assess what is achievable and then methodically work toward it. Your approach to life is grounded and realistic, yet never lacking in ambition. Project management, ritual priesthood, event coordination, and completion-oriented professions suit your nature.`,
+
+  Shubha: `You are born in Shubha Yoga, the Yoga of auspiciousness. Shubha means "good" or "virtuous," and this Yoga bestows a naturally fortunate disposition. According to classical texts, Shubha-born individuals are lustrous in appearance, eloquent in speech, and beloved by virtuous people. You carry a natural grace that attracts positive circumstances and good relationships. Your ethical nature and pleasant demeanor make you welcome in every social circle. Arts, education, counseling, philanthropy, and any profession that serves the betterment of society are strongly favored.`,
+
+  Shukla: `You are born in Shukla Yoga, the Yoga of brightness and purity. Shukla means "white" or "pure," and this Yoga blesses you with clarity of thought, moral purity, and an illuminated intellect. According to Brihat Parashara Hora Shastra, Shukla-born individuals are irritable by nature but possess a sharp intelligence and strong work ethic. Your mind is like a clear lens that perceives truth without distortion. You value honesty above social convenience and prefer straightforward communication. Academic research, spiritual philosophy, mathematics, and purification-related industries align with your Shukla nature.`,
+
+  Brahma: `You are born in Brahma Yoga, named after the Creator God. Brahma means "the creator," and this Yoga bestows tremendous creative power and the ability to bring new things into existence. According to classical texts, Brahma-born individuals are learned in sacred texts, truthful, and skilled in their professional duties. You possess an innate creative intelligence that enables you to envision and manifest new ideas, projects, and enterprises. Architecture, creative writing, innovation, education, and any field requiring original thinking and creative vision are strongly favored.`,
+
+  Indra: `You are born in Indra Yoga, named after the king of the Devas. Indra means "ruler" or "chief," and this Yoga bestows leadership abilities, material prosperity, and social prominence. According to Phaladeepika, Indra-born individuals are wealthy, powerful, and respected by rulers and authorities. You possess a regal bearing and natural command that draws others to follow your lead. Government service, corporate leadership, military command, politics, and any position of authority and responsibility are strongly indicated. Your generous nature wins you loyal allies and supporters.`,
+
+  Vaidhriti: `You are born in Vaidhriti Yoga, the final and most complex of the 27 Nithya Yogas. Vaidhriti means "great support" or "sustenance," and despite being classified as challenging by some texts, this Yoga carries profound spiritual significance. Those born under Vaidhriti possess a deep connection to the cosmic rhythms and cycles of creation. You may experience life as a series of intense transformations that serve your soul's evolution. Classical texts recommend strong spiritual practice and devotion to dharma. Astrology, spiritual counseling, hospice work, and transformative healing are aligned with your path.`,
+};
+
 export function generatePanchangaPredictions(
   dob: string,
   nakshatra: string,
-  tithi: string
+  tithi: string,
+  karanam?: string,
+  nithyaYoga?: string
 ): PanchangaPrediction {
   // --- Weekday lookup ---
   const date = new Date(dob + 'T00:00:00');
@@ -500,6 +590,34 @@ export function generatePanchangaPredictions(
     tithiPrediction = tithiPredictions['Shukla Pratipada'];
   }
 
+  // --- Karanam lookup ---
+  const karanamName = karanam ? normalizeKey(karanam) : 'Bava';
+  let karanamPrediction = karanamPredictions[karanamName];
+  if (!karanamPrediction) {
+    const lowerTarget = karanamName.toLowerCase();
+    for (const [key, value] of Object.entries(karanamPredictions)) {
+      if (key.toLowerCase() === lowerTarget || key.toLowerCase().includes(lowerTarget) || lowerTarget.includes(key.toLowerCase())) {
+        karanamPrediction = value;
+        break;
+      }
+    }
+  }
+  if (!karanamPrediction) karanamPrediction = karanamPredictions['Bava'];
+
+  // --- Nithya Yoga lookup ---
+  const yogaName = nithyaYoga ? normalizeKey(nithyaYoga) : 'Vishkambha';
+  let yogaPrediction = nithyaYogaPredictions[yogaName];
+  if (!yogaPrediction) {
+    const lowerTarget = yogaName.toLowerCase();
+    for (const [key, value] of Object.entries(nithyaYogaPredictions)) {
+      if (key.toLowerCase() === lowerTarget || key.toLowerCase().includes(lowerTarget) || lowerTarget.includes(key.toLowerCase())) {
+        yogaPrediction = value;
+        break;
+      }
+    }
+  }
+  if (!yogaPrediction) yogaPrediction = nithyaYogaPredictions['Vishkambha'];
+
   return {
     weekdayOfBirth: {
       day: dayName,
@@ -513,6 +631,14 @@ export function generatePanchangaPredictions(
     birthTithi: {
       name: tithiNormalized,
       prediction: tithiPrediction,
+    },
+    birthKaranam: {
+      name: karanamName,
+      prediction: karanamPrediction,
+    },
+    birthNithyaYoga: {
+      name: yogaName,
+      prediction: yogaPrediction,
     },
   };
 }

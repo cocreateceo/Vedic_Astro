@@ -34,8 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     auth.initUsersStorage();
     const currentUser = auth.getCurrentUser();
     if (currentUser) {
+      // Recalculate chart if engine was updated since last login
+      const migrated = auth.migrateChartIfNeeded();
       const refreshed = auth.refreshHoroscope();
-      setUser(refreshed || currentUser);
+      setUser(migrated || refreshed || currentUser);
     }
     setLoading(false);
   }, []);

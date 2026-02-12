@@ -2,7 +2,7 @@ export type SignKey =
   | 'aries' | 'taurus' | 'gemini' | 'cancer' | 'leo' | 'virgo'
   | 'libra' | 'scorpio' | 'sagittarius' | 'capricorn' | 'aquarius' | 'pisces';
 
-export type VisualThemeKey = 'vedic-ember' | 'sacred-light' | 'sacred-fire' | 'temple-gold' | 'cosmic-night' | 'ocean-deep';
+export type VisualThemeKey = 'vedic-ember' | 'sacred-light' | 'sacred-fire' | 'temple-gold' | 'cosmic-night' | 'ocean-deep' | 'cosmic-temple' | 'celestial-universe' | 'palm-leaf' | 'divine-deity';
 
 export type ThemeKey = SignKey | VisualThemeKey;
 
@@ -95,6 +95,7 @@ export const SIGN_PALETTES: Record<SignKey, SignPalette> = {
 
 export const VISUAL_THEME_KEYS: VisualThemeKey[] = [
   'vedic-ember', 'sacred-light', 'sacred-fire', 'temple-gold', 'cosmic-night', 'ocean-deep',
+  'cosmic-temple', 'celestial-universe', 'palm-leaf', 'divine-deity',
 ];
 
 export const VISUAL_THEMES: Record<VisualThemeKey, VisualTheme> = {
@@ -109,9 +110,9 @@ export const VISUAL_THEMES: Record<VisualThemeKey, VisualTheme> = {
     glowRgb: '192,120,32', bgTint: 'rgba(192,120,32,0.06)',
   },
   'sacred-fire': {
-    key: 'sacred-fire', name: 'Sacred Fire', description: 'Crimson flames',
-    primary: '#F01040', secondary: '#FF4060', dark: '#B80C30',
-    glowRgb: '240,16,64', bgTint: 'rgba(240,16,64,0.06)',
+    key: 'sacred-fire', name: 'Sacred Fire', description: 'Yagna havan flames',
+    primary: '#E85820', secondary: '#FFB848', dark: '#B83E10',
+    glowRgb: '232,88,32', bgTint: 'rgba(232,88,32,0.06)',
   },
   'temple-gold': {
     key: 'temple-gold', name: 'Temple Gold', description: 'Classic golden',
@@ -127,6 +128,26 @@ export const VISUAL_THEMES: Record<VisualThemeKey, VisualTheme> = {
     key: 'ocean-deep', name: 'Ocean Deep', description: 'Teal ocean depths',
     primary: '#00D4D8', secondary: '#40F0E0', dark: '#009898',
     glowRgb: '0,212,216', bgTint: 'rgba(0,212,216,0.06)',
+  },
+  'cosmic-temple': {
+    key: 'cosmic-temple', name: 'Cosmic Temple', description: 'Temple gopuram against starfield',
+    primary: '#7B2FBE', secondary: '#C490FF', dark: '#5A1D90',
+    glowRgb: '123,47,190', bgTint: 'rgba(123,47,190,0.06)',
+  },
+  'celestial-universe': {
+    key: 'celestial-universe', name: 'Celestial Universe', description: 'Deep space nebulae',
+    primary: '#D946EF', secondary: '#67E8F9', dark: '#A020C0',
+    glowRgb: '217,70,239', bgTint: 'rgba(217,70,239,0.06)',
+  },
+  'palm-leaf': {
+    key: 'palm-leaf', name: 'Ancient Palm Leaf', description: 'Aged parchment & sepia',
+    primary: '#8B6914', secondary: '#B8922A', dark: '#6B4E0A',
+    glowRgb: '139,105,20', bgTint: 'rgba(139,105,20,0.06)',
+  },
+  'divine-deity': {
+    key: 'divine-deity', name: 'Divine Deity', description: 'Multi-deity saffron glow',
+    primary: '#E8A020', secondary: '#FF7EB3', dark: '#C08010',
+    glowRgb: '232,160,32', bgTint: 'rgba(232,160,32,0.06)',
   },
 };
 

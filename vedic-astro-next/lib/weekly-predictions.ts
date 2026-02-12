@@ -7,7 +7,7 @@
  */
 
 import { VedicChart, WeeklyPrediction, DayHighlight, ActivityRecommendation } from '@/types';
-import { rashiDetails } from '@/lib/horoscope-data';
+import { rashiDetails, generateDailyContent } from '@/lib/horoscope-data';
 
 // ---------- Weekly Overview Templates ----------
 
@@ -684,6 +684,7 @@ export function generateWeeklyPrediction(vedicChart: VedicChart, date: Date): We
     const bestFor = pickItems(dayActivities[mood], 2 + Math.floor(rand() * 2), rand);
     const avoidFor = pickItems(dayAvoidActivities[mood], 1 + Math.floor(rand() * 2), rand);
     const briefNote = pickOne(briefNoteTemplates[mood], rand);
+    const detailed = generateDailyContent(moonSignIndex, vedicChart.nakshatra, dayDate);
 
     dayHighlights.push({
       dayName,
@@ -692,6 +693,7 @@ export function generateWeeklyPrediction(vedicChart: VedicChart, date: Date): We
       bestFor,
       avoidFor,
       briefNote,
+      detailed,
     });
   }
 

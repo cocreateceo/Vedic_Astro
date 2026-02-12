@@ -18,6 +18,7 @@ import {
   HoroscopeData,
   PlanetAnalysis,
   DailyTimings,
+  DayDetailedReport,
   TimePeriod,
 } from '@/types';
 import { generateWeeklyPrediction } from '@/lib/weekly-predictions';
@@ -1000,9 +1001,7 @@ export function calculateDailyTimings(dayOfWeek: number, moonSignIndex: number, 
   return { rahuKaal, yamagandam, gulikaKaal, abhijitMuhurat, bestHours, allPeriods };
 }
 
-export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date = new Date()): HoroscopeData {
-  const moonSignIndex = vedicChart.moonSign.index;
-  const nakshatra = vedicChart.nakshatra;
+export function generateDailyContent(moonSignIndex: number, nakshatra: string, date: Date): DayDetailedReport {
   const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
   const dayOfWeek = date.getDay();
   const dateNum = date.getDate();
@@ -1015,19 +1014,19 @@ export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date
 
   const isPositiveDay = (seed % 7) < 5;
 
-  const generalPrediction = isPositiveDay
+  const general = isPositiveDay
     ? predictions.generalPositive[seed % predictions.generalPositive.length]
     : predictions.generalChallenging[seed % predictions.generalChallenging.length];
 
-  const careerPrediction = isPositiveDay
+  const career = isPositiveDay
     ? predictions.careerPositive[seed % predictions.careerPositive.length]
     : predictions.careerChallenging[seed % predictions.careerChallenging.length];
 
-  const lovePrediction = isPositiveDay
+  const love = isPositiveDay
     ? predictions.lovePositive[seed % predictions.lovePositive.length]
     : predictions.loveChallenging[seed % predictions.loveChallenging.length];
 
-  const healthAdvice = predictions.healthAdvice[seed % predictions.healthAdvice.length];
+  const health = predictions.healthAdvice[seed % predictions.healthAdvice.length];
 
   const baseRating = isPositiveDay ? 65 : 45;
   const ratings = {
@@ -1038,10 +1037,35 @@ export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date
     finance: Math.min(95, baseRating + ((seed * 5) % 26)),
   };
 
-  const dailyRemedies = predictions.remedies.slice(0, 3);
-  dailyRemedies.push(nakshatraData.mantra || rashiData.mantra);
+  const remedies = predictions.remedies.slice(0, 3);
+  remedies.push(nakshatraData.mantra || rashiData.mantra);
 
-  const dailyTimings = calculateDailyTimings(dayOfWeek, moonSignIndex);
+  const timings = calculateDailyTimings(dayOfWeek, moonSignIndex);
+
+  return {
+    general,
+    career,
+    love,
+    health,
+    ratings,
+    lucky: {
+      number: rashiData.luckyNumbers[dateNum % rashiData.luckyNumbers.length],
+      color: rashiData.luckyColors[dayOfWeek % rashiData.luckyColors.length],
+      day: rashiData.luckyDays[dayOfWeek % rashiData.luckyDays.length],
+      direction: rashiData.direction,
+    },
+    remedies,
+    mantra: rashiData.mantra,
+    timings,
+  };
+}
+
+export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date = new Date()): HoroscopeData {
+  const moonSignIndex = vedicChart.moonSign.index;
+  const rashiData = rashiDetails[moonSignIndex];
+  const nakshatraData = nakshatraDetails[vedicChart.nakshatra] || {} as NakshatraDetail;
+
+  const daily = generateDailyContent(moonSignIndex, vedicChart.nakshatra, date);
 
   // Generate rich weekly & monthly predictions
   const weeklyPrediction = generateWeeklyPrediction(vedicChart, date);
@@ -1052,7 +1076,9 @@ export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date
   const panchangaPrediction = generatePanchangaPredictions(
     vedicChart.birthDetails.date,
     vedicChart.nakshatra,
-    birthPanchang.tithi
+    birthPanchang.tithi,
+    birthPanchang.karana,
+    birthPanchang.yoga
   );
 
   // Generate bhava (house) predictions
@@ -1064,20 +1090,15 @@ export function generatePersonalizedHoroscope(vedicChart: VedicChart, date: Date
     moonSign: rashiData,
     nakshatra: nakshatraData,
     daily: {
-      general: generalPrediction,
-      career: careerPrediction,
-      love: lovePrediction,
-      health: healthAdvice,
-      ratings,
-      lucky: {
-        number: rashiData.luckyNumbers[dateNum % rashiData.luckyNumbers.length],
-        color: rashiData.luckyColors[dayOfWeek % rashiData.luckyColors.length],
-        day: rashiData.luckyDays[dayOfWeek % rashiData.luckyDays.length],
-        direction: rashiData.direction,
-      },
-      remedies: dailyRemedies,
-      mantra: rashiData.mantra,
-      timings: dailyTimings,
+      general: daily.general,
+      career: daily.career,
+      love: daily.love,
+      health: daily.health,
+      ratings: daily.ratings,
+      lucky: daily.lucky,
+      remedies: daily.remedies,
+      mantra: daily.mantra,
+      timings: daily.timings,
     },
     weekly: weeklyPrediction,
     monthly: monthlyPrediction,

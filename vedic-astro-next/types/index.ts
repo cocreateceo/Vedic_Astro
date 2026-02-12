@@ -108,6 +108,7 @@ export interface VedicChart {
     time: string;
     place: string;
   };
+  engineVersion?: number;
 }
 
 export interface User {
@@ -140,6 +141,18 @@ export interface DailyTimings {
   abhijitMuhurat: { start: string; end: string };
   bestHours: { start: string; end: string; activity: string }[];
   allPeriods: TimePeriod[];
+}
+
+export interface DayDetailedReport {
+  general: string;
+  career: string;
+  love: string;
+  health: string;
+  ratings: Record<string, number>;
+  lucky: { number: number; color: string; day: string; direction: string };
+  remedies: string[];
+  mantra: string;
+  timings: DailyTimings;
 }
 
 export interface HoroscopeData {
@@ -384,6 +397,7 @@ export interface DayHighlight {
   bestFor: string[];
   avoidFor: string[];
   briefNote: string;
+  detailed?: DayDetailedReport;
 }
 
 export interface ActivityRecommendation {
@@ -466,6 +480,14 @@ export interface PanchangaPrediction {
     prediction: string;
   };
   birthTithi: {
+    name: string;
+    prediction: string;
+  };
+  birthKaranam: {
+    name: string;
+    prediction: string;
+  };
+  birthNithyaYoga: {
     name: string;
     prediction: string;
   };

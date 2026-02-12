@@ -608,4 +608,271 @@ Output: Chart data (houses, planets, nakshatras)
 ---
 
 *Document compiled from: Vedic_Astrology_Application_Development_Guide.docx and additional research*
-*Last updated: January 2026*
+
+---
+
+## Part 8: Deployment Guide (Vedic Astro Project)
+
+This section covers deploying the actual Vedic Astro application to AWS. It should take **2-3 minutes** if done correctly. If it's taking longer, see the Troubleshooting section below.
+
+### 8.1 Infrastructure Overview
+
+| Component | Service | Details |
+|-----------|---------|---------|
+| **Static Site** | S3 + CloudFront | Next.js static export (17 pages) |
+| **API** | API Gateway v2 | 6 routes (newsletter, contact, booking) |
+| **Database** | DynamoDB | 3 tables (Subscribers, ContactMessages, Bookings) |
+| **Email** | SES | Newsletter delivery via cocreateidea.com |
+| **Cron Jobs** | EventBridge | Daily/Weekly/Monthly newsletter sends |
+| **IaC Tool** | SST v3.17.38 | Orchestrates all resources via Pulumi |
+
+**AWS Region:** us-east-1
+**AWS Profile:** `cocreate`
+**Stage:** `production`
+**Site URL:** https://d3r8o59ewzr723.cloudfront.net
+**API URL:** https://nudjdvlmf4.execute-api.us-east-1.amazonaws.com
+
+### 8.2 Prerequisites
+
+1. **Node.js** installed at `C:\Program Files\nodejs`
+2. **AWS CLI** configured with profile `cocreate` (`aws configure --profile cocreate`)
+3. **SST** installed: `npm install` in project root (sst is a dev dependency)
+4. **Pulumi** binary at `C:\Users\patta\AppData\Roaming\sst\bin\pulumi.exe`
+
+### 8.3 Quick Deploy (Happy Path - 2 to 3 minutes)
+
+Open **PowerShell** or **Windows Terminal** (NOT Git Bash) and run:
+
+```powershell
+cd C:\Projects\Vedic_Astro
+$env:AWS_PROFILE = "cocreate"
+npx sst deploy --stage production
+```
+
+SST will:
+1. Build 5 Lambda functions (~3s)
+2. Run `npx next build` inside `vedic-astro-next/` (~5s)
+3. Generate 17 static pages (~1s)
+4. Upload to S3 (~2s)
+5. Invalidate CloudFront cache (~1-2 min)
+6. Print outputs (site URL + API URL)
+
+**Total: ~2-3 minutes**
+
+### 8.4 Deploy from Claude Code / Git Bash
+
+Claude Code uses Git Bash which cannot run `cmd.exe` commands properly. Use this exact command:
+
+```bash
+cd "C:/Projects/Vedic_Astro" && \
+  PATH="/c/Program Files/nodejs:$PATH" \
+  AWS_PROFILE=cocreate \
+  "C:/Program Files/nodejs/node.exe" \
+  node_modules/sst/bin/sst.mjs deploy --stage production
+```
+
+**Key points:**
+- Must prepend `/c/Program Files/nodejs` to PATH so SST's child processes can find `node`
+- Must use forward slashes in paths
+- Must call `node.exe` directly (not `npx`)
+- Must set `AWS_PROFILE=cocreate` as env var
+
+### 8.5 If Deployment is Locked (SST State Lock)
+
+SST uses Pulumi which takes a state lock in S3 before deploying. If a previous deploy was killed mid-flight, the lock stays and blocks all future deploys.
+
+**Symptoms:**
+```
+error: the stack is currently locked by 1 lock(s). Use `pulumi cancel` to remove.
+```
+
+**Fix — Unlock first:**
+```bash
+# From Git Bash / Claude Code:
+cd "C:/Projects/Vedic_Astro" && \
+  PATH="/c/Program Files/nodejs:$PATH" \
+  AWS_PROFILE=cocreate \
+  "C:/Program Files/nodejs/node.exe" \
+  node_modules/sst/bin/sst.mjs unlock --stage production
+
+# From PowerShell:
+cd C:\Projects\Vedic_Astro
+$env:AWS_PROFILE = "cocreate"
+npx sst unlock --stage production
+```
+
+Then deploy again.
+
+**Why locks happen:**
+- Deploy process killed via Ctrl+C, Task Manager, or session timeout
+- Claude Code conversation context ran out while deploy was running in background
+- Multiple SST processes running simultaneously (zombie from previous session)
+
+**Prevention:**
+- Always let SST finish naturally
+- If you must kill it, run `sst unlock` before the next deploy
+- Check for zombie processes: `tasklist | findstr "node.exe"` and kill any old SST processes
+
+### 8.6 Verify Deployment
+
+After deploy completes, verify the site:
+
+1. **Hard refresh** the site: Ctrl+Shift+R on https://d3r8o59ewzr723.cloudfront.net
+2. Check the **Kundli page** — enter reference chart details and verify positions
+3. Check the **Dashboard** — existing users should see recalculated chart data
+4. Check SST outputs: `cat .sst/outputs.json`
+
+### 8.7 Engine Version Migration
+
+When the astronomy engine is updated, existing users have stale chart data in localStorage (calculated with the old engine). The app handles this automatically:
+
+- `CHART_ENGINE_VERSION` in `lib/auth.ts` — bump this number after engine changes
+- `migrateChartIfNeeded()` runs on every page load, checks stored version vs current
+- If mismatched, it auto-recalculates the chart using `updateBirthDetails()`
+- No user action needed — chart updates silently on next visit
+
+**To trigger a migration after an engine update:**
+1. Increment `CHART_ENGINE_VERSION` in `vedic-astro-next/lib/auth.ts`
+2. Deploy
+3. All users get recalculated charts on their next visit
+
+---
+
+## Part 9: Deployment Incident Report (Feb 2026)
+
+### What Happened
+
+A routine deploy that should have taken 2-3 minutes took ~1 hour across two sessions, with multiple failed attempts.
+
+### Timeline
+
+| Time | Event | Duration |
+|------|-------|----------|
+| Session 1 | Started deploy, SST locked by previous zombie process | ~15 min |
+| Session 1 | Killed zombie PID 42900, restarted deploy | ~10 min |
+| Session 1 | Deploy completed but hung on CloudFront invalidation | ~15 min |
+| Session 1 | Killed SST, left stale lock. Context ran out. | - |
+| Session 2 | Code fix for stale localStorage data (3 files) | ~5 min |
+| Session 2 | 5 failed build attempts due to cmd.exe output issues | ~15 min |
+| Session 2 | Successful build + deploy, hung on CloudFront invalidation again | ~10 min |
+
+### Root Causes
+
+#### 1. Zombie SST Process (Biggest Time Waster)
+- **Problem:** Previous session's SST process (PID 42900) was killed mid-deploy but left running as zombie
+- **Impact:** Every new deploy attempt was blocked by Pulumi state lock
+- **Fix:** `tasklist | findstr sst` to find zombies, then `taskkill /PID <pid> /T /F`
+- **Prevention:** Always let SST finish. If you must kill it, check for zombies and unlock state.
+
+#### 2. cmd.exe Swallows All Output in Git Bash
+- **Problem:** Running `cmd.exe /c "..."` from Git Bash produces zero output — even `echo hello` shows nothing
+- **Impact:** 4 wasted attempts where deploy appeared to "complete instantly" but nothing happened
+- **Fix:** Never use `cmd.exe` from Git Bash. Call `node.exe` directly with forward-slash paths
+- **Working pattern:** `"C:/Program Files/nodejs/node.exe" node_modules/sst/bin/sst.mjs ...`
+- **Broken pattern:** `cmd.exe /c "npx sst deploy ..."` (produces no output)
+
+#### 3. PATH Not Inherited by SST Child Processes
+- **Problem:** SST found node (called directly), but its child processes (Next.js build, Pulumi) couldn't find `node` in PATH
+- **Error:** `"node": executable file not found in %PATH%`
+- **Fix:** Prepend `PATH="/c/Program Files/nodejs:$PATH"` before calling SST
+- **Why:** Git Bash has Unix-style PATH. SST spawns Windows child processes that need Windows PATH entries.
+
+#### 4. CloudFront Invalidation Hangs SST
+- **Problem:** SST waits synchronously for CloudFront to confirm invalidation complete
+- **Impact:** Process appears "stuck" for 5-15 minutes after all real work is done
+- **Reality:** By the time you see `VedicAstroSiteInvalidation` in output, files are already on S3 and CloudFront will serve them within minutes
+- **Fix:** Wait patiently, or kill and unlock if you need to move on. The deploy IS complete.
+
+#### 5. TypeScript Error in New Code
+- **Problem:** Cast `VedicChart as Record<string, unknown>` was rejected by TypeScript
+- **Fix:** Used direct property access since `engineVersion` was already added to the type
+- **Lesson:** Always add type field first, then access it directly. Don't use unsafe casts.
+
+### What Should Have Happened (Ideal Flow)
+
+```
+1. Open PowerShell                              (0 sec)
+2. cd C:\Projects\Vedic_Astro                   (0 sec)
+3. $env:AWS_PROFILE = "cocreate"                (0 sec)
+4. npx sst deploy --stage production            (2-3 min)
+5. Done. Verify site.                           (30 sec)
+```
+
+**Total: 3 minutes**
+
+### Lessons Learned
+
+1. **Always deploy from PowerShell/Windows Terminal**, not Git Bash or Claude Code
+2. **Never kill SST mid-deploy** — wait for it to finish, or you'll create zombie locks
+3. **Check for zombies** before deploying if previous session crashed: `tasklist | findstr node`
+4. **Build locally first** (`npx next build`) to catch TypeScript errors before deploying
+5. **CloudFront invalidation is cosmetic** — once S3 upload completes, the deploy is essentially done
+6. **Test code changes with `npx next build`** before starting SST deploy to separate build errors from deploy errors
+7. **Use `_fast-deploy.cmd` for code-only changes** — bypasses SST entirely, deploys in ~30 seconds
+
+---
+
+## Part 10: Fast Deploy — Direct AWS CLI (~30 seconds)
+
+For **code-only changes** (HTML, CSS, JS/TS, page content, styling) that don't touch infrastructure (no new Lambda functions, DynamoDB tables, API routes, or cron jobs), you can bypass SST entirely and deploy directly via AWS CLI.
+
+### 10.1 When to Use Fast Deploy
+
+| Change Type | Use Fast Deploy? | Use SST Deploy? |
+|-------------|-----------------|-----------------|
+| Page content, styling, component changes | Yes | Overkill |
+| Astronomy engine updates | Yes | Overkill |
+| New API route or Lambda function | No | Yes |
+| New DynamoDB table | No | Yes |
+| New cron job | No | Yes |
+| Environment variable changes | No | Yes |
+
+### 10.2 Quick Usage
+
+Open **PowerShell** or **Windows Terminal** and run:
+
+```powershell
+C:\Projects\Vedic_Astro\_fast-deploy.cmd
+```
+
+**What it does (3 steps, ~30 seconds):**
+1. Builds Next.js static export (`npx next build` → `out/` directory)
+2. Syncs `out/` to S3 (`aws s3 sync --delete`)
+3. Creates CloudFront invalidation (`aws cloudfront create-invalidation`)
+
+### 10.3 From Claude Code / Git Bash
+
+```bash
+cd "C:/Projects/Vedic_Astro/vedic-astro-next" && \
+  PATH="/c/Program Files/nodejs:$PATH" \
+  npx next build && \
+  AWS_PROFILE=cocreate \
+  aws s3 sync out/ s3://vedic-astro-production-vedicastrositeassetsbucket-vkhkhbnd/ --delete && \
+  AWS_PROFILE=cocreate \
+  aws cloudfront create-invalidation \
+    --distribution-id E1CTOZPIJ1ZUKP \
+    --paths "/*" > /dev/null 2>&1 && \
+  echo "Deploy complete: https://d3r8o59ewzr723.cloudfront.net"
+```
+
+### 10.4 AWS Resource IDs
+
+| Resource | Value |
+|----------|-------|
+| S3 Bucket | `vedic-astro-production-vedicastrositeassetsbucket-vkhkhbnd` |
+| CloudFront Distribution ID | `E1CTOZPIJ1ZUKP` |
+| CloudFront Domain | `d3r8o59ewzr723.cloudfront.net` |
+| AWS Profile | `cocreate` |
+| AWS Region | `us-east-1` |
+
+### 10.5 Why This Is Safe
+
+- SST's `StaticSite` resource uses S3 + CloudFront with no server-side rendering
+- `aws s3 sync --delete` is idempotent — mirrors the `out/` directory exactly
+- CloudFront invalidation just clears the CDN cache, doesn't change infrastructure
+- SST state is untouched — next `sst deploy` will still work normally
+- No Pulumi state lock involved, so no zombie process risk
+
+---
+
+*Last updated: February 2026*

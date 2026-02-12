@@ -14,10 +14,22 @@ import { analyzeAllDoshas } from '@/lib/dosha-calc';
 import { recommendGemstones } from '@/lib/gemstone-calc';
 import { analyzeTransits, detectSadeSati } from '@/lib/transit-calc';
 import { generateLifeQA } from '@/lib/qa-predictions';
+import { getNakshatraRemedies } from '@/lib/nakshatra-remedies';
+import { getRelevantDasaRemedies } from '@/lib/dasa-remedies';
+import { calculateFavourablePeriods } from '@/lib/favourable-periods';
+import { calculateAshtakavarga } from '@/lib/ashtakavarga';
+import { calculatePratyantardasha } from '@/lib/pratyantardasha';
+import { calculateCombustion, calculatePlanetaryWar, calculateLongitudeTable } from '@/lib/calc-tables';
+import { calculateGrahavastha, calculateShadbala, calculateIshtaKashta, calculateBhavabala, calculateShodasavarga, calculateSayanaLongitude, calculateBhavaTable, calculateKPTable } from '@/lib/shadbala';
+import { generateDashaPredictions } from '@/lib/dasha-predictions';
 import JagadhaKattam from '@/components/dashboard/JagadhaKattam';
+import DayExpandedDetail from '@/components/dashboard/DayExpandedDetail';
 import PdfReport from '@/components/dashboard/PdfReport';
 import NewsletterPreferences from '@/components/dashboard/NewsletterPreferences';
 import { downloadBirthChartPdf } from '@/lib/pdf-download';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
+import BirthTimePicker from '@/components/ui/BirthTimePicker';
+import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 function DashboardContent() {
   const { user, updateBirthDetails, logout, refreshHoroscope } = useAuth();
@@ -27,6 +39,8 @@ function DashboardContent() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
+  const [expandedSubPeriod, setExpandedSubPeriod] = useState<string | null>(null);
+  const [expandedDay, setExpandedDay] = useState<number | null>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,6 +107,66 @@ function DashboardContent() {
 
   const lifeQuestions = useMemo(() => generateLifeQA(chart, yogas, doshas, gemstones, enhancedDashas), [chart, yogas, doshas, gemstones, enhancedDashas]);
 
+  // New PDF sections: Nakshatra Remedies, Dasa Remedies, Favourable Periods
+  const nakshatraRemedy = useMemo(() => getNakshatraRemedies(chart.nakshatra), [chart.nakshatra]);
+  const dasaRemediesList = useMemo(() => getRelevantDasaRemedies(enhancedDashas), [enhancedDashas]);
+  const favourablePeriods = useMemo(() => {
+    if (!user.dob || enhancedDashas.length === 0) return null;
+    return calculateFavourablePeriods(user.dob, enhancedDashas, chart.ascendant.index);
+  }, [user.dob, enhancedDashas, chart.ascendant.index]);
+  const ashtakavargaData = useMemo(() => calculateAshtakavarga(
+    chart.planets as unknown as Record<string, import('@/types').Planet>,
+    chart.ascendant.index
+  ), [chart.planets, chart.ascendant.index]);
+  const pratyantardashaData = useMemo(() => {
+    if (!user.dob || !chart.nakshatra) return null;
+    // Calculate for a focused range around current age
+    const currentAge = Math.floor((Date.now() - new Date(user.dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    const startAge = Math.max(0, currentAge - 2);
+    const endAge = Math.min(90, currentAge + 35);
+    return calculatePratyantardasha(user.dob, chart.nakshatra, chart.ascendant.index, startAge, endAge);
+  }, [user.dob, chart.nakshatra, chart.ascendant.index]);
+
+  // Calculation tables
+  const combustionData = useMemo(() => calculateCombustion(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+  const planetaryWarData = useMemo(() => calculatePlanetaryWar(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+  const longitudeTableData = useMemo(() => calculateLongitudeTable(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+
+  // New Chapter 14 tables
+  const grahavasthaData = useMemo(() => calculateGrahavastha(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+  const shadbalaData = useMemo(() => calculateShadbala(
+    chart.planets as unknown as Record<string, import('@/types').Planet>, chart.ascendant.index
+  ), [chart.planets, chart.ascendant.index]);
+  const ishtaKashtaData = useMemo(() => calculateIshtaKashta(
+    chart.planets as unknown as Record<string, import('@/types').Planet>, chart.ascendant.index
+  ), [chart.planets, chart.ascendant.index]);
+  const bhavabalaData = useMemo(() => calculateBhavabala(
+    chart.planets as unknown as Record<string, import('@/types').Planet>, chart.ascendant.index
+  ), [chart.planets, chart.ascendant.index]);
+  const shodasavargaData = useMemo(() => calculateShodasavarga(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+  const sayanaData = useMemo(() => {
+    const birthYear = user.dob ? new Date(user.dob).getFullYear() : 2000;
+    return calculateSayanaLongitude(chart.planets as unknown as Record<string, import('@/types').Planet>, birthYear);
+  }, [chart.planets, user.dob]);
+  const bhavaTableData = useMemo(() => {
+    const ascDeg = chart.planets?.['Sun'] ? 15 : 15; // Use midpoint as default
+    return calculateBhavaTable(chart.planets as unknown as Record<string, import('@/types').Planet>, chart.ascendant.index, ascDeg);
+  }, [chart.planets, chart.ascendant.index]);
+  const kpTableData = useMemo(() => calculateKPTable(
+    chart.planets as unknown as Record<string, import('@/types').Planet>
+  ), [chart.planets]);
+  const dashaPredictionsData = useMemo(() => generateDashaPredictions(enhancedDashas), [enhancedDashas]);
+
   const activeDoshas = doshas.filter(d => d.detected);
   const planetNames = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
 
@@ -155,7 +229,12 @@ function DashboardContent() {
     { key: 'yogas', label: 'Yogas' },
     { key: 'doshas', label: 'Doshas' },
     { key: 'dasha', label: 'Dasha' },
+    { key: 'sub-periods', label: 'Sub-Periods' },
+    { key: 'ashtaka', label: 'Ashtaka' },
+    { key: 'favourable', label: 'Favourable' },
+    { key: 'remedies', label: 'Remedies' },
     { key: 'gems', label: 'Gems' },
+    { key: 'tables', label: 'Tables' },
   ];
 
   return (
@@ -176,6 +255,23 @@ function DashboardContent() {
         sadeSati={sadeSati}
         enhancedDashas={enhancedDashas}
         lifeQuestions={lifeQuestions}
+        nakshatraRemedy={nakshatraRemedy}
+        dasaRemediesList={dasaRemediesList}
+        favourablePeriods={favourablePeriods}
+        ashtakavarga={ashtakavargaData}
+        pratyantardasha={pratyantardashaData}
+        combustion={combustionData}
+        planetaryWar={planetaryWarData}
+        longitudeTable={longitudeTableData}
+        grahavastha={grahavasthaData}
+        shadbala={shadbalaData}
+        ishtaKashta={ishtaKashtaData}
+        bhavabala={bhavabalaData}
+        shodasavarga={shodasavargaData}
+        sayanaLongitude={sayanaData}
+        bhavaTable={bhavaTableData}
+        kpTable={kpTableData}
+        dashaPredictions={dashaPredictionsData}
       />
       <div className="max-w-[1200px] mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -214,9 +310,9 @@ function DashboardContent() {
                 </div>
               ) : (
                 <form onSubmit={handleBirthEdit} className="space-y-3">
-                  <input type="date" name="edit-dob" defaultValue={user.dob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded px-3 py-2 text-sm text-text-primary" />
-                  <input type="time" name="edit-tob" defaultValue={user.tob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded px-3 py-2 text-sm text-text-primary" />
-                  <input type="text" name="edit-pob" defaultValue={user.pob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded px-3 py-2 text-sm text-text-primary" />
+                  <BirthDatePicker name="edit-dob" defaultValue={user.dob} />
+                  <BirthTimePicker name="edit-tob" defaultValue={user.tob} />
+                  <CityAutocomplete name="edit-pob" defaultValue={user.pob} />
                   <select name="edit-timezone" defaultValue={user.timezone} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded px-3 py-2 text-sm text-text-primary">
                     <option value="Asia/Kolkata">India (IST)</option>
                     <option value="America/New_York">US Eastern</option>
@@ -387,7 +483,7 @@ function DashboardContent() {
             {/* ===== DAILY TAB ===== */}
             {activeTab === 'daily' && horoscope?.daily && (
               <div className="space-y-6 tab-content-enter" key="daily">
-                <div className="glass-card p-8">
+                <div className="glass-card p-8 relative overflow-hidden">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-heading text-sign-primary">Daily Report</h3>
                     <span className="text-text-muted text-xs">{today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
@@ -604,7 +700,7 @@ function DashboardContent() {
             {activeTab === 'planets' && (
               <div className="space-y-6 tab-content-enter" key="planets">
                 {chart.planets && (
-                  <div className="glass-card p-6">
+                  <div className="glass-card p-6 relative overflow-hidden">
                     <h3 className="font-heading text-sign-primary mb-4 text-sm">Planetary Positions</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {Object.entries(chart.planets).map(([planet, data]) => {
@@ -698,13 +794,15 @@ function DashboardContent() {
                                 excellent: 'border-green-500/20 bg-green-500/5', good: 'border-blue-500/20 bg-blue-500/5',
                                 mixed: 'border-yellow-500/20 bg-yellow-500/5', challenging: 'border-red-500/20 bg-red-500/5'
                               };
+                              const isExpanded = expandedDay === i;
                               return (
-                                <div key={i} className={`p-3 rounded-lg border ${moodBorders[d.mood] || 'border-sign-primary/10'}`}>
+                                <div key={i} className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 ${moodBorders[d.mood] || 'border-sign-primary/10'} ${isExpanded ? 'ring-1 ring-sign-primary/30' : 'hover:ring-1 hover:ring-sign-primary/15'}`} onClick={() => setExpandedDay(isExpanded ? null : i)}>
                                   <div className="flex items-center gap-3 mb-2">
                                     <span className={`w-2.5 h-2.5 rounded-full ${moodColors[d.mood]}`} />
                                     <span className="text-text-primary font-medium text-sm">{d.dayName}</span>
                                     <span className="text-text-muted text-xs">{d.date}</span>
-                                    <span className="text-xs capitalize ml-auto px-2 py-0.5 rounded bg-sign-primary/10 text-sign-primary/80">{d.mood}</span>
+                                    <span className="text-xs capitalize px-2 py-0.5 rounded bg-sign-primary/10 text-sign-primary/80 ml-auto">{d.mood}</span>
+                                    <span className={`text-sign-primary/60 text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>&#9660;</span>
                                   </div>
                                   <p className="text-text-muted text-xs mb-2">{d.briefNote}</p>
                                   <div className="flex flex-wrap gap-1.5">
@@ -715,6 +813,9 @@ function DashboardContent() {
                                       <span key={`av-${j}`} className="text-xs bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded">{a}</span>
                                     ))}
                                   </div>
+                                  {isExpanded && d.detailed && (
+                                    <DayExpandedDetail detail={d.detailed} dayName={d.dayName} />
+                                  )}
                                 </div>
                               );
                             })}
@@ -933,7 +1034,7 @@ function DashboardContent() {
                   const p = horoscope.panchanga as PanchangaPrediction;
                   return (
                     <>
-                      <div className="glass-card p-8">
+                      <div className="glass-card p-8 relative overflow-hidden">
                         <h3 className="font-heading text-sign-primary mb-2">Panchanga Predictions</h3>
                         <p className="text-text-muted text-xs mb-6">Birth-time Panchanga analysis based on classical Vedic texts (BPHS, Phaladeepika)</p>
 
@@ -963,7 +1064,7 @@ function DashboardContent() {
                         </div>
 
                         {/* Birth Tithi */}
-                        <div>
+                        <div className="mb-6">
                           <div className="flex items-center gap-3 mb-3">
                             <h4 className="text-text-primary font-medium">Birth Tithi: {p.birthTithi.name || 'Based on birth date'}</h4>
                           </div>
@@ -973,6 +1074,36 @@ function DashboardContent() {
                             ))}
                           </div>
                         </div>
+
+                        {/* Birth Karanam */}
+                        {p.birthKaranam && (
+                          <div className="mb-6">
+                            <div className="flex items-center gap-3 mb-3">
+                              <h4 className="text-text-primary font-medium">Birth Karanam: {p.birthKaranam.name}</h4>
+                              <span className="text-xs px-2 py-0.5 rounded bg-sign-primary/10 text-sign-primary">Half-Tithi</span>
+                            </div>
+                            <div className="p-4 rounded-lg bg-sign-primary/5 border border-sign-primary/10">
+                              {p.birthKaranam.prediction.split('\n\n').map((para, i) => (
+                                <p key={i} className="text-text-muted text-sm leading-relaxed mb-3 last:mb-0">{para}</p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Birth Nithya Yoga */}
+                        {p.birthNithyaYoga && (
+                          <div>
+                            <div className="flex items-center gap-3 mb-3">
+                              <h4 className="text-text-primary font-medium">Birth Nithya Yoga: {p.birthNithyaYoga.name}</h4>
+                              <span className="text-xs px-2 py-0.5 rounded bg-sign-primary/10 text-sign-primary">Sun-Moon Yoga</span>
+                            </div>
+                            <div className="p-4 rounded-lg bg-sign-primary/5 border border-sign-primary/10">
+                              {p.birthNithyaYoga.prediction.split('\n\n').map((para, i) => (
+                                <p key={i} className="text-text-muted text-sm leading-relaxed mb-3 last:mb-0">{para}</p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </>
                   );
@@ -1232,6 +1363,36 @@ function DashboardContent() {
                     })}
                   </div>
                 </div>
+
+                {/* 35-Year Dasha Prediction Summary */}
+                {dashaPredictionsData.length > 0 && (
+                  <div className="glass-card p-6">
+                    <h3 className="font-heading text-sign-primary mb-2">35-Year Prediction Summary</h3>
+                    <p className="text-text-muted text-xs mb-4">Detailed predictions for each Mahadasha/Antardasha period</p>
+                    <div className="space-y-3">
+                      {dashaPredictionsData.map((pred, i) => (
+                        <div key={i} className={`p-4 rounded-lg border ${
+                          pred.isCurrent ? 'border-sign-primary/30 bg-sign-primary/5' : 'border-sign-primary/10 bg-cosmic-bg/20'
+                        }`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-text-primary text-sm font-medium">{pred.mahadasha}/{pred.antardasha}</span>
+                              {pred.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Current</span>}
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                pred.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                                pred.rating === 'favourable' ? 'bg-blue-500/20 text-blue-400' :
+                                pred.rating === 'mixed' ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
+                              }`}>{pred.rating}</span>
+                            </div>
+                            <span className="text-text-muted text-xs">{pred.startMonth}/{pred.startYear} — {pred.endMonth}/{pred.endYear}</span>
+                          </div>
+                          <p className="text-text-muted text-sm leading-relaxed">{pred.prediction}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1292,6 +1453,783 @@ function DashboardContent() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ===== SUB-PERIODS (PRATYANTARDASHA) TAB ===== */}
+            {activeTab === 'sub-periods' && (
+              <div className="space-y-6 tab-content-enter" key="sub-periods">
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Pratyantardasha (Sub-Sub-Periods)</h3>
+                  <p className="text-text-muted text-xs mb-4">
+                    3rd level Vimshottari Dasha periods — click a Mahadasha/Antardasha to see its sub-periods
+                    {pratyantardashaData && <span className="ml-2">({pratyantardashaData.totalPeriods} periods, ages {pratyantardashaData.analysisYears})</span>}
+                  </p>
+
+                  {pratyantardashaData && pratyantardashaData.periods.length > 0 ? (() => {
+                    // Group by Mahadasha → Antardasha
+                    const groups: Record<string, typeof pratyantardashaData.periods> = {};
+                    pratyantardashaData.periods.forEach(p => {
+                      const key = `${p.mahadasha}-${p.antardasha}`;
+                      if (!groups[key]) groups[key] = [];
+                      groups[key].push(p);
+                    });
+
+                    return (
+                      <div className="space-y-2">
+                        {Object.entries(groups).map(([key, entries]) => {
+                          const hasCurrent = entries.some(e => e.isCurrent);
+                          const first = entries[0];
+                          const last = entries[entries.length - 1];
+                          return (
+                            <div key={key}>
+                              <button
+                                onClick={() => setExpandedSubPeriod(expandedSubPeriod === key ? null : key)}
+                                className={`w-full text-left p-3 rounded-lg transition-all ${hasCurrent ? 'bg-sign-primary/10 border border-sign-primary/30' : 'bg-cosmic-bg/30 hover:bg-cosmic-bg/50'}`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-text-primary text-sm font-medium">{first.mahadasha}/{first.antardasha}</span>
+                                    {hasCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Active</span>}
+                                    <span className="text-text-muted text-xs">{entries.length} sub-periods</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-text-muted text-xs">{first.startDate} — {last.endDate}</span>
+                                    <span className="text-sign-primary/60">{expandedSubPeriod === key ? '\u25BC' : '\u25B6'}</span>
+                                  </div>
+                                </div>
+                              </button>
+                              {expandedSubPeriod === key && (
+                                <div className="ml-4 mt-2 space-y-2 mb-3">
+                                  {entries.map((entry, idx) => (
+                                    <div key={idx} className={`p-3 rounded-lg border ${entry.isCurrent ? 'border-sign-primary/30 bg-sign-primary/5' : 'border-sign-primary/10 bg-cosmic-bg/20'}`}>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-text-primary text-xs font-medium">{entry.mahadasha}/{entry.antardasha}/{entry.pratyantardasha}</span>
+                                          {entry.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-1.5 py-0.5 rounded">Now</span>}
+                                        </div>
+                                        <span className="text-text-muted text-xs">{entry.duration}</span>
+                                      </div>
+                                      <div className="text-text-muted text-xs mb-2">{entry.startDate} — {entry.endDate} (Age: {entry.startAge} — {entry.endAge})</div>
+                                      <p className="text-text-muted text-xs leading-relaxed">{entry.prediction}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })() : (
+                    <p className="text-text-muted text-sm">Pratyantardasha data not available. Ensure birth details are provided.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ===== ASHTAKAVARGA TAB ===== */}
+            {activeTab === 'ashtaka' && (
+              <div className="space-y-6 tab-content-enter" key="ashtaka">
+                {/* Sarvashtakavarga Table */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">AshtakaVarga Analysis</h3>
+                  <p className="text-text-muted text-xs mb-4">Bindu distribution across 12 signs for each planet (Parashari system)</p>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          {signNames.map((s, i) => (
+                            <th key={i} className="text-center text-sign-primary/60 py-2 px-1" title={s}>{s.slice(0, 3)}</th>
+                          ))}
+                          <th className="text-center text-sign-primary/60 py-2 px-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ashtakavargaData.planets.map(p => (
+                          <tr key={p.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{p.planet}</td>
+                            {p.bindhus.map((b, si) => (
+                              <td key={si} className={`text-center py-2 px-1 ${
+                                b >= 5 ? 'text-green-400' : b >= 4 ? 'text-text-primary' : b >= 3 ? 'text-yellow-400' : 'text-red-400'
+                              }`}>{b}</td>
+                            ))}
+                            <td className="text-center text-text-primary py-2 px-2 font-medium">{p.total}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t-2 border-sign-primary/30">
+                          <td className="text-sign-primary py-2 px-2 font-medium">SAV</td>
+                          {ashtakavargaData.sarvashtakavarga.totals.map((t, i) => (
+                            <td key={i} className={`text-center py-2 px-1 font-medium ${
+                              t >= 30 ? 'text-green-400' : t >= 25 ? 'text-text-primary' : 'text-red-400'
+                            }`}>{t}</td>
+                          ))}
+                          <td className="text-center text-sign-primary py-2 px-2 font-bold">{ashtakavargaData.sarvashtakavarga.grandTotal}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Sign Strength */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-4">Sign-wise Strength</h3>
+                  <div className="space-y-2">
+                    {ashtakavargaData.sarvashtakavarga.totals.map((t, i) => {
+                      const maxVal = Math.max(...ashtakavargaData.sarvashtakavarga.totals);
+                      const pct = (t / maxVal) * 100;
+                      return (
+                        <div key={i} className="flex items-center gap-3">
+                          <span className="text-text-primary text-xs w-20">{signNames[i]}</span>
+                          <div className="flex-1 bg-cosmic-bg/50 rounded-full h-4 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                i === ashtakavargaData.sarvashtakavarga.strongestSign ? 'bg-green-500/60' :
+                                i === ashtakavargaData.sarvashtakavarga.weakestSign ? 'bg-red-500/40' :
+                                'bg-sign-primary/30'
+                              }`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs w-8 text-right ${
+                            i === ashtakavargaData.sarvashtakavarga.strongestSign ? 'text-green-400 font-medium' :
+                            i === ashtakavargaData.sarvashtakavarga.weakestSign ? 'text-red-400' :
+                            'text-text-muted'
+                          }`}>{t}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-text-muted text-xs mt-4">{ashtakavargaData.sarvashtakavarga.prediction}</p>
+                </div>
+
+                {/* Individual Planet Predictions */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-4">Planet-wise Predictions</h3>
+                  <div className="space-y-3">
+                    {ashtakavargaData.planets.map(p => (
+                      <div key={p.planet} className={`p-4 rounded-lg border ${
+                        p.natalSignBindhus >= 5 ? 'border-green-500/20 bg-green-500/5' :
+                        p.natalSignBindhus >= 4 ? 'border-sign-primary/20 bg-sign-primary/5' :
+                        p.natalSignBindhus >= 3 ? 'border-yellow-500/20 bg-yellow-500/5' :
+                        'border-red-500/20 bg-red-500/5'
+                      }`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-text-primary font-medium text-sm">{p.planet}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            p.natalSignBindhus >= 5 ? 'bg-green-500/20 text-green-400' :
+                            p.natalSignBindhus >= 4 ? 'bg-sign-primary/20 text-sign-primary' :
+                            p.natalSignBindhus >= 3 ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>{p.natalSignBindhus} bindhus in natal sign</span>
+                          <span className="text-text-muted text-xs ml-auto">Total: {p.total}</span>
+                        </div>
+                        <p className="text-text-muted text-sm">{p.prediction}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ===== FAVOURABLE PERIODS TAB ===== */}
+            {activeTab === 'favourable' && (
+              <div className="space-y-6 tab-content-enter" key="favourable">
+                {favourablePeriods ? (
+                  <>
+                    {/* Career */}
+                    <div className="glass-card p-6">
+                      <h3 className="font-heading text-sign-primary mb-2">Favourable Periods for Career</h3>
+                      <p className="text-text-muted text-xs mb-4">Based on Dasha/Antardasha lords and their relation to career houses (2, 6, 10)</p>
+                      <div className="space-y-2">
+                        {favourablePeriods.career.map((p, i) => (
+                          <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                            p.rating === 'excellent' ? 'border-green-500/30 bg-green-500/5' :
+                            p.rating === 'favourable' ? 'border-blue-500/20 bg-blue-500/5' :
+                            'border-yellow-500/10 bg-yellow-500/5'
+                          }`}>
+                            <div>
+                              <span className="text-text-muted text-xs">{p.startDate} — {p.endDate}</span>
+                              <span className="text-text-muted text-xs ml-3">(Age: {p.startAge} — {p.endAge})</span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded capitalize ${
+                              p.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                              p.rating === 'favourable' ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-yellow-500/20 text-yellow-400'
+                            }`}>{p.rating.replace('_', ' ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Business */}
+                    <div className="glass-card p-6">
+                      <h3 className="font-heading text-sign-primary mb-2">Favourable Periods for Business</h3>
+                      <p className="text-text-muted text-xs mb-4">Based on Dasha/Antardasha lords and their relation to business houses (2, 7, 9, 10, 11)</p>
+                      <div className="space-y-2">
+                        {favourablePeriods.business.map((p, i) => (
+                          <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                            p.rating === 'excellent' ? 'border-green-500/30 bg-green-500/5' :
+                            p.rating === 'favourable' ? 'border-blue-500/20 bg-blue-500/5' :
+                            'border-yellow-500/10 bg-yellow-500/5'
+                          }`}>
+                            <div>
+                              <span className="text-text-muted text-xs">{p.startDate} — {p.endDate}</span>
+                              <span className="text-text-muted text-xs ml-3">(Age: {p.startAge} — {p.endAge})</span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded capitalize ${
+                              p.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                              p.rating === 'favourable' ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-yellow-500/20 text-yellow-400'
+                            }`}>{p.rating.replace('_', ' ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* House Construction */}
+                    <div className="glass-card p-6">
+                      <h3 className="font-heading text-sign-primary mb-2">Favourable Periods for House Construction</h3>
+                      <p className="text-text-muted text-xs mb-4">Based on Dasha/Antardasha lords and their relation to property houses (2, 4, 11)</p>
+                      <div className="space-y-2">
+                        {favourablePeriods.houseConstruction.map((p, i) => (
+                          <div key={i} className={`p-3 rounded-lg border flex items-center justify-between ${
+                            p.rating === 'excellent' ? 'border-green-500/30 bg-green-500/5' :
+                            p.rating === 'favourable' ? 'border-blue-500/20 bg-blue-500/5' :
+                            'border-yellow-500/10 bg-yellow-500/5'
+                          }`}>
+                            <div>
+                              <span className="text-text-muted text-xs">{p.startDate} — {p.endDate}</span>
+                              <span className="text-text-muted text-xs ml-3">(Age: {p.startAge} — {p.endAge})</span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded capitalize ${
+                              p.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                              p.rating === 'favourable' ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-yellow-500/20 text-yellow-400'
+                            }`}>{p.rating.replace('_', ' ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Legend */}
+                    <div className="glass-card p-4">
+                      <div className="flex flex-wrap gap-4 justify-center">
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-green-500/40" /><span className="text-text-muted text-xs">Excellent</span></div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-blue-500/40" /><span className="text-text-muted text-xs">Favourable</span></div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-yellow-500/40" /><span className="text-text-muted text-xs">Less Favourable</span></div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="glass-card p-6">
+                    <p className="text-text-muted text-sm">Favourable periods data not available. Ensure birth details are provided.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ===== REMEDIES TAB ===== */}
+            {activeTab === 'remedies' && (
+              <div className="space-y-6 tab-content-enter" key="remedies">
+                {/* Nakshatra Remedies */}
+                {nakshatraRemedy && (
+                  <div className="glass-card p-6">
+                    <h3 className="font-heading text-sign-primary mb-2">Nakshatra Remedies — {nakshatraRemedy.nakshatra}</h3>
+                    <p className="text-text-muted text-sm mb-4">{nakshatraRemedy.characteristics}</p>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Star Lord</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.starLord}</span>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Sign</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.sign} ({nakshatraRemedy.signLord})</span>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Element</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.element}</span>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Animal</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.animal}</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Tree</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.tree}</span>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block">Bird</span>
+                        <span className="text-text-primary text-sm">{nakshatraRemedy.bird}</span>
+                      </div>
+                    </div>
+
+                    {nakshatraRemedy.hostileDasas.length > 0 && (
+                      <div className="mb-4 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                        <span className="text-red-400/60 text-xs block mb-1">Hostile Dasa Periods</span>
+                        <div className="flex gap-2 flex-wrap">
+                          {nakshatraRemedy.hostileDasas.map(d => (
+                            <span key={d} className="text-xs bg-red-500/10 text-red-400 px-2 py-0.5 rounded">{d}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-4 rounded-lg bg-sign-primary/5 border border-sign-primary/10 mb-4">
+                      <span className="text-sign-primary/60 text-xs block mb-1">General Advice</span>
+                      <p className="text-text-muted text-sm">{nakshatraRemedy.generalAdvice}</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-sign-primary text-sm font-medium">Remedies</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block mb-1">Prayer</span>
+                          <p className="text-text-muted text-xs">{nakshatraRemedy.remedies.prayer}</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block mb-1">Fasting</span>
+                          <p className="text-text-muted text-xs">{nakshatraRemedy.remedies.fasting}</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block mb-1">Deity</span>
+                          <p className="text-text-muted text-xs">{nakshatraRemedy.remedies.deity}</p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block mb-1">Dress Colors</span>
+                          <p className="text-text-muted text-xs">{nakshatraRemedy.remedies.dress}</p>
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                        <span className="text-sign-primary/60 text-xs block mb-1">Nurturing</span>
+                        <p className="text-text-muted text-xs">{nakshatraRemedy.remedies.nurturing}</p>
+                      </div>
+                      {nakshatraRemedy.remedies.mantras.length > 0 && (
+                        <div className="p-3 rounded-lg bg-sign-primary/5 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block mb-2">Mantras</span>
+                          {nakshatraRemedy.remedies.mantras.map((m, i) => (
+                            <p key={i} className="text-sign-primary text-sm font-devanagari mb-1">{m}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Dasa Remedies */}
+                {dasaRemediesList.length > 0 && (
+                  <div className="glass-card p-6">
+                    <h3 className="font-heading text-sign-primary mb-2">Dasa Period Remedies</h3>
+                    <p className="text-text-muted text-xs mb-4">Remedies for challenging and mixed Mahadasha periods</p>
+                    <div className="space-y-4">
+                      {dasaRemediesList.map(({ planet, remedy }) => (
+                        <div key={planet} className="p-4 rounded-lg border border-sign-primary/10 bg-cosmic-bg/30">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-text-primary font-medium">{remedy.planet} Dasa</span>
+                            <span className="text-sign-primary/60 text-xs">({remedy.sanskrit})</span>
+                          </div>
+                          <p className="text-text-muted text-sm mb-3">{remedy.overview}</p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5">
+                              <span className="text-sign-primary/60 text-xs block mb-1">Dress Colors</span>
+                              <div className="flex gap-1 flex-wrap mb-1">
+                                {remedy.dress.colors.map(c => (
+                                  <span key={c} className="text-xs bg-sign-primary/10 text-sign-primary px-2 py-0.5 rounded">{c}</span>
+                                ))}
+                              </div>
+                              <p className="text-text-muted text-xs">{remedy.dress.advice}</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5">
+                              <span className="text-sign-primary/60 text-xs block mb-1">Deity</span>
+                              <p className="text-text-primary text-xs mb-1">{remedy.deity.primary}</p>
+                              <p className="text-text-muted text-xs">{remedy.deity.advice}</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5">
+                              <span className="text-sign-primary/60 text-xs block mb-1">Fasting</span>
+                              <p className="text-text-primary text-xs">{remedy.fasting.day}</p>
+                              <p className="text-text-muted text-xs">{remedy.fasting.advice}</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5">
+                              <span className="text-sign-primary/60 text-xs block mb-1">Gemstone</span>
+                              <p className="text-text-primary text-xs">{remedy.gemstone}</p>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5 mb-3">
+                            <span className="text-sign-primary/60 text-xs block mb-1">Lifestyle</span>
+                            <p className="text-text-muted text-xs">{remedy.lifestyle}</p>
+                          </div>
+
+                          <div className="p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/5 mb-3">
+                            <span className="text-sign-primary/60 text-xs block mb-1">Charity</span>
+                            <p className="text-text-muted text-xs">{remedy.charity}</p>
+                          </div>
+
+                          {remedy.generalMantras.length > 0 && (
+                            <div className="p-3 rounded-lg bg-sign-primary/5 border border-sign-primary/10">
+                              <span className="text-sign-primary/60 text-xs block mb-2">Mantras</span>
+                              {remedy.generalMantras.map((m, i) => (
+                                <p key={i} className="text-sign-primary text-sm font-devanagari mb-1">{m}</p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!nakshatraRemedy && dasaRemediesList.length === 0 && (
+                  <div className="glass-card p-6">
+                    <p className="text-text-muted text-sm">No remedies data available.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ===== TABLES TAB ===== */}
+            {activeTab === 'tables' && (
+              <div className="space-y-6 tab-content-enter" key="tables">
+                {/* Nirayana Longitude Table */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Nirayana Longitude Table</h3>
+                  <p className="text-text-muted text-xs mb-4">Planetary positions in sidereal (Nirayana) system</p>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Longitude</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sign</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Degree in Sign</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Nakshatra</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">Pada</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">R</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {longitudeTableData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.longitude}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.sign} <span className="text-text-muted">({entry.hindi})</span></td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.degreeInSign}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.nakshatra}</td>
+                            <td className="text-center text-text-muted py-2 px-2">{entry.pada}</td>
+                            <td className="text-center py-2 px-2">{entry.retrograde ? <span className="text-red-400">R</span> : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Combustion Table */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Planetary Combustion (Moudhyam)</h3>
+                  <p className="text-text-muted text-xs mb-4">A planet is combust when it is too close to the Sun, weakening its significations</p>
+
+                  <div className="space-y-3">
+                    {combustionData.map(entry => (
+                      <div key={entry.planet} className={`p-3 rounded-lg border ${
+                        entry.isCombust ? 'border-red-500/30 bg-red-500/5' : 'border-green-500/10 bg-green-500/5'
+                      }`}>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-text-primary text-sm font-medium">{entry.planet}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              entry.isCombust ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'
+                            }`}>{entry.isCombust ? 'Combust' : 'Not Combust'}</span>
+                          </div>
+                          <span className="text-text-muted text-xs">{entry.distanceFromSun}° from Sun (threshold: {entry.combustionThreshold}°)</span>
+                        </div>
+                        <p className="text-text-muted text-xs">{entry.effect}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Planetary War */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Planetary War (Graha Yuddha)</h3>
+                  <p className="text-text-muted text-xs mb-4">Occurs when two non-luminary planets are within 1° of each other</p>
+
+                  {planetaryWarData.length > 0 ? (
+                    <div className="space-y-3">
+                      {planetaryWarData.map((w, i) => (
+                        <div key={i} className="p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-text-primary text-sm font-medium">{w.planet1} vs {w.planet2}</span>
+                              <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Winner: {w.winner}</span>
+                            </div>
+                            <span className="text-text-muted text-xs">Distance: {w.distance}°</span>
+                          </div>
+                          <p className="text-text-muted text-xs">{w.effect}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/10">
+                      <p className="text-green-400 text-sm">No planetary wars detected in this chart. All planets maintain comfortable distances from each other.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Grahavastha (Planetary Status) */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Grahavastha (Planetary Dignity)</h3>
+                  <p className="text-text-muted text-xs mb-4">Status of each planet based on its sign placement</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sign</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Degree</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Dignity</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">R</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {grahavasthaData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-muted py-2 px-2">{entry.sign}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.degree}</td>
+                            <td className="py-2 px-2">
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                entry.status === 'exalted' ? 'bg-green-500/20 text-green-400' :
+                                entry.status === 'own' || entry.status === 'moolatrikona' ? 'bg-blue-500/20 text-blue-400' :
+                                entry.status === 'debilitated' ? 'bg-red-500/20 text-red-400' :
+                                'bg-gray-500/20 text-gray-400'
+                              }`}>{entry.dignity}</span>
+                            </td>
+                            <td className="text-center py-2 px-2">{entry.retrograde ? <span className="text-red-400">R</span> : '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Shadbala (Six-fold Strength) */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Shadbala (Six-fold Strength)</h3>
+                  <p className="text-text-muted text-xs mb-4">Composite strength of each planet from positional, directional, and natural sources</p>
+                  <div className="space-y-3">
+                    {shadbalaData.map(entry => (
+                      <div key={entry.planet} className="p-3 rounded-lg border border-sign-primary/10 bg-cosmic-bg/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-text-primary text-sm font-medium">{entry.planet}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            entry.percentage >= 70 ? 'bg-green-500/20 text-green-400' :
+                            entry.percentage >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>{entry.percentage}% strength</span>
+                        </div>
+                        <div className="w-full bg-cosmic-bg/50 rounded-full h-2 mb-2">
+                          <div className={`h-2 rounded-full ${
+                            entry.percentage >= 70 ? 'bg-green-500' :
+                            entry.percentage >= 40 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`} style={{ width: `${Math.min(entry.percentage, 100)}%` }} />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div><span className="text-text-muted">Sthana:</span> <span className="text-text-primary">{entry.sthanaBala}</span></div>
+                          <div><span className="text-text-muted">Dig:</span> <span className="text-text-primary">{entry.digBala}</span></div>
+                          <div><span className="text-text-muted">Naisargika:</span> <span className="text-text-primary">{entry.naisargikaBala}</span></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Ishta Kashta Phala */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Ishta Kashta Phala</h3>
+                  <p className="text-text-muted text-xs mb-4">Favourable (Ishta) and unfavourable (Kashta) effect scores for each planet</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">Ishta Phala</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">Kashta Phala</th>
+                          <th className="text-center text-sign-primary/60 py-2 px-2">Net Effect</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ishtaKashtaData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-center text-green-400 py-2 px-2">{entry.ishtaPhala}</td>
+                            <td className="text-center text-red-400 py-2 px-2">{entry.kashtaPhala}</td>
+                            <td className="text-center py-2 px-2">
+                              <span className={entry.ishtaPhala > entry.kashtaPhala ? 'text-green-400' : 'text-red-400'}>
+                                {entry.ishtaPhala > entry.kashtaPhala ? 'Favourable' : 'Unfavourable'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Bhavabala (House Strength) */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Bhavabala (House Strength)</h3>
+                  <p className="text-text-muted text-xs mb-4">Strength of each house based on planetary occupancy and lordship</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {bhavabalaData.map(entry => (
+                      <div key={entry.house} className="p-3 rounded-lg border border-sign-primary/10 bg-cosmic-bg/20">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-text-primary text-sm font-medium">House {entry.house}</span>
+                          <span className="text-text-muted text-xs">{entry.sign}</span>
+                        </div>
+                        <div className="w-full bg-cosmic-bg/50 rounded-full h-1.5 mb-1">
+                          <div className={`h-1.5 rounded-full ${
+                            entry.strength >= 70 ? 'bg-green-500' :
+                            entry.strength >= 40 ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`} style={{ width: `${Math.min(entry.strength, 100)}%` }} />
+                        </div>
+                        <span className="text-text-muted text-xs">{entry.strength}% — {entry.signLord}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shodasavarga (16 Divisional Charts) */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Shodasavarga (Divisional Chart Positions)</h3>
+                  <p className="text-text-muted text-xs mb-4">Planetary positions across 16 divisional charts (D1-D60)</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          {['D1','D2','D3','D4','D7','D9','D10','D12','D16','D20','D24','D27','D30','D60'].map(d => (
+                            <th key={d} className="text-center text-sign-primary/60 py-1 px-1" style={{ fontSize: '10px' }}>{d}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {shodasavargaData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            {[entry.d1,entry.d2,entry.d3,entry.d4,entry.d7,entry.d9,entry.d10,entry.d12,entry.d16,entry.d20,entry.d24,entry.d27,entry.d30,entry.d60].map((v, i) => (
+                              <td key={i} className="text-center text-text-muted py-1 px-1" style={{ fontSize: '10px' }}>{v}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Sayana Longitude */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Sayana (Tropical) Longitude</h3>
+                  <p className="text-text-muted text-xs mb-4">Western/tropical positions of planets (Nirayana + Ayanamsa)</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Tropical Sign</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sayana</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Nirayana</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Ayanamsa</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sayanaData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.tropicalSign}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.sayana}</td>
+                            <td className="text-text-muted py-2 px-2">{entry.nirayana}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.ayanamsa}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Bhava Table (House Cusps) */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Bhava Table (House Cusps)</h3>
+                  <p className="text-text-muted text-xs mb-4">Beginning (Sandhi) and midpoint (Madhya) of each house</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Bhava</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sign</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Start (Sandhi)</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Midpoint (Madhya)</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">End</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planets</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bhavaTableData.map(entry => (
+                          <tr key={entry.house} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.house}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.sign}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.startDegree}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.midDegree}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.endDegree}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.planetsInHouse.join(', ') || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* KP Star Lord Table */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">KP Star Lord Table</h3>
+                  <p className="text-text-muted text-xs mb-4">Krishnamurti Paddhati star lord, sub-lord, and sub-sub-lord for each planet</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-sign-primary/20">
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Planet</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Degree</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Nakshatra</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Star Lord</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sub Lord</th>
+                          <th className="text-left text-sign-primary/60 py-2 px-2">Sub-Sub Lord</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {kpTableData.map(entry => (
+                          <tr key={entry.planet} className="border-b border-sign-primary/5">
+                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-muted py-2 px-2 font-mono">{entry.signDegree}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.nakshatra}</td>
+                            <td className="text-text-primary py-2 px-2">{entry.nakshatraLord}</td>
+                            <td className="text-text-muted py-2 px-2">{entry.subLord}</td>
+                            <td className="text-text-muted py-2 px-2">{entry.subSubLord}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
           </div>
