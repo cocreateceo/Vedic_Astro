@@ -1,0 +1,166 @@
+Delivered-To: pattangi@gmail.com
+Received: by 2002:a8a:513:0:b0:5f8:f161:85cf with SMTP id w19csp5960783ocq;
+        Mon, 6 Oct 2025 21:02:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6VroFrycSBRE/ZysHbgw4M4NZbgEFY3/l8VnN5n0qwBUIkhaB7A2VOLDRsCKyVMGjSm/r
+X-Received: by 2002:a05:620a:4014:b0:827:e9b0:275f with SMTP id af79cd13be357-87a38b2fb71mr1918452385a.81.1759809746739;
+        Mon, 06 Oct 2025 21:02:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1759809746; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cWMDvtMXLU92RW4RRHKF8gfg4Q7v8zIYdygvgjyu3FgQDfNMhZMVltI3ICUMvwT4Of
+         AJzQRffoYr8YfKdcKG8bOrPuxbFPYl4oFC84rK4K/oepih5xSbJRLTcWPsaLFUEE7q5+
+         D4rz7YbJhOocf+iFJppx3Y0LLgD1KiLPLBVq0ZkAtLHLebbauqjHkWTVu4j+kzGfqaTP
+         Uapsckx1wUO2auvVA9FDS8/6TbWg+H0LIlojm0x2SbuRomk4lnAgfz4aHEp9u9NZsZt3
+         L2qJJaCT4+N6fTiVckG0eu689zM4HH//ItblkNzzr7Edg2LKWqmIRr8TMpa0Kc7P/9zd
+         31ow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:list-unsubscribe-post:list-unsubscribe:date:message-id
+         :mime-version:subject:to:from:dkim-signature:dkim-signature;
+        bh=r3FjWEsb8/TK6lD12+hAnl8ilSL1sAHdxzYqrzEIDUQ=;
+        fh=4NpqyECBWtLdxCMDsBtJTxf+pM0q40DBnmqIMXKq7VM=;
+        b=aPY9GTeF/t5OZ0tuDAKKUroTmobUc/i/pk8gCr6hPDaD15rwUVFfFkkrDhOv7VHCfS
+         iJJq62H7JPL5wIjEyD+uOsQJPEEYvv5iDuk7a9fOAbCv3kdWpfoCjyvlF52ZRWrsnetb
+         PIxJ9/mvAVHaNmZjMIiv7avX440CUlrf6cTG0YpqYjqFmnnDJcTWZESs4IojdY10XGL9
+         l5U6r01zQPLn7YlcvEGOwrAsIs92x7bnwhpBJfAduIi6zM0auB9+hbjdl80/m9kYpXfh
+         02nM5IIbZZnWn6Txf9/vzdYywxYPbW6Qs52pgJZ3pQlAk+fZlyVoH+fjbfbsX6OMxH2P
+         lk2w==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@clickastro.com header.s=fnc header.b=ERDNuM0l;
+       dkim=pass header.i=@env.etransmail.com header.s=fnc header.b=AAo1RPaJ;
+       spf=pass (google.com: domain of 17597763651824160-86052-1-gmail.com@delivery.clickastro.com designates 202.162.253.144 as permitted sender) smtp.mailfrom=17597763651824160-86052-1-gmail.com@delivery.clickastro.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=clickastro.com
+Return-Path: <17597763651824160-86052-1-gmail.com@delivery.clickastro.com>
+Received: from mta-253.144.ncdelivery08.com (mta-253.144.ncdelivery08.com. [202.162.253.144])
+        by mx.google.com with ESMTPS id d75a77b69052e-4e55a14cc45si57050111cf.73.2025.10.06.21.02.26
+        for <pattangi@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Oct 2025 21:02:26 -0700 (PDT)
+Received-SPF: pass (google.com: domain of 17597763651824160-86052-1-gmail.com@delivery.clickastro.com designates 202.162.253.144 as permitted sender) client-ip=202.162.253.144;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@clickastro.com header.s=fnc header.b=ERDNuM0l;
+       dkim=pass header.i=@env.etransmail.com header.s=fnc header.b=AAo1RPaJ;
+       spf=pass (google.com: domain of 17597763651824160-86052-1-gmail.com@delivery.clickastro.com designates 202.162.253.144 as permitted sender) smtp.mailfrom=17597763651824160-86052-1-gmail.com@delivery.clickastro.com;
+       dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=clickastro.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=clickastro.com; s=fnc;
+	h=feedback-id:list-unsubscribe-post:list-unsubscribe:message-id:content-type:
+	 mime-version:subject:to:from:from:to:subject;
+	bh=r3FjWEsb8/TK6lD12+hAnl8ilSL1sAHdxzYqrzEIDUQ=;
+	b=ERDNuM0lWsTU3vlq40w6VDOgJ1i61Sac0ALo/EtJALXLNaingb66rzXNsWNhXsZxvsaEfJmRH97aE
+	 fYQ8LpWOF9Uog766RpGwHroOyLPGPn8QBi2cUwa0lFlHKfJz3xnYYa+Wy6/saG3BNrtitpa/fzv6PR
+	 gVer2eOSVjItIims=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=env.etransmail.com; s=fnc;
+	h=feedback-id:list-unsubscribe-post:list-unsubscribe:message-id:content-type:
+	 mime-version:subject:to:from:from:to:subject;
+	bh=r3FjWEsb8/TK6lD12+hAnl8ilSL1sAHdxzYqrzEIDUQ=;
+	b=AAo1RPaJo7pO0BGUydcG7MJ4dP7/M34epfk7o3TahuB82ZppnwiWEZ3wLV5x1YODHZFXOSV1Uu5Fe
+	 sVauiYdnhUldH+CDN2FnyuDGYqoLId0fgcdV8l2S+aadvVRGMmE8kKOzLXC8mttef4sArUj6YxYyFQ
+	 q7a6zElcHGkYfr6E=
+From: "Clickastro" <support@clickastro.com>
+To: pattangi@gmail.com
+Subject: Mukundan Pattangi, Invoice for Clickastro Report [CI85388742EBrd]
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="==Multipart_Boundary_x5f2b9d16249063005d2894d94d952143x"
+Message-Id: <20251007040224.AA56CE9D7DC6@smtpgcus11.falconide.com>
+Date: Tue, 07 Oct 2025 09:32:26 +0530
+X-InjTime: 1759809744
+List-Unsubscribe: <https://unsub-api.netcorecloud.net/YHNMJN?id=86052=bU4JAAsAAAxRHRQSGBMQFxUVF0YQFhRBQxZFEkMZRBcYEhkQExYQGUNBFBIYExAXFQVLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUIQA0sYTVxKRVEbUUkKT1pXTFBfRVBWWwlFUhoPBkJKayt3KX12DVBUT0AD>, <mailto:17597763651824160-86052-fncunsub@usub.ftrans03.com?subject=Unsubscribe>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Feedback-ID: ODYwNTI6MjAyNTEwMDdfMDk6T3JkZXJJbnZvaWNl:pepipostE
+X-FNCID: 86052-17597763651824160-0
+X-Mta-Source: astrovisionpepi_86052
+X-Traffic-Type: 86052-2
+X-Mailer: NetcoreCloud Mailer
+
+This is a multi-part message in MIME format.
+
+--==Multipart_Boundary_x5f2b9d16249063005d2894d94d952143x
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+
+<html>
+<body style='margin:0;padding:0;min-width: 100%;background-color:#ffffff; font-family:Arial, Helvetica, sans-serif;'>
+<div style='width: 100%;table-layout: fixed;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%; margin:0 auto; max-width:600px; background-color:#f9f9f9'>
+    <div><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/clickastro-banner.jpg' alt='Clickastro' style='width:100%;' /></div>
+    <div style='clear:both;'></div>
+    <div style='text-align:center;'>
+        <div style='clear:both;'></div>
+        <div style='padding:0 25px;'><div style='padding:5px 0; color:#484848; text-align:justify; font-size:12px; line-height:20px;'>Dear Mukundan Pattangi,<br> Thank you for your purchase! We’ve successfully received your payment of INR. 1178.00, and your In-Depth Horoscope is now ready. You'll find it at the link below.</div>
+            <div style='background-color:#eaeaea; color:#000000; font-size:17px;text-align:left; padding:5px; border:1px solid #eaeaea;'>🧾 Your Order Details</div>
+            <div style='clear:both;'></div>
+            <div style='background-color:#FFFFFF;padding:10px; border:1px solid #eaeaea;'>
+                <div>
+                    <div style='padding:0 10px; width:120px; float:left;'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/indepth-concon.png' alt='In-Depth Horoscope' /></div>
+                    <div style='float:left; padding:10px; width:330px; text-align:left; line-height:22px;'>
+<div style='color:#484848; font-size:12px;'>
+<div style='float:left; width:85px;'>Product</div>
+              <div style='float:left;'> : In-Depth Horoscope</div>
+              <div style='clear:both;'></div>
+                            <div style='float:left; width:85px;'>Order Id</div>
+                          <div style='float:left;'> : CI85388742EBrd</div>
+              <div style='clear:both;'></div>
+                            <div style='float:left; width:85px;'>Order Date</div>
+                          <div style='float:left;'> : 07-10-2025 08:29 AM</div>
+                            <div style='clear:both;'></div>
+                            <div style='float:left; width:85px;'>Order Total</div>
+                          <div style='float:left;'> : 1178.00 INR</div>
+                            <div style='clear:both;'></div><div style='float:left; width:85px;'>Transaction Id</div><div style='float:left;'> : CI1853339BpbE</div>
+                            
+                            <div style='clear:both;'></div>
+                            <div style='float:left; width:85px;'>CIN</div>
+                          <div style='float:left;'> : U72200KL2001PTC014651</div>
+                            <div style='clear:both;'></div>
+                            <div style='float:left; width:85px;'>GSTN</div>
+                          <div style='float:left;'> : 32AADCA9733C1Z2</div>
+                        </div>
+                    </div>
+                    <div style='clear:both'></div>
+                </div>
+                 <div style='clear:both;'></div>
+                <div style='padding:0 10px 10px 10px; line-height:22px;'>
+                <div style='font-size:20px; color:#1e879d; padding-bottom:10px;text-align: left;'>Download your PDF reports</div><div style='line-height:25px;'><div style='float:left; padding-right:10px;'><a href=' http://rep.clickastro.com/reports/87205877_MukundanPa.pdf' target='_blank' style='font-size:14px;'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/pdflink.png' alt='PDF' /></a></div> &nbsp; <div style='float:left'><a href=' http://rep.clickastro.com/reports/87205877_MukundanPa.pdf' target='_blank' style='font-size:14px;color:#0000ef;'> In-Depth Horoscope (Mobile) </a></div><div style='clear:both'></div><div style='float:left; padding-right:10px;'><a href=' http://rep.clickastro.com/reports/87205877_MukundanPa_pnr.pdf' target='_blank' style='font-size:14px;'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/pdflink.png' alt='PDF' /></a></div> &nbsp; <div style='float:left'><a href=' http://rep.clickastro.com/reports/87205877_MukundanPa_pnr.pdf' target='_blank' style='font-size:14px;color:#0000ef;'> In-Depth Horoscope (Printable) </a></div><div style='clear:both'></div></div></div>
+                </div>
+                <div style='clear:both;'></div><div style='background-color:#eaeaea; color:#000000; font-size:17px;text-align:left; padding:5px; border:1px solid #eaeaea;'>📄 What’s Available?</div><div style='padding:5px 0; color:#484848; text-align:justify; font-size:12px; line-height:20px;'>You’ll find two versions of your report:</div><div style='padding:5px 0; color:#484848; text-align:justify; font-size:12px; line-height:20px;'> 📱 Mobile View PDF – Optimised for easy reading on your phone.</div><div style='padding: 10px 0px 10px 0px;text-align:center;'><a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHVVQCQQFVFYEBAAFVQQAWgdWAwIPUwBdAQwDUQIJAFMABFBbV1UCDFZLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQAkZH0sGERpRVFpTXFRGQxRfGFcODhkXVxNWFkNLHQEHAQYFAVRWa39NWEVZUVRZNlEYRAUF' style='background-color: #3f9b08;font-size: 16px;
+    font-weight: 500;color: #fff;border: none;border-radius: 4px;padding: 10px 10px 10px 10px;text-decoration: none;margin-top: 30px;' target='_blank'>Download Mobile Version</a></div><div style='padding:5px 0; color:#484848; text-align:justify; font-size:12px; line-height:20px;'> 🖨️ Printable PDF – Ideal for printing or viewing on a desktop.</div><div style='padding:0px 0px 10px 0px;text-align:center;'><a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHVABAABWVQ0EUlAJUgcFWwNdVlYOXVMIVglVAlRWXFpYAVBaCgYPAFZLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQAkZH0sGERpRVFpTXFRGQxRfGFcODhkXVxNWFkNLHQEHAQYFAVRWa39NWEVZUVRZNlFpRA8RGBVWBQ==' target='_blank' style='color:#3f9b08;text-decoration:underline;font-size: 18px;'><b>Download Printable Version</b></a></div><div style='padding:5px 0; color:#484848; text-align:justify; font-size:12px; line-height:20px;'>If you have any questions or need further assistance, feel free to reach out.</div><div style='clear:both;'></div><div style='color: #484848; font-size:12px; text-align:justify;padding: 10px 0px;'><b>IMPORTANT:</b> These links will be active for <b>30 days only</b> from the date of this email. After that, they will expire, and a new order may be required. <b>Please make sure to download and save your report before the link expires.</b></div><div style='border-top:1px solid #dadada;'>
+                    <div style='padding-top:10px;border-top:1px solid #dadada; color:#484848; text-align:center; font-size:12px; float:left; width:100%; line-height:20px;'>Thank You for choosing <b> Clickastro</b>.<br />We hope your horoscope brings insight, clarity, and maybe a few lightbulb moments!<br>Warm regards,<br><b>Team Clickastro</b></div>
+<div><a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHQICDVYDBFRQAVIDVFdWAQNXUFcJAAFcUA0JVQIEWAdTUQReVwUEVgdLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYUFkMcW19ZVF5URBJCWRoCDFtKRRFQEFIVUxRCVkBZXBQ=' style='border:none;' target='_blank'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/reviewca.jpg' alt='Write a review' style='padding-top:10px;width:140px;' /></a><a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHQwGAFIADlMHBVFTVQNSAgdUAlFfAA4IBF0EBAEFCVJRAFNaUAFVAQJLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYUFkMcW19ZVF5URBJCWRoCDFtKUxBNFlhUXV5JHlVfVxAUWEZZXVNOGEZHA1NfVQ1OWQNUBks=' style='border:none;' target='_blank'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/thanks_mailerimage.png' alt='general consultation' style='padding-top:10px;width:100%;' /></a></div>
+                  <div style='clear:both;'></div>
+              </div>
+              <div style='clear:both;'></div>
+            </div>
+            
+            <div style='clear:both;'></div>
+
+             <div style='padding-top:10px; border:1px solid #eaeaea;margin-top:15px; line-height:20px;'>
+                <div style='color:#1e879d; font-size:20px; padding-bottom:5px;'>We're here to help</div>
+                <div style='font-size:12px;'>+91(India) 6366920680</div>
+                <div style='clear:both;'></div>
+                <div style='font-size:12px;'><a href='mailto:support@clickastro.com' style='color:#000000; text-decoration:none;'>support@clickastro.com</a><br><a href='mailto:predictions@clickastro.com' style='color:#000000; text-decoration:none;'>predictions@clickastro.com</a></div>
+                <div style='clear:both;'></div>
+            </div>
+           
+
+            <div style='clear:both;'></div><div style='border:1px solid #eaeaea;margin-top:15px; line-height:20px; background-color:#FFFFFF; padding:20px 0 10px 0; text-align:center;'>
+              <div style='color:#000000; font-size:20px; padding-bottom:5px;'>Download our mobile app</div>
+                    <div style='float:left;margin: 0 auto; width: 100%;'><a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHQUKCVUCAgNRUQUFBVICAAIGA1QPUlMNUwtUUAIDW1ZQDFcKCgAHAFBLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYTDVVLFlRfWFJZUkhTWVlOEEIKQAYWBUdIQRZUVkJRUA8S&ext=aWQ9Y29tLmNsaWNrYXN0cm8uZnJlZWhvcm9zY29wZS5hc3Ryb2xvZ3kmcmVmZXJyZXI9dXRtX3NvdXJjZT1pbnZvaWNlX2VtYWlsJnV0bV9tZWRpdW09cHVyY2hhc2VfZW1haWwmdXRtX3Rlcm09SW4tRGVwdGggSG9yb3Njb3BlJnV0bV9jb250ZW50PWdvb2dsZXBsYXlidXR0b25faW52b2ljZV9lbWFpbA==' target='_blank'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/google-play.png?v=0' width='130' alt='Android App' /></a>
+                    <a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHVUEDAoGAlFUAlRVBlZUV1MHUFdaBw4KBgtVVQEBW1ZZBgIOBlNUAABLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYCEURBFlJAR1lQGQVfWxsUEBkEQhMWB1tRUVJRQEJCVk4JW0BXQFNYRVAYD1QHAFVXD10EVA9c' target='_blank'><img src='https://ca-img.s3.ap-south-1.amazonaws.com/ca/mvcimages/emails/app-store.png?v=0' width='130' alt='iOS App' /></a></div>
+                <div style='clear:both;'></div>
+            </div><div style='clear:both;'></div>
+            <div style='padding:10px; border-top:1px solid #a3a3a3;margin-top:10px; line-height:20px; color:#484848; font-size:12px;'>
+                <a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHQwGDVYBUQMEUlYGAQZZAVVXCgJbVlEMBFoBVVIFXQdVBQYNBlVUBQVLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYUFkMcW19ZVF5URBJCWRoCDFtKQhFQElZbSxRAXFpZWho=' style='text-decoration:none; color:#484848;' target='_blank'>Privacy Policy</a> | 
+                <a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHQ0DCQQCBFQMVAJSUgBWBw5VBgdfUQ5ZCgAEAg4AAVRSUlNZBwNTAANLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQEAMHxYUFkMcW19ZVF5URBJCWRoCDFtKRgZLCUQVU1dUHlVfVwcIQFtXXUM=' style='text-decoration:none; color:#484848;' target='_blank'>Terms of Use</a><br />
+                &copy; 2025  <a href='http://delivery.clickastro.com/DRTYBSE?id=86052=e04JAAsAAAxRHVUFCgoDVFcFVlcFAw1RUwZTAFRbBgEKCglSA1QAXVcHBwcNAVEGVwxLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D&fl=UEZNQAkZH04UFhpTS0dCWBhDXhVZWVpPAFkIHQ==' target='_blank' style='text-decoration:none; color:#484848;'>Astro-Vision Futuretech Pvt. Ltd.</a> <br>
+              All rights reserved.          </div>
+          <div style='clear:both;'></div>
+        </div>
+        <div style='clear:both;'></div>
+    </div>
+</div>
+
+
+<img id='SBBBB' src='http://delivery.clickastro.com/DRTYBSE?id=86052=d04JAAsAAAxRHRQSGBMQFxUVF0YQFhRBQxZFEkMZRBcYEhkQExYQGUNBFBIYExAXFQVLFlFCQAANUQxyBFQFXlQcWl9eSgEOVlgDBQ4ABgIEDQVSAQAEHQtCEUJZFktTXV5QRlZESRcADV1RU1JDQ0daGQVfWxslMWI8cDB8W15cTk8D' /></body>
+</html>
+
+--==Multipart_Boundary_x5f2b9d16249063005d2894d94d952143x

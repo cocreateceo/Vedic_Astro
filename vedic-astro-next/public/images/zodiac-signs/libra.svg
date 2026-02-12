@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="200" r="155" fill="url(#glow)"/>
+  <!-- Central pillar -->
+  <rect x="196" y="120" width="8" height="170" rx="4" fill="url(#gold)" opacity="0.8"/>
+  <!-- Top ornament -->
+  <circle cx="200" cy="110" r="12" fill="none" stroke="url(#goldLight)" stroke-width="2.5"/>
+  <circle cx="200" cy="110" r="6" fill="#FFD700" opacity="0.7"/>
+  <path d="M200 95 L203 88 L206 95 L213 98 L206 101 L203 108" fill="url(#goldLight)" opacity="0.6"/>
+  <path d="M200 95 L197 88 L194 95 L187 98 L194 101 L197 108" fill="url(#goldLight)" opacity="0.6"/>
+  <!-- Cross beam -->
+  <rect x="80" y="173" width="240" height="6" rx="3" fill="url(#gold)"/>
+  <!-- Left chain -->
+  <path d="M110 179 Q108 190 110 200" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <path d="M110 200 Q112 210 110 218" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <path d="M110 218 Q108 226 110 232" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <!-- Left pan -->
+  <path d="M65 235 Q70 230 110 232 Q150 230 155 235 Q152 255 140 268 Q125 278 110 280 Q95 278 80 268 Q68 255 65 235Z" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <path d="M75 240 Q110 236 145 240" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M80 250 Q110 246 140 250" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <!-- Left pan chains to beam -->
+  <line x1="80" y1="176" x2="75" y2="235" stroke="url(#gold)" stroke-width="2"/>
+  <line x1="140" y1="176" x2="145" y2="235" stroke="url(#gold)" stroke-width="2"/>
+  <!-- Right chain -->
+  <path d="M290 179 Q288 190 290 200" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <path d="M290 200 Q292 210 290 218" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <path d="M290 218 Q288 226 290 232" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <!-- Right pan -->
+  <path d="M245 235 Q250 230 290 232 Q330 230 335 235 Q332 255 320 268 Q305 278 290 280 Q275 278 260 268 Q248 255 245 235Z" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <path d="M255 240 Q290 236 325 240" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M260 250 Q290 246 320 250" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <!-- Right pan chains to beam -->
+  <line x1="260" y1="176" x2="255" y2="235" stroke="url(#gold)" stroke-width="2"/>
+  <line x1="320" y1="176" x2="325" y2="235" stroke="url(#gold)" stroke-width="2"/>
+  <!-- Base -->
+  <path d="M150 290 Q160 285 200 290 Q240 285 250 290 Q245 295 240 298 Q220 305 200 306 Q180 305 160 298 Q155 295 150 290Z" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <rect x="185" y="298" width="30" height="8" rx="4" fill="url(#gold)" opacity="0.6"/>
+  <!-- Base platform -->
+  <path d="M140 310 Q170 315 200 316 Q230 315 260 310" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M130 318 Q165 324 200 325 Q235 324 270 318" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.6"/>
+  <!-- Decorative flourishes -->
+  <path d="M80 173 Q70 160 78 148 Q88 140 95 150" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <path d="M320 173 Q330 160 322 148 Q312 140 305 150" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="55" cy="60" r="2"/><circle cx="345" cy="55" r="1.5"/><circle cx="50" cy="330" r="1.8"/>
+    <circle cx="350" cy="335" r="2"/><circle cx="200" cy="42" r="1.5"/><circle cx="45" cy="180" r="1"/>
+    <circle cx="355" cy="190" r="1.3"/><circle cx="120" cy="50" r="1.2"/><circle cx="280" cy="48" r="1"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M68 78 L70 71 L72 78 L79 80 L72 82 L70 89 L68 82 L61 80Z"/>
+    <path d="M332 72 L334 65 L336 72 L343 74 L336 76 L334 83 L332 76 L325 74Z"/>
+    <path d="M55 305 L57 298 L59 305 L66 307 L59 309 L57 316 L55 309 L48 307Z"/>
+    <path d="M345 310 L347 303 L349 310 L356 312 L349 314 L347 321 L345 314 L338 312Z"/>
+  </g>
+</svg>

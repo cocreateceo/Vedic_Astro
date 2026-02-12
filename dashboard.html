@@ -617,49 +617,23 @@
                     <div id="birth-edit" style="display: none;">
                         <form id="birth-edit-form">
                             <div class="edit-field">
-                                <label for="edit-dob">Date of Birth</label>
-                                <input type="date" id="edit-dob" required>
+                                <label>Date of Birth</label>
+                                <div id="edit-date-picker" class="vap-compact"></div>
+                                <input type="hidden" id="edit-dob" required>
                             </div>
                             <div class="edit-field">
-                                <label for="edit-tob">Time of Birth</label>
-                                <input type="time" id="edit-tob" required>
+                                <label>Time of Birth</label>
+                                <div id="edit-time-picker" class="vap-compact"></div>
+                                <input type="hidden" id="edit-tob" required>
                             </div>
                             <div class="edit-field">
                                 <label for="edit-pob">Place of Birth</label>
                                 <input type="text" id="edit-pob" placeholder="City, Country" required>
                             </div>
                             <div class="edit-field">
-                                <label for="edit-timezone">Timezone</label>
-                                <select id="edit-timezone" required>
-                                    <option value="">Select Timezone</option>
-                                    <optgroup label="India">
-                                        <option value="Asia/Kolkata">India (IST) UTC+5:30</option>
-                                    </optgroup>
-                                    <optgroup label="Americas">
-                                        <option value="America/New_York">Eastern Time UTC-5</option>
-                                        <option value="America/Chicago">Central Time UTC-6</option>
-                                        <option value="America/Denver">Mountain Time UTC-7</option>
-                                        <option value="America/Los_Angeles">Pacific Time UTC-8</option>
-                                        <option value="America/Sao_Paulo">Sao Paulo UTC-3</option>
-                                    </optgroup>
-                                    <optgroup label="Europe">
-                                        <option value="Europe/London">London UTC+0</option>
-                                        <option value="Europe/Paris">Paris/Berlin UTC+1</option>
-                                        <option value="Europe/Moscow">Moscow UTC+3</option>
-                                    </optgroup>
-                                    <optgroup label="Asia">
-                                        <option value="Asia/Dubai">Dubai UTC+4</option>
-                                        <option value="Asia/Karachi">Pakistan UTC+5</option>
-                                        <option value="Asia/Dhaka">Bangladesh UTC+6</option>
-                                        <option value="Asia/Singapore">Singapore UTC+8</option>
-                                        <option value="Asia/Hong_Kong">Hong Kong UTC+8</option>
-                                        <option value="Asia/Tokyo">Japan UTC+9</option>
-                                    </optgroup>
-                                    <optgroup label="Australia">
-                                        <option value="Australia/Sydney">Sydney UTC+10</option>
-                                        <option value="Pacific/Auckland">New Zealand UTC+12</option>
-                                    </optgroup>
-                                </select>
+                                <label>Timezone</label>
+                                <div id="edit-tz-picker" class="vap-compact"></div>
+                                <input type="hidden" id="edit-timezone" required>
                             </div>
                             <div class="edit-buttons">
                                 <button type="submit" class="save-btn">Save & Recalculate</button>
@@ -723,6 +697,7 @@
 
     <script src="js/horoscope-data.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/date-time-picker.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

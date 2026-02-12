@@ -19,7 +19,11 @@
   "author": "Vedic Astro",
   "license": "Proprietary",
   "dependencies": {
-    "sst": "^3.17.25"
+    "@aws-sdk/client-dynamodb": "^3.987.0",
+    "@aws-sdk/client-sesv2": "^3.987.0",
+    "@aws-sdk/lib-dynamodb": "^3.987.0",
+    "pdfjs-dist": "^5.4.624",
+    "sst": "^3.17.38"
   },
   "engines": {
     "node": ">=20.0.0"

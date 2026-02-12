@@ -1,4 +1,5 @@
 // Kundli Calculator JavaScript with North & South Indian Charts
+// Uses AstroEngine (bundled from vedic-astro-next/lib/astro) for real astronomical calculations.
 
 const signNames = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
                    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
@@ -10,7 +11,7 @@ const hindiSignNames = ['Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kany
 
 const signAbbrev = ['Ar', 'Ta', 'Ge', 'Ca', 'Le', 'Vi', 'Li', 'Sc', 'Sg', 'Cp', 'Aq', 'Pi'];
 
-const planets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+const planetList = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
 
 const planetAbbrev = {
     'Sun': 'Su', 'Moon': 'Mo', 'Mars': 'Ma', 'Mercury': 'Me',
@@ -28,10 +29,60 @@ const nakshatras = [
 const dashaOrder = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
 const dashaDurations = [7, 20, 6, 10, 7, 18, 16, 19, 17];
 
+// City database for place resolution (subset — legacy site)
+const CITY_DB = {
+    'delhi': { lat: 28.61, lng: 77.21, tz: 5.5 },
+    'new delhi': { lat: 28.61, lng: 77.21, tz: 5.5 },
+    'mumbai': { lat: 19.08, lng: 72.88, tz: 5.5 },
+    'bombay': { lat: 19.08, lng: 72.88, tz: 5.5 },
+    'kolkata': { lat: 22.57, lng: 88.36, tz: 5.5 },
+    'calcutta': { lat: 22.57, lng: 88.36, tz: 5.5 },
+    'chennai': { lat: 13.08, lng: 80.27, tz: 5.5 },
+    'madras': { lat: 13.08, lng: 80.27, tz: 5.5 },
+    'bengaluru': { lat: 12.97, lng: 77.59, tz: 5.5 },
+    'bangalore': { lat: 12.97, lng: 77.59, tz: 5.5 },
+    'hyderabad': { lat: 17.39, lng: 78.49, tz: 5.5 },
+    'ahmedabad': { lat: 23.02, lng: 72.57, tz: 5.5 },
+    'pune': { lat: 18.52, lng: 73.86, tz: 5.5 },
+    'poona': { lat: 18.52, lng: 73.86, tz: 5.5 },
+    'jaipur': { lat: 26.91, lng: 75.79, tz: 5.5 },
+    'lucknow': { lat: 26.85, lng: 80.95, tz: 5.5 },
+    'varanasi': { lat: 25.32, lng: 83.01, tz: 5.5 },
+    'benares': { lat: 25.32, lng: 83.01, tz: 5.5 },
+    'kochi': { lat: 9.93, lng: 76.26, tz: 5.5 },
+    'cochin': { lat: 9.93, lng: 76.26, tz: 5.5 },
+    'chandigarh': { lat: 30.73, lng: 76.78, tz: 5.5 },
+    'patna': { lat: 25.60, lng: 85.10, tz: 5.5 },
+    'guwahati': { lat: 26.14, lng: 91.74, tz: 5.5 },
+    'thiruvananthapuram': { lat: 8.52, lng: 76.94, tz: 5.5 },
+    'trivandrum': { lat: 8.52, lng: 76.94, tz: 5.5 },
+    'new york': { lat: 40.71, lng: -74.01, tz: -5 },
+    'los angeles': { lat: 34.05, lng: -118.24, tz: -8 },
+    'london': { lat: 51.51, lng: -0.13, tz: 0 },
+    'dubai': { lat: 25.20, lng: 55.27, tz: 4 },
+    'singapore': { lat: 1.35, lng: 103.82, tz: 8 },
+    'sydney': { lat: -33.87, lng: 151.21, tz: 11 },
+    'toronto': { lat: 43.65, lng: -79.38, tz: -5 },
+};
+
+function resolveCity(placeName) {
+    if (!placeName) return CITY_DB['delhi'];
+    const key = placeName.trim().toLowerCase();
+    if (CITY_DB[key]) return CITY_DB[key];
+    // Partial match
+    for (const k of Object.keys(CITY_DB)) {
+        if (k.startsWith(key) || key.startsWith(k)) return CITY_DB[k];
+    }
+    console.warn(`City "${placeName}" not found, defaulting to Delhi.`);
+    return CITY_DB['delhi'];
+}
+
 // Store current chart data for style switching
 let currentPlanetPositions = null;
+let currentNavamsaPositions = null;
 let currentChartStyle = 'north';
 let currentAscendantIndex = 0;
+let currentNavamsaAscIndex = 0;
 
 // Generate North Indian style Kundli chart (Diamond pattern)
 function generateNorthIndianChart(planetPositions, ascendantIndex, chartType = 'rashi') {
@@ -45,23 +96,6 @@ function generateNorthIndianChart(planetPositions, ascendantIndex, chartType = '
         });
     }
 
-    // North Indian chart - diamond pattern with houses
-    // House positions in the diamond layout
-    const houseCoords = [
-        { x: 150, y: 30, textY: 50 },    // House 1 (Lagna - top center)
-        { x: 75, y: 30, textY: 50 },     // House 2
-        { x: 30, y: 75, textY: 95 },     // House 3
-        { x: 30, y: 150, textY: 145 },   // House 4
-        { x: 30, y: 225, textY: 195 },   // House 5
-        { x: 75, y: 270, textY: 250 },   // House 6
-        { x: 150, y: 270, textY: 250 },  // House 7
-        { x: 225, y: 270, textY: 250 },  // House 8
-        { x: 270, y: 225, textY: 195 },  // House 9
-        { x: 270, y: 150, textY: 145 },  // House 10
-        { x: 270, y: 75, textY: 95 },    // House 11
-        { x: 225, y: 30, textY: 50 }     // House 12
-    ];
-
     let svg = `
         <svg viewBox="0 0 300 300" class="kundli-svg" style="width: 100%; height: auto;">
             <defs>
@@ -70,174 +104,88 @@ function generateNorthIndianChart(planetPositions, ascendantIndex, chartType = '
                     <stop offset="100%" style="stop-color:#B8860B"/>
                 </linearGradient>
             </defs>
-
-            <!-- Background -->
             <rect x="5" y="5" width="290" height="290" fill="rgba(22, 33, 62, 0.9)" stroke="#D4AF37" stroke-width="2" rx="4"/>
-
-            <!-- Outer square -->
             <rect x="10" y="10" width="280" height="280" fill="none" stroke="#D4AF37" stroke-width="1.5"/>
-
-            <!-- Diagonal lines creating diamond pattern -->
             <line x1="10" y1="10" x2="290" y2="290" stroke="#D4AF37" stroke-width="1"/>
             <line x1="290" y1="10" x2="10" y2="290" stroke="#D4AF37" stroke-width="1"/>
-
-            <!-- Cross lines -->
             <line x1="150" y1="10" x2="150" y2="290" stroke="#D4AF37" stroke-width="1"/>
             <line x1="10" y1="150" x2="290" y2="150" stroke="#D4AF37" stroke-width="1"/>
-
-            <!-- Inner diamond (center box) -->
             <polygon points="150,80 220,150 150,220 80,150" fill="none" stroke="#D4AF37" stroke-width="1"/>
-
-            <!-- Lagna marker in house 1 -->
             <text x="148" y="25" text-anchor="middle" fill="#D4AF37" font-size="10" font-weight="bold">Asc</text>
     `;
 
-    // Add house numbers at corners
-    const houseNumPositions = [
-        { x: 150, y: 60 },   // 1
-        { x: 80, y: 40 },    // 2
-        { x: 25, y: 80 },    // 3
-        { x: 25, y: 150 },   // 4
-        { x: 25, y: 220 },   // 5
-        { x: 80, y: 265 },   // 6
-        { x: 150, y: 265 },  // 7
-        { x: 220, y: 265 },  // 8
-        { x: 275, y: 220 },  // 9
-        { x: 275, y: 150 },  // 10
-        { x: 275, y: 80 },   // 11
-        { x: 220, y: 40 }    // 12
-    ];
-
-    // Add planet text positions
     const planetTextPositions = [
-        { x: 150, y: 55 },    // 1
-        { x: 80, y: 55 },     // 2
-        { x: 40, y: 100 },    // 3
-        { x: 40, y: 155 },    // 4
-        { x: 40, y: 210 },    // 5
-        { x: 80, y: 250 },    // 6
-        { x: 150, y: 250 },   // 7
-        { x: 220, y: 250 },   // 8
-        { x: 260, y: 210 },   // 9
-        { x: 260, y: 155 },   // 10
-        { x: 260, y: 100 },   // 11
-        { x: 220, y: 55 }     // 12
+        { x: 150, y: 55 }, { x: 80, y: 55 }, { x: 40, y: 100 }, { x: 40, y: 155 },
+        { x: 40, y: 210 }, { x: 80, y: 250 }, { x: 150, y: 250 }, { x: 220, y: 250 },
+        { x: 260, y: 210 }, { x: 260, y: 155 }, { x: 260, y: 100 }, { x: 220, y: 55 }
     ];
 
-    // Add planets to each house
     for (let house = 1; house <= 12; house++) {
         const pos = planetTextPositions[house - 1];
-        const planetsList = housePlanets[house] || [];
-        if (planetsList.length > 0) {
-            const text = planetsList.join(' ');
-            svg += `<text x="${pos.x}" y="${pos.y + 15}" text-anchor="middle" fill="#D4AF37" font-size="10" font-weight="500">${text}</text>`;
+        const pl = housePlanets[house] || [];
+        if (pl.length > 0) {
+            svg += `<text x="${pos.x}" y="${pos.y + 15}" text-anchor="middle" fill="#D4AF37" font-size="10" font-weight="500">${pl.join(' ')}</text>`;
         }
     }
 
-    // Center label
     svg += `
         <text x="150" y="145" text-anchor="middle" fill="#B8B8B8" font-size="10">${chartType === 'rashi' ? 'Rashi' : 'Navamsa'}</text>
         <text x="150" y="160" text-anchor="middle" fill="#B8B8B8" font-size="10">Chart</text>
-    `;
-
-    svg += '</svg>';
+    </svg>`;
     return svg;
 }
 
 // Generate South Indian style Kundli chart (Grid pattern with fixed signs)
 function generateSouthIndianChart(planetPositions, ascendantIndex, chartType = 'rashi') {
-    // South Indian chart - 4x4 grid with fixed sign positions
-    // Signs are always in the same position, Ascendant is marked
-
-    // Grid positions for the 12 houses (outer ring of 4x4, going clockwise from top-left)
-    // Pisces starts at top-left, going right then down
     const signPositions = [
-        // Top row: Pisces, Aries, Taurus, Gemini
-        { x: 0, y: 0, sign: 11 },   // Pisces (12th sign, index 11)
-        { x: 1, y: 0, sign: 0 },    // Aries
-        { x: 2, y: 0, sign: 1 },    // Taurus
-        { x: 3, y: 0, sign: 2 },    // Gemini
-        // Right column: Cancer, Leo
-        { x: 3, y: 1, sign: 3 },    // Cancer
-        { x: 3, y: 2, sign: 4 },    // Leo
-        // Bottom row (right to left): Virgo, Libra, Scorpio, Sagittarius
-        { x: 3, y: 3, sign: 5 },    // Virgo
-        { x: 2, y: 3, sign: 6 },    // Libra
-        { x: 1, y: 3, sign: 7 },    // Scorpio
-        { x: 0, y: 3, sign: 8 },    // Sagittarius
-        // Left column (bottom to top): Capricorn, Aquarius
-        { x: 0, y: 2, sign: 9 },    // Capricorn
-        { x: 0, y: 1, sign: 10 }    // Aquarius
+        { x: 0, y: 0, sign: 11 }, { x: 1, y: 0, sign: 0 }, { x: 2, y: 0, sign: 1 }, { x: 3, y: 0, sign: 2 },
+        { x: 3, y: 1, sign: 3 }, { x: 3, y: 2, sign: 4 },
+        { x: 3, y: 3, sign: 5 }, { x: 2, y: 3, sign: 6 }, { x: 1, y: 3, sign: 7 }, { x: 0, y: 3, sign: 8 },
+        { x: 0, y: 2, sign: 9 }, { x: 0, y: 1, sign: 10 }
     ];
 
-    // Map planets to their signs
     const signPlanets = {};
     if (planetPositions) {
         Object.entries(planetPositions).forEach(([planet, data]) => {
-            const signIndex = signNames.indexOf(data.sign);
-            if (!signPlanets[signIndex]) signPlanets[signIndex] = [];
-            signPlanets[signIndex].push(planetAbbrev[planet] || planet.substring(0, 2));
+            const si = signNames.indexOf(data.sign);
+            if (!signPlanets[si]) signPlanets[si] = [];
+            signPlanets[si].push(planetAbbrev[planet] || planet.substring(0, 2));
         });
     }
 
-    const cellSize = 70;
-    const padding = 5;
-    const totalSize = cellSize * 4 + padding * 2;
+    const cellSize = 70, padding = 5, totalSize = cellSize * 4 + padding * 2;
 
     let svg = `
         <svg viewBox="0 0 ${totalSize} ${totalSize}" class="kundli-svg" style="width: 100%; height: auto;">
-            <defs>
-                <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#D4AF37"/>
-                    <stop offset="100%" style="stop-color:#B8860B"/>
-                </linearGradient>
-            </defs>
+            <defs><linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#D4AF37"/><stop offset="100%" style="stop-color:#B8860B"/></linearGradient></defs>
+            <rect x="0" y="0" width="${totalSize}" height="${totalSize}" fill="rgba(22, 33, 62, 0.9)" stroke="#D4AF37" stroke-width="2" rx="4"/>`;
 
-            <!-- Background -->
-            <rect x="0" y="0" width="${totalSize}" height="${totalSize}" fill="rgba(22, 33, 62, 0.9)" stroke="#D4AF37" stroke-width="2" rx="4"/>
+    for (let i = 0; i <= 4; i++) {
+        const y = padding + cellSize * i;
+        svg += `<line x1="${padding}" y1="${y}" x2="${totalSize - padding}" y2="${y}" stroke="#D4AF37" stroke-width="1"/>`;
+        svg += `<line x1="${padding + cellSize * i}" y1="${padding}" x2="${padding + cellSize * i}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>`;
+    }
 
-            <!-- Grid lines -->
-            <line x1="${padding}" y1="${padding}" x2="${totalSize - padding}" y2="${padding}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding}" y1="${padding + cellSize}" x2="${totalSize - padding}" y2="${padding + cellSize}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding}" y1="${padding + cellSize * 2}" x2="${totalSize - padding}" y2="${padding + cellSize * 2}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding}" y1="${padding + cellSize * 3}" x2="${totalSize - padding}" y2="${padding + cellSize * 3}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding}" y1="${totalSize - padding}" x2="${totalSize - padding}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
+    svg += `<text x="${totalSize / 2}" y="${totalSize / 2 - 5}" text-anchor="middle" fill="#B8B8B8" font-size="10">${chartType === 'rashi' ? 'Rashi' : 'Navamsa'}</text>
+            <text x="${totalSize / 2}" y="${totalSize / 2 + 10}" text-anchor="middle" fill="#B8B8B8" font-size="10">Chart</text>`;
 
-            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding + cellSize}" y1="${padding}" x2="${padding + cellSize}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding + cellSize * 2}" y1="${padding}" x2="${padding + cellSize * 2}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${padding + cellSize * 3}" y1="${padding}" x2="${padding + cellSize * 3}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
-            <line x1="${totalSize - padding}" y1="${padding}" x2="${totalSize - padding}" y2="${totalSize - padding}" stroke="#D4AF37" stroke-width="1"/>
-
-            <!-- Center area label -->
-            <text x="${totalSize / 2}" y="${totalSize / 2 - 5}" text-anchor="middle" fill="#B8B8B8" font-size="10">${chartType === 'rashi' ? 'Rashi' : 'Navamsa'}</text>
-            <text x="${totalSize / 2}" y="${totalSize / 2 + 10}" text-anchor="middle" fill="#B8B8B8" font-size="10">Chart</text>
-    `;
-
-    // Draw each sign box
-    signPositions.forEach((pos, index) => {
+    signPositions.forEach(pos => {
         const x = padding + pos.x * cellSize;
         const y = padding + pos.y * cellSize;
-        const signIndex = pos.sign;
-        const isAscendant = signIndex === ascendantIndex;
+        const si = pos.sign;
+        const isAsc = si === ascendantIndex;
 
-        // Sign abbreviation in top-left corner
-        svg += `<text x="${x + 5}" y="${y + 12}" fill="${isAscendant ? '#D4AF37' : '#888'}" font-size="9">${signAbbrev[signIndex]}</text>`;
-
-        // Ascendant marker (diagonal line in corner)
-        if (isAscendant) {
+        svg += `<text x="${x + 5}" y="${y + 12}" fill="${isAsc ? '#D4AF37' : '#888'}" font-size="9">${signAbbrev[si]}</text>`;
+        if (isAsc) {
             svg += `<line x1="${x + cellSize - 15}" y1="${y + 3}" x2="${x + cellSize - 3}" y2="${y + 15}" stroke="#D4AF37" stroke-width="2"/>`;
             svg += `<text x="${x + cellSize - 10}" y="${y + 12}" fill="#D4AF37" font-size="8">As</text>`;
         }
 
-        // Planets in this sign
-        const planetsList = signPlanets[signIndex] || [];
-        if (planetsList.length > 0) {
-            const planetsText = planetsList.slice(0, 3).join(' ');
-            svg += `<text x="${x + cellSize / 2}" y="${y + cellSize / 2 + 5}" text-anchor="middle" fill="#D4AF37" font-size="10" font-weight="500">${planetsText}</text>`;
-            if (planetsList.length > 3) {
-                const remainingText = planetsList.slice(3).join(' ');
-                svg += `<text x="${x + cellSize / 2}" y="${y + cellSize / 2 + 18}" text-anchor="middle" fill="#D4AF37" font-size="10">${remainingText}</text>`;
+        const pl = signPlanets[si] || [];
+        if (pl.length > 0) {
+            svg += `<text x="${x + cellSize / 2}" y="${y + cellSize / 2 + 5}" text-anchor="middle" fill="#D4AF37" font-size="10" font-weight="500">${pl.slice(0, 3).join(' ')}</text>`;
+            if (pl.length > 3) {
+                svg += `<text x="${x + cellSize / 2}" y="${y + cellSize / 2 + 18}" text-anchor="middle" fill="#D4AF37" font-size="10">${pl.slice(3).join(' ')}</text>`;
             }
         }
     });
@@ -246,72 +194,135 @@ function generateSouthIndianChart(planetPositions, ascendantIndex, chartType = '
     return svg;
 }
 
-// Calculate planetary positions (simplified)
-function calculatePlanetaryPositions(birthDate, birthTime) {
-    const date = new Date(birthDate + 'T' + birthTime);
-    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-    const hour = date.getHours();
+// ---------- Real astronomical calculations via AstroEngine ----------
 
-    const positions = {};
+const bodyKeys = {
+    sun: 'Sun', moon: 'Moon', mars: 'Mars', mercury: 'Mercury',
+    jupiter: 'Jupiter', venus: 'Venus', saturn: 'Saturn', rahu: 'Rahu', ketu: 'Ketu',
+};
 
-    planets.forEach((planet, index) => {
-        const seed = dayOfYear + index * 31 + hour;
-        const signIndex = (seed * 7) % 12;
-        const degree = ((seed * 13) % 30);
-        const house = ((signIndex + Math.floor(hour / 2)) % 12) + 1;
-        const nakshatraIndex = Math.floor((signIndex * 30 + degree) / 13.333) % 27;
-
-        positions[planet] = {
-            sign: signNames[signIndex],
-            signIndex: signIndex,
-            signHindi: hindiSignNames[signIndex],
-            degree: degree.toFixed(2),
-            house: house,
-            nakshatra: nakshatras[nakshatraIndex],
-            retrograde: (seed % 5 === 0 && ['Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].includes(planet))
-        };
+/**
+ * Single engine call that returns moonData, ascendant, positions, tithi, yoga.
+ * Use this instead of calling calculateMoonSign + calculateAscendant + calculatePlanetaryPositions separately.
+ */
+function computeFullChartLegacy(birthDate, birthTime, birthPlace, tzOverride) {
+    const city = resolveCity(birthPlace);
+    const tz = (tzOverride !== null && tzOverride !== undefined) ? tzOverride : city.tz;
+    const chart = AstroEngine.computeChart({
+        dateStr: birthDate, timeStr: birthTime,
+        lat: city.lat, lng: city.lng, utcOffsetHours: tz,
     });
 
-    return positions;
-}
+    const ascSignIndex = chart.ascendant.signIndex;
+    const positions = {};
 
-// Calculate Ascendant
-function calculateAscendant(birthTime) {
-    const hour = parseInt(birthTime.split(':')[0]);
-    const signIndex = Math.floor(hour / 2) % 12;
-    return {
-        sign: signNames[signIndex],
-        signIndex: signIndex,
-        signHindi: hindiSignNames[signIndex],
-        symbol: signSymbols[signIndex]
+    for (const [bodyKey, planetName] of Object.entries(bodyKeys)) {
+        const body = chart[bodyKey];
+        const si = body.signIndex;
+        const deg = body.degreeInSign;
+        const house = ((si - ascSignIndex + 12) % 12) + 1;
+        const absDeg = si * 30 + deg;
+        const nakshatraIndex = Math.floor(absDeg / 13.333) % 27;
+        const retrograde = body.speed < 0 && ['Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'].includes(planetName);
+
+        positions[planetName] = {
+            sign: signNames[si],
+            signIndex: si,
+            signHindi: hindiSignNames[si],
+            degree: deg.toFixed(2),
+            house: house,
+            nakshatra: nakshatras[nakshatraIndex],
+            retrograde: retrograde,
+        };
+    }
+
+    // Moon sign
+    const moonSi = chart.moon.signIndex;
+    const moonAbsDeg = chart.moon.longitude;
+    const moonNakshatraIndex = Math.floor(moonAbsDeg / 13.333) % 27;
+    const moonData = {
+        sign: signNames[moonSi],
+        signHindi: hindiSignNames[moonSi],
+        symbol: signSymbols[moonSi],
+        nakshatra: nakshatras[moonNakshatraIndex],
     };
-}
 
-// Calculate Moon Sign and Nakshatra
-function calculateMoonSign(birthDate) {
-    const date = new Date(birthDate);
-    const dayOfMonth = date.getDate();
-    const month = date.getMonth();
-
-    const signIndex = (dayOfMonth + month) % 12;
-    const nakshatraIndex = (dayOfMonth * 27 / 30) % 27;
-
-    return {
-        sign: signNames[signIndex],
-        signHindi: hindiSignNames[signIndex],
-        symbol: signSymbols[signIndex],
-        nakshatra: nakshatras[Math.floor(nakshatraIndex)]
+    // Ascendant
+    const ascendant = {
+        sign: signNames[ascSignIndex],
+        signIndex: ascSignIndex,
+        signHindi: hindiSignNames[ascSignIndex],
+        symbol: signSymbols[ascSignIndex],
     };
+
+    // Tithi
+    let tithiDiff = chart.moon.longitude - chart.sun.longitude;
+    if (tithiDiff < 0) tithiDiff += 360;
+    const tithiIndex = Math.floor(tithiDiff / 12);
+    const tithiNames = ['Pratipada', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
+                    'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
+                    'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Purnima/Amavasya'];
+    const paksha = tithiIndex < 15 ? 'Shukla' : 'Krishna';
+    const tithi = `${paksha} ${tithiNames[tithiIndex % 15]}`;
+
+    // Yoga
+    const yogaSum = (chart.sun.longitude + chart.moon.longitude) % 360;
+    const yogaIndex = Math.floor(yogaSum / (800 / 60)) % 27;
+    const yogaNames = ['Vishkumbha', 'Priti', 'Ayushman', 'Saubhagya', 'Shobhana',
+                   'Atiganda', 'Sukarma', 'Dhriti', 'Shula', 'Ganda',
+                   'Vriddhi', 'Dhruva', 'Vyaghata', 'Harshana', 'Vajra',
+                   'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva',
+                   'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma',
+                   'Indra', 'Vaidhriti'];
+    const yoga = yogaNames[yogaIndex];
+
+    // Navamsa positions (D9 chart)
+    const navamsaPositions = {};
+    const ascDeg = chart.ascendant.degreeInSign;
+    const ascNakPada = Math.min(4, Math.floor((ascSignIndex * 30 + ascDeg) % 13.333 / 3.333) + 1);
+    const navamsaAscIndex = (ascSignIndex * 9 + (ascNakPada - 1)) % 12;
+
+    for (const [planetName, data] of Object.entries(positions)) {
+        const si = data.signIndex;
+        const deg = parseFloat(data.degree);
+        const absDeg = si * 30 + deg;
+        const pada = Math.min(4, Math.floor(absDeg % 13.333 / 3.333) + 1);
+        const navamsaSign = (si * 9 + (pada - 1)) % 12;
+        const navamsaHouse = ((navamsaSign - navamsaAscIndex + 12) % 12) + 1;
+
+        navamsaPositions[planetName] = {
+            sign: signNames[navamsaSign],
+            signIndex: navamsaSign,
+            signHindi: hindiSignNames[navamsaSign],
+            degree: data.degree,
+            house: navamsaHouse,
+            nakshatra: data.nakshatra,
+            retrograde: data.retrograde,
+        };
+    }
+
+    return { moonData, ascendant, positions, navamsaPositions, navamsaAscIndex, tithi, yoga };
 }
 
-// Calculate Vimshottari Dasha periods
+// Legacy wrappers for backward compatibility (each now calls computeFullChartLegacy)
+function calculatePlanetaryPositions(birthDate, birthTime, birthPlace) {
+    return computeFullChartLegacy(birthDate, birthTime, birthPlace).positions;
+}
+
+function calculateAscendant(birthDate, birthTime, birthPlace) {
+    return computeFullChartLegacy(birthDate, birthTime, birthPlace).ascendant;
+}
+
+function calculateMoonSign(birthDate, birthTime, birthPlace) {
+    return computeFullChartLegacy(birthDate, birthTime, birthPlace).moonData;
+}
+
+// Vimshottari Dasha (unchanged — pure rule-based)
 function calculateDasha(birthDate, moonNakshatra) {
     const nakshatraIndex = nakshatras.indexOf(moonNakshatra);
     const dashaLordIndex = nakshatraIndex % 9;
-
     const dashas = [];
     let currentYear = new Date(birthDate).getFullYear();
-
     const balanceYears = (dashaDurations[dashaLordIndex] * 0.6);
 
     for (let i = 0; i < 9; i++) {
@@ -321,73 +332,44 @@ function calculateDasha(birthDate, moonNakshatra) {
         const endYear = currentYear + duration;
 
         dashas.push({
-            planet: planet,
-            startYear: Math.floor(currentYear),
-            endYear: Math.floor(endYear),
-            duration: duration,
-            isCurrent: new Date().getFullYear() >= currentYear && new Date().getFullYear() < endYear
+            planet, startYear: Math.floor(currentYear), endYear: Math.floor(endYear),
+            duration, isCurrent: new Date().getFullYear() >= currentYear && new Date().getFullYear() < endYear
         });
-
         currentYear = endYear;
     }
-
     return dashas;
-}
-
-// Calculate Tithi
-function calculateTithi(birthDate) {
-    const date = new Date(birthDate);
-    const daysSinceNewMoon = date.getDate() % 15;
-    const tithis = ['Pratipada', 'Dwitiya', 'Tritiya', 'Chaturthi', 'Panchami',
-                    'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
-                    'Ekadashi', 'Dwadashi', 'Trayodashi', 'Chaturdashi', 'Purnima/Amavasya'];
-    const paksha = date.getDate() <= 15 ? 'Shukla' : 'Krishna';
-    return `${paksha} ${tithis[daysSinceNewMoon]}`;
-}
-
-// Calculate Yoga
-function calculateYoga(birthDate) {
-    const date = new Date(birthDate);
-    const yogas = ['Vishkumbha', 'Priti', 'Ayushman', 'Saubhagya', 'Shobhana',
-                   'Atiganda', 'Sukarma', 'Dhriti', 'Shula', 'Ganda',
-                   'Vriddhi', 'Dhruva', 'Vyaghata', 'Harshana', 'Vajra',
-                   'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva',
-                   'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma',
-                   'Indra', 'Vaidhriti'];
-    const index = (date.getDate() + date.getMonth()) % 27;
-    return yogas[index];
 }
 
 // Switch chart style function
 function switchChartStyle(style) {
     currentChartStyle = style;
-
-    // Update button states
     document.getElementById('north-btn').classList.toggle('active', style === 'north');
     document.getElementById('south-btn').classList.toggle('active', style === 'south');
-
-    // Re-render charts if we have data
-    if (currentPlanetPositions) {
-        renderCharts();
-    }
+    if (currentPlanetPositions) renderCharts();
 }
 
-// Render charts with current style
 function renderCharts() {
-    if (currentChartStyle === 'north') {
-        document.getElementById('rashi-chart').innerHTML = generateNorthIndianChart(currentPlanetPositions, currentAscendantIndex, 'rashi');
-        document.getElementById('navamsa-chart').innerHTML = generateNorthIndianChart(currentPlanetPositions, currentAscendantIndex, 'navamsa');
-    } else {
-        document.getElementById('rashi-chart').innerHTML = generateSouthIndianChart(currentPlanetPositions, currentAscendantIndex, 'rashi');
-        document.getElementById('navamsa-chart').innerHTML = generateSouthIndianChart(currentPlanetPositions, currentAscendantIndex, 'navamsa');
-    }
+    const gen = currentChartStyle === 'north' ? generateNorthIndianChart : generateSouthIndianChart;
+    document.getElementById('rashi-chart').innerHTML = gen(currentPlanetPositions, currentAscendantIndex, 'rashi');
+    document.getElementById('navamsa-chart').innerHTML = gen(currentNavamsaPositions || currentPlanetPositions, currentNavamsaAscIndex, 'navamsa');
 }
 
-// Make switchChartStyle available globally
 window.switchChartStyle = switchChartStyle;
 
+// Initialize pickers for kundli page
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VedicPicker !== 'undefined' && document.getElementById('kundli-date-picker')) {
+        window._kundliDatePicker = VedicPicker.createDatePicker('#kundli-date-picker', { hiddenInputId: 'birth-date' });
+        window._kundliTimePicker = VedicPicker.createTimePicker('#kundli-time-picker', { hiddenInputId: 'birth-time' });
+        window._kundliTzPicker = VedicPicker.createTimezoneSelector('#kundli-tz-picker', { hiddenInputId: 'kundli-timezone', autoDetect: true });
+    }
+    if (typeof VedicPicker !== 'undefined' && document.getElementById('birth-place')) {
+        VedicPicker.createPlaceAutocomplete('#birth-place');
+    }
+});
+
 // Form submission handler
-document.getElementById('kundli-form').addEventListener('submit', function(e) {
+document.getElementById('kundli-form')?.addEventListener('submit', function(e) {
     e.preventDefault();
 
     const name = document.getElementById('name').value;
@@ -396,15 +378,23 @@ document.getElementById('kundli-form').addEventListener('submit', function(e) {
     const birthPlace = document.getElementById('birth-place').value;
     const chartStyle = document.getElementById('chart-style').value;
 
-    // Calculate all astrological data
-    const moonData = calculateMoonSign(birthDate);
-    const ascendant = calculateAscendant(birthTime);
-    const planetPositions = calculatePlanetaryPositions(birthDate, birthTime);
+    // Use timezone offset from picker if available (without mutating CITY_DB)
+    let tzOverride = null;
+    const tzInput = document.getElementById('kundli-timezone');
+    if (tzInput && tzInput.dataset.offsetHours) {
+        tzOverride = parseFloat(tzInput.dataset.offsetHours);
+    }
+
+    // Calculate all astrological data using real astronomy (single engine call)
+    const fullChart = computeFullChartLegacy(birthDate, birthTime, birthPlace, tzOverride);
+    const { moonData, ascendant, positions: planetPositions, navamsaPositions, navamsaAscIndex, tithi, yoga } = fullChart;
     const dashas = calculateDasha(birthDate, moonData.nakshatra);
 
     // Store for chart style switching
     currentPlanetPositions = planetPositions;
+    currentNavamsaPositions = navamsaPositions;
     currentAscendantIndex = ascendant.signIndex;
+    currentNavamsaAscIndex = navamsaAscIndex;
     currentChartStyle = chartStyle;
 
     // Update button states
@@ -417,8 +407,8 @@ document.getElementById('kundli-form').addEventListener('submit', function(e) {
     document.getElementById('birth-nakshatra').textContent = moonData.nakshatra;
     document.getElementById('ascendant').textContent = `${ascendant.symbol} ${ascendant.signHindi}`;
     document.getElementById('sun-sign').textContent = `${planetPositions['Sun'].sign}`;
-    document.getElementById('birth-tithi').textContent = calculateTithi(birthDate);
-    document.getElementById('birth-yoga').textContent = calculateYoga(birthDate);
+    document.getElementById('birth-tithi').textContent = tithi;
+    document.getElementById('birth-yoga').textContent = yoga;
 
     // Generate charts
     renderCharts();
@@ -427,22 +417,66 @@ document.getElementById('kundli-form').addEventListener('submit', function(e) {
     const planetTable = document.getElementById('planet-positions');
     planetTable.innerHTML = '';
 
-    planets.forEach(planet => {
+    planetList.forEach(planet => {
         const data = planetPositions[planet];
+        const isBenefic = window.VedicHoroscopeData?.isBeneficForAscendant(planet, ascendant.signIndex);
+        const mostMalefic = window.VedicHoroscopeData?.getMostMalefic(ascendant.signIndex);
+        const isMostMalefic = (planet === mostMalefic);
+        const houseInfo = window.VedicHoroscopeData?.getHouseInfo(data.house);
+
+        let statusIcon = '';
+        let statusClass = '';
+        if (isMostMalefic) {
+            statusIcon = ' \u26A0';
+            statusClass = ' style="color: #ff6b6b;"';
+        } else if (isBenefic) {
+            statusIcon = ' \u2713';
+            statusClass = ' style="color: #51cf66;"';
+        }
+
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><strong>${planet}</strong>${data.retrograde ? ' (R)' : ''}</td>
+            <td><strong${statusClass}>${planet}${statusIcon}</strong>${data.retrograde ? ' (R)' : ''}</td>
             <td>${data.signHindi} (${data.sign})</td>
-            <td>${data.degree}°</td>
-            <td>${data.house}</td>
+            <td>${data.degree}\u00B0</td>
+            <td title="${houseInfo ? houseInfo.keywords.join(', ') : ''}">${data.house}</td>
             <td>${data.nakshatra}</td>
         `;
         planetTable.appendChild(row);
     });
 
+    // Add planet analysis section
+    if (window.VedicHoroscopeData) {
+        const analysisContainer = document.getElementById('planet-analysis');
+        if (analysisContainer) {
+            const vedicChart = { ascendant: ascendant, planets: planetPositions };
+            const analysis = window.VedicHoroscopeData.generatePlanetAnalysis(vedicChart);
+            const mostMalefic = window.VedicHoroscopeData.getMostMalefic(ascendant.signIndex);
+
+            let html = `<div class="analysis-header" style="margin-bottom: 1rem;">
+                <p style="color: var(--text-muted); font-size: 0.85rem;">
+                    <span style="color: #51cf66;">\u2713 Green</span> = Benefic for your Ascendant (${ascendant.sign}) &nbsp;|&nbsp;
+                    <span style="color: #ff6b6b;">\u26A0 Red</span> = Most Malefic Planet (${mostMalefic})
+                </p>
+            </div>`;
+
+            analysis.forEach(item => {
+                const borderColor = item.isMostMalefic ? '#ff6b6b' : item.isBenefic ? '#51cf66' : '#D4AF37';
+                html += `
+                    <div style="border-left: 3px solid ${borderColor}; padding: 0.5rem 1rem; margin-bottom: 0.5rem; background: rgba(22,33,62,0.5); border-radius: 4px;">
+                        <strong style="color: ${borderColor};">${item.planet}</strong>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;"> in ${item.sign} | House ${item.house}</span>
+                        <p style="color: var(--text); font-size: 0.85rem; margin-top: 0.25rem;">${item.interpretation}</p>
+                    </div>`;
+            });
+
+            analysisContainer.innerHTML = html;
+        }
+    }
+
     // Populate Dasha list
-    const dashaList = document.getElementById('dasha-list');
-    dashaList.innerHTML = '';
+    const dashaListEl = document.getElementById('dasha-list');
+    dashaListEl.innerHTML = '';
 
     dashas.forEach(dasha => {
         const div = document.createElement('div');
@@ -451,12 +485,10 @@ document.getElementById('kundli-form').addEventListener('submit', function(e) {
             <span class="dasha-planet">${dasha.planet} Mahadasha${dasha.isCurrent ? ' (Current)' : ''}</span>
             <span class="dasha-period">${dasha.startYear} - ${dasha.endYear}</span>
         `;
-        dashaList.appendChild(div);
+        dashaListEl.appendChild(div);
     });
 
     // Show results
     document.getElementById('kundli-result').classList.add('active');
-
-    // Scroll to results
     document.getElementById('kundli-result').scrollIntoView({ behavior: 'smooth' });
 });

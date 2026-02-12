@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="200" r="155" fill="url(#glow)"/>
+  <!-- Goat head -->
+  <ellipse cx="175" cy="135" rx="28" ry="32" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Eyes -->
+  <circle cx="165" cy="128" r="2.5" fill="#FFD700"/>
+  <circle cx="182" cy="128" r="2.5" fill="#FFD700"/>
+  <!-- Nose/mouth -->
+  <path d="M168 145 Q175 152 180 145" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Horns - curved and ornate -->
+  <path d="M155 115 Q140 90 130 72 Q122 58 130 50 Q140 45 148 55 Q154 65 152 80" fill="none" stroke="url(#gold)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M192 112 Q205 88 215 72 Q222 58 215 50 Q205 45 198 55 Q192 65 195 80" fill="none" stroke="url(#gold)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Horn ridges -->
+  <path d="M142 85 Q138 80 142 75" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.6"/>
+  <path d="M136 72 Q132 68 136 62" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.6"/>
+  <path d="M208 85 Q212 80 208 75" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.6"/>
+  <path d="M214 72 Q218 68 214 62" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.6"/>
+  <!-- Beard -->
+  <path d="M165 155 Q160 170 155 180 Q150 188 152 195" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <path d="M172 158 Q168 175 165 185 Q163 192 165 198" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.5" stroke-linecap="round"/>
+  <!-- Goat body -->
+  <path d="M190 155 Q210 165 225 180 Q240 200 245 220 Q248 240 240 258" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M160 155 Q145 170 140 190 Q138 210 145 230" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Body middle -->
+  <path d="M145 220 Q180 235 240 225" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.5"/>
+  <!-- Front legs (goat) -->
+  <path d="M150 225 Q145 255 142 280 Q140 292 147 295" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M160 228 Q158 258 156 282 Q155 294 162 296" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Fish tail transition -->
+  <path d="M240 255 Q245 270 255 280 Q268 290 280 285 Q295 278 305 262 Q315 245 310 225 Q305 210 290 205" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Fish tail fin -->
+  <path d="M290 205 Q275 195 268 180 Q262 168 270 160 Q280 155 288 165" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M290 205 Q300 192 308 182 Q315 172 310 162 Q302 155 295 165" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Scales pattern on tail -->
+  <path d="M248 268 Q252 262 258 268" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.5"/>
+  <path d="M260 278 Q265 272 272 278" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.5"/>
+  <path d="M278 282 Q285 276 290 280" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.5"/>
+  <path d="M295 270 Q302 264 306 268" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.5"/>
+  <path d="M308 250 Q312 244 314 248" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.5"/>
+  <!-- Water splash at transition -->
+  <path d="M235 260 Q230 250 225 255" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.4"/>
+  <path d="M242 250 Q238 242 234 246" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Hooves -->
+  <ellipse cx="147" cy="297" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <ellipse cx="162" cy="298" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="55" cy="55" r="2"/><circle cx="345" cy="60" r="1.5"/><circle cx="50" cy="330" r="1.8"/>
+    <circle cx="350" cy="340" r="2"/><circle cx="200" cy="42" r="1.5"/><circle cx="45" cy="200" r="1"/>
+    <circle cx="355" cy="195" r="1.3"/><circle cx="100" cy="48" r="1.2"/><circle cx="280" cy="45" r="1"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M68 72 L70 65 L72 72 L79 74 L72 76 L70 83 L68 76 L61 74Z"/>
+    <path d="M335 78 L337 71 L339 78 L346 80 L339 82 L337 89 L335 82 L328 80Z"/>
+    <path d="M55 310 L57 303 L59 310 L66 312 L59 314 L57 321 L55 314 L48 312Z"/>
+    <path d="M345 315 L347 308 L349 315 L356 317 L349 319 L347 326 L345 319 L338 317Z"/>
+  </g>
+</svg>

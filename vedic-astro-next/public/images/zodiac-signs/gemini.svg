@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="200" r="155" fill="url(#glow)"/>
+  <!-- Left twin face outline -->
+  <path d="M155 160 Q155 130 145 110 Q138 96 145 85 Q155 75 168 82 Q178 90 175 105 Q172 118 170 135 Q168 150 170 165 Q172 185 168 200 Q162 220 155 240 Q148 260 152 275" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Left face features -->
+  <ellipse cx="148" cy="180" rx="22" ry="30" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <circle cx="141" cy="175" r="2.5" fill="#FFD700"/>
+  <circle cx="155" cy="175" r="2.5" fill="#FFD700"/>
+  <path d="M143 188 Q148 194 153 188" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Left flowing hair -->
+  <path d="M130 155 Q110 140 100 160 Q90 180 95 210 Q100 240 115 260" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M125 150 Q100 145 88 170 Q78 195 85 230 Q92 255 110 270" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.7" stroke-linecap="round"/>
+  <path d="M135 148 Q120 135 105 150 Q92 168 92 200" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <!-- Left hair flower -->
+  <circle cx="128" cy="140" r="6" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <circle cx="128" cy="140" r="2" fill="#FFD700"/>
+  <!-- Right twin face outline (mirrored) -->
+  <path d="M245 160 Q245 130 255 110 Q262 96 255 85 Q245 75 232 82 Q222 90 225 105 Q228 118 230 135 Q232 150 230 165 Q228 185 232 200 Q238 220 245 240 Q252 260 248 275" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right face features -->
+  <ellipse cx="252" cy="180" rx="22" ry="30" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <circle cx="245" cy="175" r="2.5" fill="#FFD700"/>
+  <circle cx="259" cy="175" r="2.5" fill="#FFD700"/>
+  <path d="M247 188 Q252 194 257 188" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Right flowing hair -->
+  <path d="M270 155 Q290 140 300 160 Q310 180 305 210 Q300 240 285 260" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M275 150 Q300 145 312 170 Q322 195 315 230 Q308 255 290 270" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.7" stroke-linecap="round"/>
+  <path d="M265 148 Q280 135 295 150 Q308 168 308 200" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <!-- Right hair flower -->
+  <circle cx="272" cy="140" r="6" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <circle cx="272" cy="140" r="2" fill="#FFD700"/>
+  <!-- Connection between twins - intertwined energy -->
+  <path d="M170 200 Q185 190 200 200 Q215 210 230 200" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.6"/>
+  <path d="M170 220 Q185 210 200 220 Q215 230 230 220" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Center star between twins -->
+  <path d="M200 110 L203 100 L206 110 L216 113 L206 116 L203 126 L200 116 L190 113Z" fill="url(#goldLight)"/>
+  <!-- Bottom flourish -->
+  <path d="M140 290 Q160 310 200 315 Q240 310 260 290" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.5"/>
+  <path d="M155 300 Q175 315 200 318 Q225 315 245 300" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.3"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="60" cy="60" r="2"/><circle cx="340" cy="55" r="1.5"/><circle cx="55" cy="310" r="1.8"/>
+    <circle cx="345" cy="320" r="2"/><circle cx="200" cy="50" r="1.5"/><circle cx="50" cy="200" r="1"/>
+    <circle cx="350" cy="180" r="1.3"/><circle cx="120" cy="45" r="1.2"/><circle cx="290" cy="40" r="1"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M75 75 L77 68 L79 75 L86 77 L79 79 L77 86 L75 79 L68 77Z"/>
+    <path d="M325 70 L327 63 L329 70 L336 72 L329 74 L327 81 L325 74 L318 72Z"/>
+    <path d="M60 280 L62 273 L64 280 L71 282 L64 284 L62 291 L60 284 L53 282Z"/>
+    <path d="M340 290 L342 283 L344 290 L351 292 L344 294 L342 301 L340 294 L333 292Z"/>
+  </g>
+</svg>

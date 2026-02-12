@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- ===== 1. Enhanced Navigation ===== -->
     <header class="header">
         <nav class="nav container">
             <a href="index.html" class="logo">
@@ -52,98 +52,133 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
+    <!-- ===== 2. Grand Hero Section ===== -->
     <section class="hero">
         <div class="hero-bg">
-            <div class="stars"></div>
+            <canvas id="star-canvas"></canvas>
             <div class="celestial-circle"></div>
         </div>
+        <div class="hero-om-watermark">&#x0950;</div>
         <div class="container hero-content">
-            <h1 class="hero-title">Discover Your Cosmic Destiny</h1>
+            <p class="hero-shloka sanskrit-text">|| &#x091C;&#x094D;&#x092F;&#x094B;&#x0924;&#x093F;&#x0937;&#x093E;&#x0902; &#x0938;&#x0942;&#x0930;&#x094D;&#x092F;&#x0936;&#x094D;&#x091A;&#x0928;&#x094D;&#x0926;&#x094D;&#x0930;&#x092E;&#x0938;&#x094C; ||</p>
+            <h1 class="hero-title">Discover Your <span class="gold-shimmer">Cosmic Destiny</span></h1>
             <p class="hero-subtitle">Unlock the ancient wisdom of Vedic astrology with personalized horoscopes, birth charts, and life predictions based on 5,000 years of Indian astrological tradition.</p>
             <div class="hero-cta">
-                <a href="kundli.html" class="btn btn-primary">Get Free Birth Chart</a>
+                <a href="kundli.html" class="btn btn-primary btn-glow">Get Free Birth Chart</a>
                 <a href="horoscopes.html" class="btn btn-secondary">Today's Horoscope</a>
             </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-number" data-target="5000">0</span>
+                    <span class="stat-label">Years of Wisdom</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number" data-target="27">0</span>
+                    <span class="stat-label">Nakshatras</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number" data-target="12">0</span>
+                    <span class="stat-label">Rashis</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number" data-target="9">0</span>
+                    <span class="stat-label">Grahas</span>
+                </div>
+            </div>
+        </div>
+        <a href="#cosmic-ticker" class="scroll-indicator" aria-label="Scroll down">&#x25BC;</a>
+    </section>
+
+    <!-- ===== 3. Cosmic Ticker Bar ===== -->
+    <section class="cosmic-ticker" id="cosmic-ticker">
+        <div class="ticker-track" id="ticker-track">
+            <!-- Populated by JS -->
         </div>
     </section>
 
-    <!-- Zodiac Signs Quick Access -->
-    <section class="zodiac-bar">
+    <!-- ===== 4. Live Panchang Widget ===== -->
+    <section class="panchang-widget section" id="panchang-section">
         <div class="container">
-            <h2 class="section-subtitle">Select Your Moon Sign</h2>
-            <div class="zodiac-grid">
-                <a href="zodiac.html#aries" class="zodiac-item">
-                    <span class="zodiac-symbol">♈</span>
-                    <span class="zodiac-name">Mesha</span>
-                    <span class="zodiac-english">Aries</span>
-                </a>
-                <a href="zodiac.html#taurus" class="zodiac-item">
-                    <span class="zodiac-symbol">♉</span>
-                    <span class="zodiac-name">Vrishabha</span>
-                    <span class="zodiac-english">Taurus</span>
-                </a>
-                <a href="zodiac.html#gemini" class="zodiac-item">
-                    <span class="zodiac-symbol">♊</span>
-                    <span class="zodiac-name">Mithuna</span>
-                    <span class="zodiac-english">Gemini</span>
-                </a>
-                <a href="zodiac.html#cancer" class="zodiac-item">
-                    <span class="zodiac-symbol">♋</span>
-                    <span class="zodiac-name">Karka</span>
-                    <span class="zodiac-english">Cancer</span>
-                </a>
-                <a href="zodiac.html#leo" class="zodiac-item">
-                    <span class="zodiac-symbol">♌</span>
-                    <span class="zodiac-name">Simha</span>
-                    <span class="zodiac-english">Leo</span>
-                </a>
-                <a href="zodiac.html#virgo" class="zodiac-item">
-                    <span class="zodiac-symbol">♍</span>
-                    <span class="zodiac-name">Kanya</span>
-                    <span class="zodiac-english">Virgo</span>
-                </a>
-                <a href="zodiac.html#libra" class="zodiac-item">
-                    <span class="zodiac-symbol">♎</span>
-                    <span class="zodiac-name">Tula</span>
-                    <span class="zodiac-english">Libra</span>
-                </a>
-                <a href="zodiac.html#scorpio" class="zodiac-item">
-                    <span class="zodiac-symbol">♏</span>
-                    <span class="zodiac-name">Vrishchika</span>
-                    <span class="zodiac-english">Scorpio</span>
-                </a>
-                <a href="zodiac.html#sagittarius" class="zodiac-item">
-                    <span class="zodiac-symbol">♐</span>
-                    <span class="zodiac-name">Dhanu</span>
-                    <span class="zodiac-english">Sagittarius</span>
-                </a>
-                <a href="zodiac.html#capricorn" class="zodiac-item">
-                    <span class="zodiac-symbol">♑</span>
-                    <span class="zodiac-name">Makara</span>
-                    <span class="zodiac-english">Capricorn</span>
-                </a>
-                <a href="zodiac.html#aquarius" class="zodiac-item">
-                    <span class="zodiac-symbol">♒</span>
-                    <span class="zodiac-name">Kumbha</span>
-                    <span class="zodiac-english">Aquarius</span>
-                </a>
-                <a href="zodiac.html#pisces" class="zodiac-item">
-                    <span class="zodiac-symbol">♓</span>
-                    <span class="zodiac-name">Meena</span>
-                    <span class="zodiac-english">Pisces</span>
-                </a>
+            <div class="section-header-decorated">
+                <p class="section-sanskrit sanskrit-text">&#x0906;&#x091C; &#x0915;&#x093E; &#x092A;&#x0902;&#x091A;&#x093E;&#x0902;&#x0917;</p>
+                <h2 class="section-title">Today's Panchang</h2>
+                <p class="section-description" id="panchang-date"></p>
+            </div>
+            <div class="moon-phase-display" id="moon-phase-display">
+                <!-- Moon phase SVG inserted by JS -->
+            </div>
+            <div class="panchang-widget-grid">
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x1F319;</span>
+                    <span class="panchang-label">Tithi</span>
+                    <span class="panchang-value" id="tithi">Loading...</span>
+                </div>
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x2B50;</span>
+                    <span class="panchang-label">Nakshatra</span>
+                    <span class="panchang-value" id="nakshatra">Loading...</span>
+                </div>
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x2638;</span>
+                    <span class="panchang-label">Yoga</span>
+                    <span class="panchang-value" id="yoga">Loading...</span>
+                </div>
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x25D1;</span>
+                    <span class="panchang-label">Karana</span>
+                    <span class="panchang-value" id="karana">Loading...</span>
+                </div>
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x23F0;</span>
+                    <span class="panchang-label">Rahu Kaal</span>
+                    <span class="panchang-value" id="rahu-kaal">Loading...</span>
+                    <span class="rahu-kaal-status" id="rahu-kaal-status"></span>
+                </div>
+                <div class="glass-card panchang-glass-card">
+                    <span class="panchang-icon">&#x2600;</span>
+                    <span class="panchang-label">Sunrise / Sunset</span>
+                    <span class="panchang-value" id="sunrise-sunset">6:48 AM / 5:32 PM</span>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="panchang.html" class="btn btn-secondary">View Full Panchang</a>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features section">
+    <!-- ===== 5. Interactive Zodiac Wheel ===== -->
+    <section class="zodiac-wheel-section section" id="zodiac-section">
         <div class="container">
-            <h2 class="section-title">Our Services</h2>
-            <p class="section-description">Explore authentic Vedic astrology tools and insights</p>
+            <div class="section-header-decorated">
+                <p class="section-sanskrit sanskrit-text">&#x0930;&#x093E;&#x0936;&#x093F; &#x091A;&#x0915;&#x094D;&#x0930;</p>
+                <h2 class="section-title">Zodiac Signs</h2>
+                <p class="section-description">Explore the 12 Rashis of Vedic Astrology</p>
+            </div>
+            <div class="zodiac-wheel-container">
+                <div class="zodiac-wheel-wrapper" id="zodiac-wheel-wrapper">
+                    <!-- SVG wheel generated by JS -->
+                </div>
+                <div class="zodiac-wheel-info" id="zodiac-wheel-info">
+                    <div class="zodiac-wheel-default">
+                        <h3>Rashi Chakra</h3>
+                        <p>Hover over a sign on the wheel to see details, or click to explore the full zodiac page.</p>
+                        <p style="margin-top: var(--space-md);"><a href="zodiac.html" class="btn btn-secondary">Explore All Signs</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 6. Our Sacred Services ===== -->
+    <section class="services-section section">
+        <div class="container">
+            <div class="section-header-decorated">
+                <p class="section-sanskrit sanskrit-text">&#x0938;&#x0947;&#x0935;&#x093E;&#x090F;&#x0902;</p>
+                <h2 class="section-title">Our Sacred Services</h2>
+                <p class="section-description">Explore authentic Vedic astrology tools and insights</p>
+            </div>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -157,9 +192,9 @@
                     </div>
                     <h3>Free Kundli</h3>
                     <p>Generate your complete Vedic birth chart with planetary positions, houses, and Dasha periods.</p>
-                    <a href="kundli.html" class="feature-link">Create Kundli →</a>
+                    <a href="kundli.html" class="feature-link">Create Kundli &#x2192;</a>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <rect x="8" y="12" width="48" height="44" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -173,9 +208,9 @@
                     </div>
                     <h3>Daily Panchang</h3>
                     <p>Check today's tithi, nakshatra, yoga, karana, and auspicious timings for important activities.</p>
-                    <a href="panchang.html" class="feature-link">View Panchang →</a>
+                    <a href="panchang.html" class="feature-link">View Panchang &#x2192;</a>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <circle cx="22" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -188,9 +223,9 @@
                     </div>
                     <h3>Compatibility</h3>
                     <p>Check your Kundli Milan for marriage compatibility using Ashtakoot and Dashakoot matching.</p>
-                    <a href="compatibility.html" class="feature-link">Check Match →</a>
+                    <a href="compatibility.html" class="feature-link">Check Match &#x2192;</a>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <path d="M32 8 L40 24 L56 26 L44 38 L47 54 L32 46 L17 54 L20 38 L8 26 L24 24 Z" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -198,9 +233,9 @@
                     </div>
                     <h3>Horoscopes</h3>
                     <p>Get daily, weekly, monthly, and yearly predictions based on your Moon sign and planetary transits.</p>
-                    <a href="horoscopes.html" class="feature-link">Read Horoscope →</a>
+                    <a href="horoscopes.html" class="feature-link">Read Horoscope &#x2192;</a>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <rect x="10" y="8" width="44" height="48" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -211,9 +246,9 @@
                     </div>
                     <h3>Learn Astrology</h3>
                     <p>Explore articles on planets, houses, nakshatras, yogas, and remedial measures in Vedic astrology.</p>
-                    <a href="articles.html" class="feature-link">Start Learning →</a>
+                    <a href="articles.html" class="feature-link">Start Learning &#x2192;</a>
                 </div>
-                <div class="feature-card highlight">
+                <div class="feature-card highlight scroll-reveal">
                     <div class="feature-icon">
                         <svg viewBox="0 0 64 64" class="icon">
                             <circle cx="32" cy="20" r="12" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -225,13 +260,68 @@
                     </div>
                     <h3>Expert Consultation</h3>
                     <p>Connect with experienced Vedic astrologers for personalized readings and life guidance.</p>
-                    <a href="consultation.html" class="feature-link">Book Session →</a>
+                    <a href="consultation.html" class="feature-link">Book Session &#x2192;</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Why Vedic Astrology Section -->
+    <!-- ===== 7. Quick Kundli Preview ===== -->
+    <section class="quick-kundli-section section" id="quick-kundli">
+        <div class="container">
+            <div class="section-header-decorated">
+                <p class="section-sanskrit sanskrit-text">&#x0915;&#x0941;&#x0923;&#x094D;&#x0921;&#x0932;&#x0940;</p>
+                <h2 class="section-title">Quick Kundli Preview</h2>
+                <p class="section-description">Enter your birth details to see a preview of your Vedic birth chart</p>
+            </div>
+            <div class="quick-kundli-grid">
+                <div class="glass-card quick-kundli-form">
+                    <h3 style="font-family: var(--font-heading); color: var(--gold); margin-bottom: var(--space-lg);">Birth Details</h3>
+                    <form id="quick-kundli-form">
+                        <div class="form-group">
+                            <label class="form-label" for="qk-name">Name</label>
+                            <input type="text" id="qk-name" class="form-input" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <div id="qk-date-picker"></div>
+                            <input type="hidden" id="qk-dob" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time of Birth</label>
+                            <div id="qk-time-picker"></div>
+                            <input type="hidden" id="qk-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Timezone</label>
+                            <div id="qk-tz-picker"></div>
+                            <input type="hidden" id="qk-timezone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="qk-place">Place of Birth</label>
+                            <input type="text" id="qk-place" class="form-input" placeholder="City, Country" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Preview</button>
+                    </form>
+                </div>
+                <div class="glass-card quick-kundli-result" id="quick-kundli-result">
+                    <div class="quick-kundli-placeholder" id="quick-kundli-placeholder">
+                        <div class="placeholder-icon">&#x2728;</div>
+                        <p>Your birth chart preview will appear here once you enter your details.</p>
+                    </div>
+                    <div id="quick-kundli-chart" style="display: none;">
+                        <div id="quick-chart-svg"></div>
+                        <div class="quick-kundli-badges" id="quick-kundli-badges"></div>
+                        <div style="margin-top: var(--space-lg);">
+                            <a href="kundli.html" class="btn btn-secondary">View Full Report &#x2192;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 8. Why Vedic Astrology ===== -->
     <section class="why-vedic section">
         <div class="container">
             <div class="why-vedic-content">
@@ -240,28 +330,28 @@
                     <p>Vedic astrology, also known as Jyotish Shastra, is an ancient Indian science dating back over 5,000 years. Unlike Western astrology, Vedic astrology uses the sidereal zodiac, accounting for the precession of equinoxes for more accurate planetary positions.</p>
                     <ul class="vedic-benefits">
                         <li>
-                            <span class="benefit-icon">☽</span>
+                            <span class="benefit-icon">&#x263D;</span>
                             <div>
                                 <strong>Moon Sign Based</strong>
                                 <p>Predictions based on Moon sign for deeper emotional and karmic insights</p>
                             </div>
                         </li>
                         <li>
-                            <span class="benefit-icon">⏰</span>
+                            <span class="benefit-icon">&#x23F0;</span>
                             <div>
                                 <strong>Precise Timing</strong>
                                 <p>Dasha system provides accurate timing of life events</p>
                             </div>
                         </li>
                         <li>
-                            <span class="benefit-icon">💎</span>
+                            <span class="benefit-icon">&#x1F48E;</span>
                             <div>
                                 <strong>Remedial Measures</strong>
                                 <p>Gemstones, mantras, and rituals to balance planetary influences</p>
                             </div>
                         </li>
                         <li>
-                            <span class="benefit-icon">🔮</span>
+                            <span class="benefit-icon">&#x1F52E;</span>
                             <div>
                                 <strong>Predictive Accuracy</strong>
                                 <p>Proven system refined over millennia of observation</p>
@@ -270,101 +360,146 @@
                     </ul>
                 </div>
                 <div class="why-vedic-image">
-                    <div class="mandala">
-                        <div class="mandala-ring ring-1"></div>
-                        <div class="mandala-ring ring-2"></div>
-                        <div class="mandala-ring ring-3"></div>
-                        <div class="mandala-center">
-                            <span>ॐ</span>
+                    <div class="mandala-svg-container" id="mandala-container">
+                        <!-- Enhanced mandala SVG generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 9. Featured Astrologers ===== -->
+    <section class="astrologers-section section">
+        <div class="container">
+            <div class="section-header-decorated">
+                <p class="section-sanskrit sanskrit-text">&#x091C;&#x094D;&#x092F;&#x094B;&#x0924;&#x093F;&#x0937;&#x0940;</p>
+                <h2 class="section-title">Featured Astrologers</h2>
+                <p class="section-description">Connect with our experienced Vedic astrology experts</p>
+            </div>
+            <div class="astrologers-grid">
+                <div class="glass-card astrologer-card scroll-reveal">
+                    <span class="ribbon">Top Rated</span>
+                    <div class="astrologer-avatar">&#x1F9D1;</div>
+                    <h4>Pt. Ramesh Shastri</h4>
+                    <div class="astrologer-specialization">
+                        <span class="tag">Kundli</span>
+                        <span class="tag">Muhurta</span>
+                    </div>
+                    <div class="astrologer-rating">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                    <div class="astrologer-stats">15+ years | 5000+ consultations</div>
+                    <a href="consultation.html" class="btn btn-secondary">Book Session</a>
+                </div>
+                <div class="glass-card astrologer-card scroll-reveal">
+                    <div class="astrologer-avatar">&#x1F469;</div>
+                    <h4>Dr. Meera Joshi</h4>
+                    <div class="astrologer-specialization">
+                        <span class="tag">Nadi</span>
+                        <span class="tag">Remedies</span>
+                    </div>
+                    <div class="astrologer-rating">&#x2605;&#x2605;&#x2605;&#x2605;&#x2606;</div>
+                    <div class="astrologer-stats">12+ years | 3500+ consultations</div>
+                    <a href="consultation.html" class="btn btn-secondary">Book Session</a>
+                </div>
+                <div class="glass-card astrologer-card scroll-reveal">
+                    <div class="astrologer-avatar">&#x1F468;</div>
+                    <h4>Acharya Vikram Singh</h4>
+                    <div class="astrologer-specialization">
+                        <span class="tag">Prashna</span>
+                        <span class="tag">Vastu</span>
+                    </div>
+                    <div class="astrologer-rating">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                    <div class="astrologer-stats">20+ years | 8000+ consultations</div>
+                    <a href="consultation.html" class="btn btn-secondary">Book Session</a>
+                </div>
+                <div class="glass-card astrologer-card scroll-reveal">
+                    <div class="astrologer-avatar">&#x1F9D1;</div>
+                    <h4>Jyotishi Ananya Devi</h4>
+                    <div class="astrologer-specialization">
+                        <span class="tag">Marriage</span>
+                        <span class="tag">Career</span>
+                    </div>
+                    <div class="astrologer-rating">&#x2605;&#x2605;&#x2605;&#x2605;&#x2606;</div>
+                    <div class="astrologer-stats">10+ years | 2800+ consultations</div>
+                    <a href="consultation.html" class="btn btn-secondary">Book Session</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 10. Testimonials Carousel ===== -->
+    <section class="testimonials-carousel-section section">
+        <div class="container">
+            <div class="section-header-decorated">
+                <h2 class="section-title">What Our Users Say</h2>
+            </div>
+            <div class="carousel-container" id="testimonial-carousel">
+                <div class="carousel-track" id="carousel-track">
+                    <div class="carousel-slide">
+                        <div class="carousel-testimonial">
+                            <div class="carousel-quote-mark">&#x201C;</div>
+                            <div class="testimonial-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                            <p class="testimonial-text">"The birth chart analysis was incredibly accurate. It helped me understand my career path and relationship patterns in ways I never expected."</p>
+                            <span class="author-name">Priya S.</span>
+                            <span class="author-location">Mumbai, India</span>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-testimonial">
+                            <div class="carousel-quote-mark">&#x201C;</div>
+                            <div class="testimonial-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                            <p class="testimonial-text">"I've been using Vedic_Astro for daily horoscopes and Panchang. The predictions are remarkably on point. Highly recommended!"</p>
+                            <span class="author-name">Rajesh K.</span>
+                            <span class="author-location">Delhi, India</span>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-testimonial">
+                            <div class="carousel-quote-mark">&#x201C;</div>
+                            <div class="testimonial-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                            <p class="testimonial-text">"The compatibility report helped us understand our relationship dynamics better. The remedies suggested made a real difference."</p>
+                            <span class="author-name">Anita &amp; Vikram</span>
+                            <span class="author-location">Bangalore, India</span>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="carousel-testimonial">
+                            <div class="carousel-quote-mark">&#x201C;</div>
+                            <div class="testimonial-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                            <p class="testimonial-text">"The Kundli generation was so detailed and insightful. Pt. Ramesh Shastri's consultation changed my perspective on my Saturn transit."</p>
+                            <span class="author-name">Amit P.</span>
+                            <span class="author-location">Pune, India</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Today's Panchang Preview -->
-    <section class="panchang-preview section">
-        <div class="container">
-            <h2 class="section-title">Today's Panchang</h2>
-            <p class="section-description" id="panchang-date"></p>
-            <div class="panchang-grid" id="panchang-data">
-                <div class="panchang-item">
-                    <span class="panchang-label">Tithi</span>
-                    <span class="panchang-value" id="tithi">Shukla Dashami</span>
-                </div>
-                <div class="panchang-item">
-                    <span class="panchang-label">Nakshatra</span>
-                    <span class="panchang-value" id="nakshatra">Uttara Phalguni</span>
-                </div>
-                <div class="panchang-item">
-                    <span class="panchang-label">Yoga</span>
-                    <span class="panchang-value" id="yoga">Shubha</span>
-                </div>
-                <div class="panchang-item">
-                    <span class="panchang-label">Karana</span>
-                    <span class="panchang-value" id="karana">Balava</span>
-                </div>
-                <div class="panchang-item">
-                    <span class="panchang-label">Sunrise</span>
-                    <span class="panchang-value" id="sunrise">6:48 AM</span>
-                </div>
-                <div class="panchang-item">
-                    <span class="panchang-label">Sunset</span>
-                    <span class="panchang-value" id="sunset">5:32 PM</span>
-                </div>
-            </div>
-            <a href="panchang.html" class="btn btn-secondary">View Full Panchang</a>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials section">
-        <div class="container">
-            <h2 class="section-title">What Our Users Say</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"The birth chart analysis was incredibly accurate. It helped me understand my career path and relationship patterns in ways I never expected."</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">Priya S.</span>
-                        <span class="author-location">Mumbai, India</span>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"I've been using Vedic_Astro for daily horoscopes and Panchang. The predictions are remarkably on point. Highly recommended!"</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">Rajesh K.</span>
-                        <span class="author-location">Delhi, India</span>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-stars">★★★★★</div>
-                    <p class="testimonial-text">"The compatibility report helped us understand our relationship dynamics better. The remedies suggested made a real difference."</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">Anita & Vikram</span>
-                        <span class="author-location">Bangalore, India</span>
-                    </div>
+                <div class="carousel-dots" id="carousel-dots">
+                    <!-- Dots generated by JS -->
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta section">
+    <!-- ===== 11. Final CTA ===== -->
+    <section class="cta-enhanced section">
+        <div class="cta-lotus cta-lotus-left">&#x2740;</div>
+        <div class="cta-lotus cta-lotus-right">&#x2740;</div>
         <div class="container">
             <div class="cta-content">
                 <h2>Ready to Explore Your Cosmic Blueprint?</h2>
                 <p>Get your free Vedic birth chart and discover what the stars have in store for you.</p>
-                <a href="kundli.html" class="btn btn-primary btn-large">Generate Free Kundli</a>
+                <div class="cta-buttons">
+                    <a href="kundli.html" class="btn btn-primary btn-large btn-glow">Generate Free Kundli</a>
+                    <a href="consultation.html" class="btn btn-secondary btn-large">Consult an Astrologer</a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- ===== 12. Premium Footer ===== -->
+    <footer class="footer footer-premium">
         <div class="container">
+            <div class="footer-top-border">
+                <span class="footer-ornament">&#x2726;</span>
+            </div>
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="index.html" class="logo">
@@ -372,6 +507,12 @@
                         <span class="logo-text">Vedic_Astro</span>
                     </a>
                     <p>Your trusted source for authentic Vedic astrology insights, horoscopes, and spiritual guidance.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook">f</a>
+                        <a href="#" aria-label="Twitter">X</a>
+                        <a href="#" aria-label="Instagram">in</a>
+                        <a href="#" aria-label="YouTube">YT</a>
+                    </div>
                 </div>
                 <div class="footer-links">
                     <h4>Quick Links</h4>
@@ -392,24 +533,34 @@
                     </ul>
                 </div>
                 <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="terms.html">Terms of Use</a></li>
-                    </ul>
+                    <h4>Newsletter</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: var(--space-sm);">Get daily horoscope updates</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed!';">
+                        <input type="email" placeholder="Your email" aria-label="Email for newsletter">
+                        <button type="submit">Join</button>
+                    </form>
+                    <div style="margin-top: var(--space-lg);">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2025 Vedic_Astro. All rights reserved.</p>
+                <p>&copy; 2026 Vedic_Astro. All rights reserved.</p>
                 <p class="disclaimer">Disclaimer: Astrology is for entertainment and guidance purposes. Major life decisions should be made with professional advice.</p>
             </div>
         </div>
     </footer>
 
+    <script src="js/date-time-picker.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/astro-engine.js"></script>
+    <script src="js/kundli.js"></script>
     <script>
         // Check if user is logged in
         const AUTH_KEY = 'vedic_astro_user';

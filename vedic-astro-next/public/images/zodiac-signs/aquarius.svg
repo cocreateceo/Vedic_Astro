@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="185" r="155" fill="url(#glow)"/>
+  <!-- Figure head -->
+  <ellipse cx="170" cy="100" rx="22" ry="26" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Face -->
+  <circle cx="163" cy="95" r="2" fill="#FFD700"/>
+  <circle cx="177" cy="95" r="2" fill="#FFD700"/>
+  <path d="M167 106 Q170 111 173 106" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Hair -->
+  <path d="M150 88 Q135 78 128 85 Q122 95 130 108" fill="none" stroke="url(#gold)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M152 82 Q140 68 130 72 Q118 80 125 100" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.7" stroke-linecap="round"/>
+  <path d="M155 78 Q148 62 138 65 Q128 72 130 90" fill="none" stroke="url(#goldLight)" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
+  <!-- Neck and shoulders -->
+  <path d="M158 125 Q155 140 145 150" fill="none" stroke="url(#gold)" stroke-width="2"/>
+  <path d="M182 125 Q185 140 195 148" fill="none" stroke="url(#gold)" stroke-width="2"/>
+  <!-- Body/robe -->
+  <path d="M145 150 Q135 180 130 215 Q128 240 135 260" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M195 148 Q200 175 198 210 Q195 240 188 260" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Robe folds -->
+  <path d="M148 180 Q160 188 152 210" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M190 178 Q178 185 185 208" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <!-- Water vessel (kumbha) -->
+  <path d="M205 140 Q215 130 230 130 Q248 130 255 145 Q260 158 255 170 Q248 182 230 185 Q215 185 208 175 Q203 165 205 155" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <!-- Vessel opening -->
+  <ellipse cx="230" cy="130" rx="18" ry="5" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <!-- Vessel decoration -->
+  <path d="M212 155 Q230 148 250 155" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <path d="M210 165 Q230 158 252 165" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <!-- Arms holding vessel -->
+  <path d="M195 155 Q200 148 208 145" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M145 160 Q150 155 160 158 Q170 162 175 170" fill="none" stroke="url(#gold)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Water pouring out - main stream -->
+  <path d="M250 175 Q265 195 275 220 Q282 240 280 260 Q275 280 265 300 Q255 320 240 340" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Water stream details -->
+  <path d="M252 180 Q270 200 280 225 Q287 248 285 270 Q280 290 272 310" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <path d="M255 185 Q275 210 285 238 Q292 260 290 280" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <!-- Water splashes/droplets -->
+  <circle cx="270" cy="235" r="3" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="282" cy="258" r="2.5" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <circle cx="275" cy="280" r="3" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="260" cy="310" r="2" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <!-- Water wave lines -->
+  <path d="M235 345 Q260 338 285 345 Q310 352 335 345" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4"/>
+  <path d="M225 355 Q250 348 275 355 Q300 362 325 355" fill="none" stroke="url(#gold)" stroke-width="1" opacity="0.3"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="55" cy="50" r="2"/><circle cx="345" cy="55" r="1.5"/><circle cx="50" cy="320" r="1.8"/>
+    <circle cx="355" cy="330" r="2"/><circle cx="300" cy="50" r="1.5"/><circle cx="40" cy="180" r="1"/>
+    <circle cx="100" cy="45" r="1.3"/><circle cx="350" cy="170" r="1.2"/><circle cx="200" cy="38" r="1"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M65 65 L67 58 L69 65 L76 67 L69 69 L67 76 L65 69 L58 67Z"/>
+    <path d="M338 70 L340 63 L342 70 L349 72 L342 74 L340 81 L338 74 L331 72Z"/>
+    <path d="M55 300 L57 293 L59 300 L66 302 L59 304 L57 311 L55 304 L48 302Z"/>
+    <path d="M350 305 L352 298 L354 305 L361 307 L354 309 L352 316 L350 309 L343 307Z"/>
+  </g>
+</svg>

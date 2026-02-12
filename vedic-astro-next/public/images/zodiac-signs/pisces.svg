@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="200" r="155" fill="url(#glow)"/>
+  <!-- Upper fish (swimming right) -->
+  <path d="M120 140 Q145 120 180 115 Q215 112 245 120 Q270 130 285 148 Q295 162 288 175 Q278 188 260 190 Q240 192 218 185 Q195 178 175 168 Q150 155 135 150 Q120 148 120 140Z" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <!-- Upper fish eye -->
+  <circle cx="255" cy="148" r="5" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <circle cx="255" cy="148" r="2.5" fill="#FFD700"/>
+  <!-- Upper fish tail -->
+  <path d="M120 140 Q100 125 85 115 Q75 108 72 118 Q70 128 80 135" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M120 140 Q100 152 88 160 Q78 168 75 158 Q72 148 82 142" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Upper fish fins -->
+  <path d="M200 115 Q210 95 220 100 Q225 108 215 118" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.6"/>
+  <path d="M170 165 Q165 180 172 185 Q180 182 178 172" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <!-- Upper fish scales -->
+  <path d="M160 128 Q170 125 175 132" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M185 125 Q195 122 198 130" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M210 125 Q220 123 222 130" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M235 130 Q245 128 247 135" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M175 145 Q185 142 188 150" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <path d="M200 148 Q210 145 213 153" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <path d="M225 152 Q235 150 237 157" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <!-- Lower fish (swimming left) -->
+  <path d="M280 260 Q255 280 220 285 Q185 288 155 280 Q130 270 115 252 Q105 238 112 225 Q122 212 140 210 Q160 208 182 215 Q205 222 225 232 Q250 245 265 250 Q280 252 280 260Z" fill="none" stroke="url(#gold)" stroke-width="3"/>
+  <!-- Lower fish eye -->
+  <circle cx="145" cy="252" r="5" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <circle cx="145" cy="252" r="2.5" fill="#FFD700"/>
+  <!-- Lower fish tail -->
+  <path d="M280 260 Q300 275 315 285 Q325 292 328 282 Q330 272 320 265" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M280 260 Q300 248 312 240 Q322 232 325 242 Q328 252 318 258" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Lower fish fins -->
+  <path d="M200 285 Q190 305 180 300 Q175 292 185 282" fill="none" stroke="url(#goldLight)" stroke-width="2" opacity="0.6"/>
+  <path d="M230 235 Q235 220 228 215 Q220 218 222 228" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.5"/>
+  <!-- Lower fish scales -->
+  <path d="M240 272 Q230 275 225 268" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M215 275 Q205 278 202 270" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M190 275 Q180 277 178 270" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <path d="M165 270 Q155 272 153 265" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <!-- Connecting band/ribbon between fish -->
+  <path d="M200 185 Q205 200 200 215" fill="none" stroke="url(#goldLight)" stroke-width="2.5" opacity="0.6"/>
+  <path d="M195 188 Q192 200 195 212" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4"/>
+  <path d="M205 188 Q208 200 205 212" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Center jewel -->
+  <circle cx="200" cy="200" r="6" fill="url(#goldLight)" opacity="0.6"/>
+  <circle cx="200" cy="200" r="9" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Bubbles -->
+  <circle cx="160" cy="192" r="3" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <circle cx="240" cy="208" r="3" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.4"/>
+  <circle cx="175" cy="205" r="2" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <circle cx="228" cy="195" r="2" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="55" cy="55" r="2"/><circle cx="348" cy="52" r="1.5"/><circle cx="50" cy="340" r="1.8"/>
+    <circle cx="352" cy="345" r="2"/><circle cx="200" cy="42" r="1.5"/><circle cx="42" cy="200" r="1"/>
+    <circle cx="358" cy="195" r="1.3"/><circle cx="110" cy="48" r="1.2"/><circle cx="295" cy="45" r="1"/>
+    <circle cx="55" cy="145" r="1.5"/><circle cx="345" cy="135" r="1"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M68 72 L70 65 L72 72 L79 74 L72 76 L70 83 L68 76 L61 74Z"/>
+    <path d="M335 65 L337 58 L339 65 L346 67 L339 69 L337 76 L335 69 L328 67Z"/>
+    <path d="M55 318 L57 311 L59 318 L66 320 L59 322 L57 329 L55 322 L48 320Z"/>
+    <path d="M345 322 L347 315 L349 322 L356 324 L349 326 L347 333 L345 326 L338 324Z"/>
+  </g>
+</svg>

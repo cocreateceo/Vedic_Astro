@@ -1261,6 +1261,132 @@ const VedicHoroscopeData = {
         });
 
         return keyDates;
+    },
+
+    // Functional Benefic Planets per Ascendant
+    // Source: Functional B Planets.jpg (documents/)
+    functionalBenefics: {
+        0:  ["Sun", "Moon", "Mars", "Jupiter", "Venus", "Saturn"],       // Aries
+        1:  ["Sun", "Moon", "Mercury", "Saturn"],                         // Taurus
+        2:  ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"], // Gemini
+        3:  ["Sun", "Moon", "Mars", "Mercury", "Venus"],                  // Cancer
+        4:  ["Sun", "Mars", "Mercury", "Jupiter", "Venus"],               // Leo
+        5:  ["Moon", "Mercury", "Jupiter", "Venus"],                      // Virgo
+        6:  ["Sun", "Moon", "Mars", "Jupiter", "Venus", "Saturn"],        // Libra
+        7:  ["Sun", "Moon", "Mercury", "Jupiter", "Saturn"],              // Scorpio
+        8:  ["Sun", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"],     // Sagittarius
+        9:  ["Moon", "Mars", "Mercury", "Venus", "Saturn"],               // Capricorn
+        10: ["Sun", "Mars", "Jupiter", "Venus", "Saturn"],                // Aquarius
+        11: ["Moon", "Mars", "Mercury", "Jupiter"]                        // Pisces
+    },
+
+    // Most Malefic Planet per Ascendant
+    // Source: MMP.jpg (documents/)
+    mostMaleficPlanet: {
+        0:  "Ketu",      // Aries
+        1:  "Jupiter",   // Taurus
+        2:  "Ketu",      // Gemini
+        3:  "Saturn",    // Cancer
+        4:  "Moon",      // Leo
+        5:  "Mars",      // Virgo
+        6:  "Mercury",   // Libra
+        7:  "Venus",     // Scorpio
+        8:  "Moon",      // Sagittarius
+        9:  "Sun",       // Capricorn
+        10: "Mercury",   // Aquarius
+        11: "Venus"      // Pisces
+    },
+
+    // House Significations (North Indian Chart)
+    // Source: house_rep_n.jpeg (documents/)
+    houseSignifications: {
+        1:  { name: "1st House (Lagna)", keywords: ["Looks", "Complexion", "Character", "Manners"], description: "Self, personality, physical body, health, and overall life path" },
+        2:  { name: "2nd House (Dhana)", keywords: ["Speech", "Savings"], description: "Wealth, family, speech, food habits, and early education" },
+        3:  { name: "3rd House (Sahaja)", keywords: ["Courage", "Social Media", "Creative Writing"], description: "Siblings, courage, communication, short travels, and self-effort" },
+        4:  { name: "4th House (Sukha)", keywords: ["Property", "Vehicles", "Education"], description: "Mother, home, land, vehicles, happiness, and formal education" },
+        5:  { name: "5th House (Putra)", keywords: ["Intelligence", "Romance", "Fame"], description: "Children, creativity, intelligence, romance, past life merit" },
+        6:  { name: "6th House (Ripu)", keywords: ["Diseases", "Debts", "Service Roles", "Enemies"], description: "Enemies, diseases, debts, obstacles, and daily work routines" },
+        7:  { name: "7th House (Kalatra)", keywords: ["Business", "Legal Contracts", "Partnership", "Marriage"], description: "Spouse, marriage, business partnerships, and public dealings" },
+        8:  { name: "8th House (Ayu)", keywords: ["Death", "Occult Knowledge", "Court Cases", "Divorce"], description: "Longevity, transformation, inheritance, secrets, and sudden events" },
+        9:  { name: "9th House (Dharma)", keywords: ["Travels", "Spirituality", "Higher Education"], description: "Fortune, father, religion, long travels, higher learning, and guru" },
+        10: { name: "10th House (Karma)", keywords: ["Career", "Bosses", "Co-workers", "Workplace", "Prestige"], description: "Career, profession, reputation, authority, and public status" },
+        11: { name: "11th House (Labha)", keywords: ["Income", "Social Circle", "Networking Contacts"], description: "Gains, income, friends, elder siblings, and fulfillment of desires" },
+        12: { name: "12th House (Vyaya)", keywords: ["Losses", "Prison", "Research", "Moksha"], description: "Expenses, losses, foreign lands, spirituality, and liberation" }
+    },
+
+    /**
+     * Check if a planet is functionally benefic for a given ascendant
+     * @param {string} planet - Planet name
+     * @param {number} ascendantIndex - Ascendant sign index (0-11)
+     * @returns {boolean}
+     */
+    isBeneficForAscendant: function(planet, ascendantIndex) {
+        const benefics = this.functionalBenefics[ascendantIndex];
+        return benefics ? benefics.includes(planet) : false;
+    },
+
+    /**
+     * Get the most malefic planet for a given ascendant
+     * @param {number} ascendantIndex - Ascendant sign index (0-11)
+     * @returns {string} - Planet name
+     */
+    getMostMalefic: function(ascendantIndex) {
+        return this.mostMaleficPlanet[ascendantIndex] || "Unknown";
+    },
+
+    /**
+     * Get house signification details
+     * @param {number} houseNumber - House number (1-12)
+     * @returns {Object} - House details
+     */
+    getHouseInfo: function(houseNumber) {
+        return this.houseSignifications[houseNumber] || null;
+    },
+
+    /**
+     * Generate planet analysis based on benefic/malefic status
+     * @param {Object} vedicChart - User's Vedic chart
+     * @returns {Array} - Array of planet analysis objects
+     */
+    generatePlanetAnalysis: function(vedicChart) {
+        if (!vedicChart || !vedicChart.ascendant || !vedicChart.planets) return [];
+
+        const ascIdx = vedicChart.ascendant.index;
+        const malefic = this.getMostMalefic(ascIdx);
+        const analysis = [];
+
+        Object.entries(vedicChart.planets).forEach(([planet, data]) => {
+            const isBenefic = this.isBeneficForAscendant(planet, ascIdx);
+            const isMostMalefic = (planet === malefic);
+            const houseInfo = this.getHouseInfo(data.house);
+
+            analysis.push({
+                planet: planet,
+                sign: data.sign,
+                house: data.house,
+                degree: data.degree,
+                isBenefic: isBenefic,
+                isMostMalefic: isMostMalefic,
+                houseKeywords: houseInfo ? houseInfo.keywords : [],
+                houseDescription: houseInfo ? houseInfo.description : "",
+                interpretation: isMostMalefic
+                    ? `${planet} is your most challenging planet. In the ${data.house}${this.getOrdinal(data.house)} house (${houseInfo ? houseInfo.keywords.join(', ') : ''}), exercise caution in these areas. Remedies are recommended.`
+                    : isBenefic
+                        ? `${planet} is a functional benefic for your ascendant. Placed in the ${data.house}${this.getOrdinal(data.house)} house (${houseInfo ? houseInfo.keywords.join(', ') : ''}), it brings positive results in these life areas.`
+                        : `${planet} in the ${data.house}${this.getOrdinal(data.house)} house (${houseInfo ? houseInfo.keywords.join(', ') : ''}) gives mixed results. Monitor this area carefully.`
+            });
+        });
+
+        return analysis;
+    },
+
+    /**
+     * Get ordinal suffix for a number
+     */
+    getOrdinal: function(n) {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return (s[(v - 20) % 10] || s[v] || s[0]);
     }
 };
 

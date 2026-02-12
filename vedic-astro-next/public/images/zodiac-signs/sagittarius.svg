@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#F28C1A"/><stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DC"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#DAA520"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.25"/><stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="starGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="400" height="400" fill="#0a0604" rx="20"/>
+  <circle cx="200" cy="190" r="160" fill="url(#glow)"/>
+  <!-- Bow -->
+  <path d="M115 100 Q80 150 85 210 Q90 270 125 310" fill="none" stroke="url(#gold)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Bowstring -->
+  <line x1="115" y1="100" x2="125" y2="310" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Pulled bowstring curve -->
+  <path d="M115 100 Q200 180 125 310" fill="none" stroke="url(#goldLight)" stroke-width="1" opacity="0.3"/>
+  <!-- Arrow shaft -->
+  <line x1="130" y1="210" x2="320" y2="80" stroke="url(#gold)" stroke-width="3"/>
+  <!-- Arrowhead -->
+  <path d="M320 80 L335 65 L325 90 L320 80Z" fill="url(#goldLight)"/>
+  <path d="M320 80 L310 62 L325 75" fill="url(#goldLight)" opacity="0.7"/>
+  <!-- Arrow fletching -->
+  <path d="M142 203 Q135 210 138 218" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <path d="M138 206 Q130 200 132 192" fill="none" stroke="url(#goldLight)" stroke-width="2"/>
+  <!-- Centaur torso (human upper) -->
+  <ellipse cx="185" cy="195" rx="22" ry="28" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Head -->
+  <ellipse cx="190" cy="155" rx="18" ry="22" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Face -->
+  <circle cx="184" cy="150" r="2" fill="#FFD700"/>
+  <circle cx="196" cy="150" r="2" fill="#FFD700"/>
+  <path d="M187 160 Q190 164 193 160" fill="none" stroke="url(#goldLight)" stroke-width="1.5"/>
+  <!-- Hair flowing back -->
+  <path d="M175 142 Q160 130 150 135 Q142 142 148 155" fill="none" stroke="url(#gold)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M178 138 Q165 122 155 125 Q145 132 150 148" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.7" stroke-linecap="round"/>
+  <path d="M180 135 Q170 118 162 120 Q153 125 155 140" fill="none" stroke="url(#goldLight)" stroke-width="1.2" opacity="0.5" stroke-linecap="round"/>
+  <!-- Arms drawing bow -->
+  <path d="M165 190 Q145 195 130 205" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M200 185 Q230 170 250 155" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Horse body -->
+  <path d="M185 225 Q200 230 230 235 Q260 238 280 230 Q295 220 300 205 Q302 192 295 185" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M185 225 Q175 235 170 248 Q168 260 175 270" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
+  <!-- Horse belly -->
+  <path d="M190 240 Q220 255 260 250 Q280 245 290 230" fill="none" stroke="url(#gold)" stroke-width="1.5" opacity="0.4"/>
+  <!-- Front legs -->
+  <path d="M270 240 Q265 270 260 300 Q258 315 265 320" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M280 235 Q278 265 275 295 Q274 312 280 318" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Hind legs -->
+  <path d="M185 248 Q178 275 175 305 Q174 318 180 322" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M195 252 Q192 280 190 310 Q189 322 195 325" fill="none" stroke="url(#gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Tail -->
+  <path d="M175 260 Q155 270 145 285 Q138 300 142 315 Q148 325 160 320" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <path d="M175 262 Q160 275 152 292 Q148 308 155 318" fill="none" stroke="url(#goldLight)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <!-- Hooves -->
+  <ellipse cx="265" cy="322" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <ellipse cx="280" cy="320" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <ellipse cx="180" cy="324" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <ellipse cx="195" cy="327" rx="6" ry="3" fill="url(#gold)" opacity="0.6"/>
+  <!-- Sparkles -->
+  <g fill="#FFD700" filter="url(#starGlow)">
+    <circle cx="50" cy="55" r="2"/><circle cx="350" cy="50" r="1.5"/><circle cx="45" cy="330" r="1.8"/>
+    <circle cx="355" cy="340" r="2"/><circle cx="340" cy="100" r="1.5"/><circle cx="40" cy="280" r="1"/>
+    <circle cx="355" cy="150" r="1.3"/><circle cx="300" cy="50" r="1.2"/>
+  </g>
+  <g fill="#FFF8DC" opacity="0.9">
+    <path d="M60 70 L62 63 L64 70 L71 72 L64 74 L62 81 L60 74 L53 72Z"/>
+    <path d="M340 60 L342 53 L344 60 L351 62 L344 64 L342 71 L340 64 L333 62Z"/>
+    <path d="M50 310 L52 303 L54 310 L61 312 L54 314 L52 321 L50 314 L43 312Z"/>
+  </g>
+</svg>

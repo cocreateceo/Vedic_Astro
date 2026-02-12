@@ -92,19 +92,62 @@ function initDashboard() {
     document.getElementById('sidebar-asc').textContent = chart.ascendant.name;
     document.getElementById('sidebar-nak').textContent = chart.nakshatra;
 
-    // Initialize edit form with current values
-    document.getElementById('edit-dob').value = user.dob;
-    document.getElementById('edit-tob').value = user.tob;
-    document.getElementById('edit-pob').value = user.pob;
-    if (user.timezone) {
-        document.getElementById('edit-timezone').value = user.timezone;
+    // Initialize pickers for edit form
+    if (typeof VedicPicker !== 'undefined' && document.getElementById('edit-date-picker')) {
+        window._editDatePicker = VedicPicker.createDatePicker('#edit-date-picker', { hiddenInputId: 'edit-dob' });
+        window._editTimePicker = VedicPicker.createTimePicker('#edit-time-picker', { hiddenInputId: 'edit-tob' });
+        window._editTzPicker = VedicPicker.createTimezoneSelector('#edit-tz-picker', { hiddenInputId: 'edit-timezone', autoDetect: false });
+
+        // Set current values on pickers
+        if (user.dob) window._editDatePicker.setValue(user.dob);
+        if (user.tob) window._editTimePicker.setValue(user.tob);
+        if (user.timezone) window._editTzPicker.setValue(user.timezone);
+    }
+    if (typeof VedicPicker !== 'undefined' && document.getElementById('edit-pob')) {
+        VedicPicker.createPlaceAutocomplete('#edit-pob');
     }
 
-    // Set Dasha (calculated from Vimshottari system)
+    // Set place of birth for the text input
+    document.getElementById('edit-pob').value = user.pob;
+
+    // Set Dasha using real Vimshottari calculation from Moon nakshatra
     const dashaOrder = ['Ketu', 'Venus', 'Sun', 'Moon', 'Mars', 'Rahu', 'Jupiter', 'Saturn', 'Mercury'];
-    const currentDashaIndex = (today.getFullYear() - new Date(user.dob).getFullYear()) % 9;
-    document.getElementById('current-dasha').textContent = `${dashaOrder[currentDashaIndex]} Mahadasha`;
-    document.getElementById('current-antardasha').textContent = `${dashaOrder[(currentDashaIndex + 1) % 9]} Antardasha`;
+    const dashaDurations = [7, 20, 6, 10, 7, 18, 16, 19, 17];
+    const nakshatraList = [
+        'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira', 'Ardra',
+        'Punarvasu', 'Pushya', 'Ashlesha', 'Magha', 'Purva Phalguni', 'Uttara Phalguni',
+        'Hasta', 'Chitra', 'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha',
+        'Mula', 'Purva Ashadha', 'Uttara Ashadha', 'Shravana', 'Dhanishta', 'Shatabhisha',
+        'Purva Bhadrapada', 'Uttara Bhadrapada', 'Revati'
+    ];
+    const nakIdx = nakshatraList.indexOf(chart.nakshatra);
+    const dashaLordIdx = nakIdx >= 0 ? nakIdx % 9 : 0;
+    const birthYear = new Date(user.dob).getFullYear();
+    const balanceYears = dashaDurations[dashaLordIdx] * 0.6;
+    let dashaLord = dashaOrder[dashaLordIdx];
+    let antardashaLord = dashaOrder[(dashaLordIdx + 1) % 9];
+
+    // Walk through dasha periods to find current one
+    let yearCursor = birthYear;
+    for (let i = 0; i < 9; i++) {
+        const idx = (dashaLordIdx + i) % 9;
+        const dur = i === 0 ? balanceYears : dashaDurations[idx];
+        const endYear = yearCursor + dur;
+        if (today.getFullYear() >= yearCursor && today.getFullYear() < endYear) {
+            dashaLord = dashaOrder[idx];
+            antardashaLord = dashaOrder[(idx + 1) % 9];
+            break;
+        }
+        yearCursor = endYear;
+    }
+
+    const dashaMalefic = window.VedicHoroscopeData?.getMostMalefic(chart.ascendant.index) || '';
+    const dashaBenefic = window.VedicHoroscopeData?.isBeneficForAscendant(dashaLord, chart.ascendant.index);
+    const dashaStatus = (dashaLord === dashaMalefic) ? ' ⚠' : dashaBenefic ? ' ✓' : '';
+    const dashaColor = (dashaLord === dashaMalefic) ? 'color:#ff6b6b;' : dashaBenefic ? 'color:#51cf66;' : '';
+
+    document.getElementById('current-dasha').innerHTML = `<span style="${dashaColor}">${dashaLord} Mahadasha${dashaStatus}</span>`;
+    document.getElementById('current-antardasha').textContent = `${antardashaLord} Antardasha`;
 
     // Load reports from stored horoscope
     loadDailyReport();
@@ -165,16 +208,25 @@ function loadDailyReport() {
             "Your cosmic energies are aligned for a productive day. Trust your intuition and take measured steps toward your goals.";
     }
 
-    // Set transits (calculated from current date)
+    // Set transits with benefic/malefic indicators
     const planets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
     const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    const ascIdx = user.vedicChart?.ascendant?.index || 0;
+    const mostMalefic = window.VedicHoroscopeData?.getMostMalefic(ascIdx) || '';
+
     const transitGrid = document.getElementById('transit-grid');
-    transitGrid.innerHTML = planets.slice(0, 6).map((planet, i) => `
-        <div class="transit-item">
-            <div class="transit-planet">${planet}</div>
-            <div class="transit-sign">${signs[(today.getMonth() + i) % 12]}</div>
-        </div>
-    `).join('');
+    transitGrid.innerHTML = planets.slice(0, 6).map((planet, i) => {
+        const isBenefic = window.VedicHoroscopeData?.isBeneficForAscendant(planet, ascIdx);
+        const isMalefic = (planet === mostMalefic);
+        const indicator = isMalefic ? ' <span style="color:#ff6b6b;" title="Most malefic for your ascendant">⚠</span>'
+                        : isBenefic ? ' <span style="color:#51cf66;" title="Benefic for your ascendant">✓</span>'
+                        : '';
+        return `
+            <div class="transit-item">
+                <div class="transit-planet">${planet}${indicator}</div>
+                <div class="transit-sign">${signs[(today.getMonth() + i) % 12]}</div>
+            </div>`;
+    }).join('');
 }
 
 // Load weekly report from stored horoscope

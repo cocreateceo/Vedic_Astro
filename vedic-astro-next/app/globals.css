@@ -1,0 +1,756 @@
+@import "tailwindcss";
+
+/* ===== Google Translate - Hide default UI ===== */
+.goog-te-banner-frame,
+.skiptranslate,
+#goog-gt-tt {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+/* ===== Custom Theme Variables ===== */
+@theme {
+  --color-cosmic-bg: var(--sign-cosmic-bg, #110a04);
+  --color-cosmic-surface: var(--sign-surface, #241810);
+  --color-cosmic-card: rgba(52, 34, 24, 0.88);
+  --color-cosmic-card-border: rgba(242, 140, 26, 0.2);
+  --color-gold-400: #d4a843;
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #b8860b;
+  --color-gold-light: #F4E4BA;
+  --color-accent-purple: #8b5cf6;
+  --color-text-primary: var(--sign-text-primary, #F5F5F5);
+  --color-text-muted: var(--sign-text-muted, #B8B8B8);
+  --color-bg-card: var(--sign-card-bg, #342218);
+  --color-bg-light: var(--sign-bg-light, #2e1e14);
+
+  /* Sign theme colors - consumed via Tailwind utilities */
+  --color-sign-primary: var(--sign-primary, #F28C1A);
+  --color-sign-secondary: var(--sign-secondary, #FFB030);
+  --color-sign-dark: var(--sign-dark, #D06A10);
+
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Poppins', sans-serif;
+  --font-devanagari: 'Noto Sans Devanagari', sans-serif;
+}
+
+/* ===== Sign Theme CSS Custom Properties ===== */
+:root {
+  --sign-primary: #F28C1A;
+  --sign-secondary: #FFB030;
+  --sign-dark: #D06A10;
+  --sign-glow-rgb: 242,140,26;
+  --sign-cosmic-bg: #110a04;
+  --sign-surface: #241810;
+  --sign-bg-light: #2e1e14;
+  --sign-card-bg: #342218;
+  --sign-nav-bg: rgba(17,10,4,0.95);
+  --sign-nav-scroll: rgba(17,10,4,0.98);
+  --sign-glass-from: rgba(52,34,24,0.88);
+  --sign-glass-to: rgba(42,26,16,0.88);
+  --sign-text-primary: #F5F5F5;
+  --sign-text-muted: #B8B8B8;
+}
+
+/*
+ * CRITICAL: --color-* must be re-defined on [data-sign-theme] elements
+ * because Tailwind's @theme defines them with var() on :root.
+ * CSS resolves var() at computed-value time ON the element where it's defined.
+ * Re-defining here ensures they resolve with body's overridden values.
+ */
+[data-sign-theme] {
+  --color-sign-primary: var(--sign-primary);
+  --color-sign-secondary: var(--sign-secondary);
+  --color-sign-dark: var(--sign-dark);
+  --color-cosmic-bg: var(--sign-cosmic-bg);
+  --color-cosmic-surface: var(--sign-surface);
+  --color-bg-card: var(--sign-card-bg);
+  --color-bg-light: var(--sign-bg-light);
+  --color-text-primary: var(--sign-text-primary);
+  --color-text-muted: var(--sign-text-muted);
+}
+
+/* ===== Visual Themes ===== */
+
+/* Vedic Ember - Warm Sunset (matches :root default) */
+[data-sign-theme="vedic-ember"] {
+  --sign-primary: #F28C1A;
+  --sign-secondary: #FFB030;
+  --sign-dark: #D06A10;
+  --sign-glow-rgb: 242,140,26;
+  --sign-cosmic-bg: #110a04;
+  --sign-surface: #241810;
+  --sign-bg-light: #2e1e14;
+  --sign-card-bg: #342218;
+  --sign-nav-bg: rgba(17,10,4,0.95);
+  --sign-nav-scroll: rgba(17,10,4,0.98);
+  --sign-glass-from: rgba(52,34,24,0.88);
+  --sign-glass-to: rgba(42,26,16,0.88);
+}
+
+/* Sacred Fire - Crimson Flames */
+[data-sign-theme="sacred-fire"] {
+  --sign-primary: #F01040;
+  --sign-secondary: #FF4060;
+  --sign-dark: #B80C30;
+  --sign-glow-rgb: 240,16,64;
+  --sign-cosmic-bg: #140408;
+  --sign-surface: #2e1018;
+  --sign-bg-light: #381420;
+  --sign-card-bg: #3e1824;
+  --sign-nav-bg: rgba(20,4,8,0.95);
+  --sign-nav-scroll: rgba(20,4,8,0.98);
+  --sign-glass-from: rgba(62,24,36,0.88);
+  --sign-glass-to: rgba(50,16,26,0.88);
+}
+
+/* Temple Gold - Classic Golden */
+[data-sign-theme="temple-gold"] {
+  --sign-primary: #E8B830;
+  --sign-secondary: #FFD740;
+  --sign-dark: #C09010;
+  --sign-glow-rgb: 232,184,48;
+  --sign-cosmic-bg: #100e04;
+  --sign-surface: #262010;
+  --sign-bg-light: #302818;
+  --sign-card-bg: #362e1c;
+  --sign-nav-bg: rgba(16,14,4,0.95);
+  --sign-nav-scroll: rgba(16,14,4,0.98);
+  --sign-glass-from: rgba(54,46,28,0.88);
+  --sign-glass-to: rgba(44,36,20,0.88);
+}
+
+/* Cosmic Night - Deep Indigo Sky */
+[data-sign-theme="cosmic-night"] {
+  --sign-primary: #4B6EF5;
+  --sign-secondary: #70A0FF;
+  --sign-dark: #3050C0;
+  --sign-glow-rgb: 75,110,245;
+  --sign-cosmic-bg: #04060e;
+  --sign-surface: #0c142c;
+  --sign-bg-light: #101a36;
+  --sign-card-bg: #141e3c;
+  --sign-nav-bg: rgba(4,6,14,0.95);
+  --sign-nav-scroll: rgba(4,6,14,0.98);
+  --sign-glass-from: rgba(20,30,60,0.88);
+  --sign-glass-to: rgba(26,36,72,0.88);
+}
+
+/* Ocean Deep - Teal Depths */
+[data-sign-theme="ocean-deep"] {
+  --sign-primary: #00D4D8;
+  --sign-secondary: #40F0E0;
+  --sign-dark: #009898;
+  --sign-glow-rgb: 0,212,216;
+  --sign-cosmic-bg: #040c0e;
+  --sign-surface: #0c1e22;
+  --sign-bg-light: #10262c;
+  --sign-card-bg: #142c32;
+  --sign-nav-bg: rgba(4,12,14,0.95);
+  --sign-nav-scroll: rgba(4,12,14,0.98);
+  --sign-glass-from: rgba(18,38,44,0.88);
+  --sign-glass-to: rgba(24,46,52,0.88);
+}
+
+/* Sacred Light - Clean Ivory & Saffron */
+[data-sign-theme="sacred-light"] {
+  --sign-primary: #C07820;
+  --sign-secondary: #D89838;
+  --sign-dark: #A06010;
+  --sign-glow-rgb: 192,120,32;
+  --sign-cosmic-bg: #FEFBF6;
+  --sign-surface: #F5EFE5;
+  --sign-bg-light: #EDE5D8;
+  --sign-card-bg: #FFFFFF;
+  --sign-nav-bg: rgba(254,251,246,0.95);
+  --sign-nav-scroll: rgba(254,251,246,0.98);
+  --sign-glass-from: rgba(255,255,255,0.92);
+  --sign-glass-to: rgba(248,242,232,0.92);
+  --sign-text-primary: #1C1410;
+  --sign-text-muted: #6B5D50;
+}
+
+/* Light theme: give glass cards subtle depth shadow */
+[data-sign-theme="sacred-light"] .glass-card {
+  box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+}
+[data-sign-theme="sacred-light"] .glass-card:hover {
+  box-shadow: 0 4px 30px rgba(192,120,32,0.15);
+}
+
+/* ===== Zodiac Sign Themes (auto-applied on login) ===== */
+
+/* ===== Aries - Fire / Mars - Crimson Red ===== */
+[data-sign-theme="aries"] {
+  --sign-primary: #DC143C;
+  --sign-secondary: #FF4D6A;
+  --sign-dark: #A0102E;
+  --sign-glow-rgb: 220,20,60;
+  --sign-cosmic-bg: #1a080c;
+  --sign-surface: #2a1218;
+  --sign-bg-light: #301820;
+  --sign-card-bg: #341a22;
+  --sign-nav-bg: rgba(26,8,12,0.95);
+  --sign-nav-scroll: rgba(26,8,12,0.98);
+  --sign-glass-from: rgba(42,18,24,0.9);
+  --sign-glass-to: rgba(52,26,34,0.9);
+}
+
+/* ===== Taurus - Earth / Venus - Emerald Green ===== */
+[data-sign-theme="taurus"] {
+  --sign-primary: #2E8B57;
+  --sign-secondary: #4CAF7A;
+  --sign-dark: #1E6B3E;
+  --sign-glow-rgb: 46,139,87;
+  --sign-cosmic-bg: #081410;
+  --sign-surface: #122418;
+  --sign-bg-light: #16281c;
+  --sign-card-bg: #1a2e22;
+  --sign-nav-bg: rgba(8,20,16,0.95);
+  --sign-nav-scroll: rgba(8,20,16,0.98);
+  --sign-glass-from: rgba(18,36,24,0.9);
+  --sign-glass-to: rgba(26,46,34,0.9);
+}
+
+/* ===== Gemini - Air / Mercury - Yellow ===== */
+[data-sign-theme="gemini"] {
+  --sign-primary: #F4D03F;
+  --sign-secondary: #FFEB3B;
+  --sign-dark: #C9A825;
+  --sign-glow-rgb: 244,208,63;
+  --sign-cosmic-bg: #14120a;
+  --sign-surface: #242018;
+  --sign-bg-light: #28241c;
+  --sign-card-bg: #2c2820;
+  --sign-nav-bg: rgba(20,18,10,0.95);
+  --sign-nav-scroll: rgba(20,18,10,0.98);
+  --sign-glass-from: rgba(36,32,24,0.9);
+  --sign-glass-to: rgba(44,40,32,0.9);
+}
+
+/* ===== Cancer - Water / Moon - Silver ===== */
+[data-sign-theme="cancer"] {
+  --sign-primary: #C0C0C0;
+  --sign-secondary: #D8D8D8;
+  --sign-dark: #A0A0A0;
+  --sign-glow-rgb: 192,192,192;
+  --sign-cosmic-bg: #0a0c14;
+  --sign-surface: #141824;
+  --sign-bg-light: #181c28;
+  --sign-card-bg: #1c2030;
+  --sign-nav-bg: rgba(10,12,20,0.95);
+  --sign-nav-scroll: rgba(10,12,20,0.98);
+  --sign-glass-from: rgba(20,24,36,0.9);
+  --sign-glass-to: rgba(28,32,48,0.9);
+}
+
+/* ===== Leo - Fire / Sun - Royal Gold ===== */
+[data-sign-theme="leo"] {
+  --sign-primary: #D4AF37;
+  --sign-secondary: #E4C84B;
+  --sign-dark: #B8860B;
+  --sign-glow-rgb: 212,175,55;
+  --sign-cosmic-bg: #12100a;
+  --sign-surface: #201e14;
+  --sign-bg-light: #242218;
+  --sign-card-bg: #28261c;
+  --sign-nav-bg: rgba(18,16,10,0.95);
+  --sign-nav-scroll: rgba(18,16,10,0.98);
+  --sign-glass-from: rgba(32,30,20,0.9);
+  --sign-glass-to: rgba(42,38,28,0.9);
+}
+
+/* ===== Virgo - Earth / Mercury - Olive Green ===== */
+[data-sign-theme="virgo"] {
+  --sign-primary: #6B8E23;
+  --sign-secondary: #8AAF3C;
+  --sign-dark: #4F6A1A;
+  --sign-glow-rgb: 107,142,35;
+  --sign-cosmic-bg: #0c1008;
+  --sign-surface: #1a2014;
+  --sign-bg-light: #1e2418;
+  --sign-card-bg: #222a1c;
+  --sign-nav-bg: rgba(12,16,8,0.95);
+  --sign-nav-scroll: rgba(12,16,8,0.98);
+  --sign-glass-from: rgba(26,32,20,0.9);
+  --sign-glass-to: rgba(34,42,28,0.9);
+}
+
+/* ===== Libra - Air / Venus - Pink ===== */
+[data-sign-theme="libra"] {
+  --sign-primary: #E8B4C8;
+  --sign-secondary: #F0CCD8;
+  --sign-dark: #D09AAE;
+  --sign-glow-rgb: 232,180,200;
+  --sign-cosmic-bg: #140a10;
+  --sign-surface: #221620;
+  --sign-bg-light: #261a24;
+  --sign-card-bg: #2c1e28;
+  --sign-nav-bg: rgba(20,10,16,0.95);
+  --sign-nav-scroll: rgba(20,10,16,0.98);
+  --sign-glass-from: rgba(34,22,32,0.9);
+  --sign-glass-to: rgba(44,30,40,0.9);
+}
+
+/* ===== Scorpio - Water / Mars - Black & Deep Red ===== */
+[data-sign-theme="scorpio"] {
+  --sign-primary: #8B0000;
+  --sign-secondary: #B02020;
+  --sign-dark: #6A0000;
+  --sign-glow-rgb: 139,0,0;
+  --sign-cosmic-bg: #140606;
+  --sign-surface: #221010;
+  --sign-bg-light: #261414;
+  --sign-card-bg: #2c1818;
+  --sign-nav-bg: rgba(20,6,6,0.95);
+  --sign-nav-scroll: rgba(20,6,6,0.98);
+  --sign-glass-from: rgba(34,16,16,0.9);
+  --sign-glass-to: rgba(44,24,24,0.9);
+}
+
+/* ===== Sagittarius - Fire / Jupiter - Purple ===== */
+[data-sign-theme="sagittarius"] {
+  --sign-primary: #8A2BE2;
+  --sign-secondary: #A855F7;
+  --sign-dark: #6A1FB0;
+  --sign-glow-rgb: 138,43,226;
+  --sign-cosmic-bg: #100a1a;
+  --sign-surface: #1c142e;
+  --sign-bg-light: #201832;
+  --sign-card-bg: #241c38;
+  --sign-nav-bg: rgba(16,10,26,0.95);
+  --sign-nav-scroll: rgba(16,10,26,0.98);
+  --sign-glass-from: rgba(28,20,46,0.9);
+  --sign-glass-to: rgba(36,28,56,0.9);
+}
+
+/* ===== Capricorn - Earth / Saturn - Brown ===== */
+[data-sign-theme="capricorn"] {
+  --sign-primary: #8B6C42;
+  --sign-secondary: #A89060;
+  --sign-dark: #6B4E2A;
+  --sign-glow-rgb: 139,108,66;
+  --sign-cosmic-bg: #120e08;
+  --sign-surface: #201c14;
+  --sign-bg-light: #242018;
+  --sign-card-bg: #28241c;
+  --sign-nav-bg: rgba(18,14,8,0.95);
+  --sign-nav-scroll: rgba(18,14,8,0.98);
+  --sign-glass-from: rgba(32,28,20,0.9);
+  --sign-glass-to: rgba(40,36,28,0.9);
+}
+
+/* ===== Aquarius - Air / Saturn+Rahu - Electric Blue ===== */
+[data-sign-theme="aquarius"] {
+  --sign-primary: #00BFFF;
+  --sign-secondary: #40E0D0;
+  --sign-dark: #0088BB;
+  --sign-glow-rgb: 0,191,255;
+  --sign-cosmic-bg: #061218;
+  --sign-surface: #0e1e2c;
+  --sign-bg-light: #122230;
+  --sign-card-bg: #162836;
+  --sign-nav-bg: rgba(6,18,24,0.95);
+  --sign-nav-scroll: rgba(6,18,24,0.98);
+  --sign-glass-from: rgba(14,30,44,0.9);
+  --sign-glass-to: rgba(22,40,54,0.9);
+}
+
+/* ===== Pisces - Water / Jupiter - Lavender ===== */
+[data-sign-theme="pisces"] {
+  --sign-primary: #9370DB;
+  --sign-secondary: #B19CD9;
+  --sign-dark: #7048B0;
+  --sign-glow-rgb: 147,112,219;
+  --sign-cosmic-bg: #0e0a16;
+  --sign-surface: #1a142a;
+  --sign-bg-light: #1e182e;
+  --sign-card-bg: #221c34;
+  --sign-nav-bg: rgba(14,10,22,0.95);
+  --sign-nav-scroll: rgba(14,10,22,0.98);
+  --sign-glass-from: rgba(26,20,42,0.9);
+  --sign-glass-to: rgba(34,28,52,0.9);
+}
+
+/* ===== Base Styles ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-cosmic-bg);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Smooth theme transitions when sign changes */
+@property --sign-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #F28C1A;
+}
+
+@property --sign-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #FFB030;
+}
+
+@property --sign-dark {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #D06A10;
+}
+
+body[data-sign-theme],
+body:not([data-sign-theme]) {
+  transition: --sign-primary 0.6s ease,
+              --sign-secondary 0.6s ease,
+              --sign-dark 0.6s ease;
+}
+
+/* Prevent theme flash before JS hydration */
+body.theme-loading * {
+  transition: none !important;
+}
+
+/* ===== Gold Shimmer Text ===== */
+.gold-shimmer {
+  background: linear-gradient(90deg, var(--sign-primary), var(--sign-secondary), var(--sign-primary), var(--sign-dark), var(--sign-primary));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 3s linear infinite;
+}
+
+@keyframes goldShimmer {
+  to { background-position: 200% center; }
+}
+
+/* ===== Header Shimmer ===== */
+@keyframes headerShimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ===== Ticker Scroll ===== */
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== Mandala Rotations ===== */
+.mandala-layer-slow {
+  animation: mandalaRotate 60s linear infinite;
+  transform-origin: center;
+}
+
+.mandala-layer-medium {
+  animation: mandalaRotate 40s linear infinite reverse;
+  transform-origin: center;
+}
+
+.mandala-layer-fast {
+  animation: mandalaRotate 25s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes mandalaRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Celestial Circle ===== */
+@keyframes rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===== Glass Card ===== */
+.glass-card {
+  background: linear-gradient(145deg, var(--sign-glass-from), var(--sign-glass-to));
+  border: 1px solid rgba(var(--sign-glow-rgb), 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(var(--sign-glow-rgb), 0.05);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(var(--sign-glow-rgb), 0.45);
+  box-shadow: 0 0 25px rgba(var(--sign-glow-rgb), 0.2);
+  transform: translateY(-2px);
+}
+
+/* ===== Scroll Reveal ===== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Carousel ===== */
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+}
+
+/* ===== Star Canvas ===== */
+#star-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ===== Button Glow ===== */
+.btn-glow {
+  animation: btnGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes btnGlow {
+  from { box-shadow: 0 0 12px rgba(var(--sign-glow-rgb), 0.5); }
+  to { box-shadow: 0 0 30px rgba(var(--sign-glow-rgb), 0.8); }
+}
+
+/* ===== Zodiac Wedge Hover ===== */
+.zodiac-wedge path {
+  transition: all 0.3s ease;
+}
+
+.zodiac-wedge:hover path {
+  fill: rgba(var(--sign-glow-rgb), 0.25);
+  stroke: rgba(var(--sign-glow-rgb), 0.9);
+  stroke-width: 2;
+}
+
+/* ===== Kundli SVG ===== */
+.kundli-svg {
+  width: 100%;
+  height: auto;
+  max-width: 400px;
+}
+
+/* ===== Score Circle ===== */
+.score-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--sign-primary) calc(var(--score-percent, 0%) * 3.6deg),
+    rgba(var(--sign-glow-rgb), 0.2) 0deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-circle-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--sign-cosmic-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Rating Bar ===== */
+.rating-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(var(--sign-glow-rgb), 0.2);
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sign-primary), var(--sign-secondary));
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* ===== Toast Notification ===== */
+.success-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--sign-primary), var(--sign-dark));
+  color: #0a0a1a;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  z-index: 9999;
+  animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ===== Theme Fade In ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== Premium Interaction Utilities ===== */
+
+/* Hover Lift — card hover with vertical shift + glow shadow */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(var(--sign-glow-rgb), 0.15);
+}
+
+/* Hover Glow — subtle glow on hover */
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--sign-glow-rgb), 0.2);
+}
+
+/* Stagger Items — fade+translate with variable delay */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition-delay: calc(var(--stagger, 0) * 80ms);
+}
+.stagger-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade Up animation with stagger support */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s ease forwards;
+  animation-delay: calc(var(--stagger, 0) * 80ms);
+}
+
+/* Animated Underline — grows from left on hover */
+.animated-underline {
+  position: relative;
+}
+.animated-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--sign-primary);
+  transition: width 0.3s ease;
+}
+.animated-underline:hover::after {
+  width: 100%;
+}
+
+/* Premium Button — scale + enhanced glow */
+.btn-premium {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-premium:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px rgba(var(--sign-glow-rgb), 0.35);
+}
+.btn-premium:active {
+  transform: scale(0.99);
+}
+
+/* Shimmer Border — animated gradient border */
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(var(--sign-glow-rgb), 0.6), transparent);
+  background-size: 200% 100%;
+  animation: shimmerBorder 3s linear infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+@keyframes shimmerBorder {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Focus Glow — input focus ring */
+.focus-glow:focus {
+  outline: none;
+  border-color: var(--sign-primary) !important;
+  box-shadow: 0 0 0 3px rgba(var(--sign-glow-rgb), 0.15), 0 0 15px rgba(var(--sign-glow-rgb), 0.1);
+}
+
+/* Tab Content Enter — fade in on tab switch */
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-content-enter {
+  animation: tabFadeIn 0.35s ease forwards;
+}
+
+/* Rating Bar Fill Animate — width grows from 0 */
+.rating-bar-fill-animate {
+  animation: ratingGrow 1s ease forwards;
+}
+@keyframes ratingGrow {
+  from { width: 0; }
+}
+
+/* Om Pulse — scale + opacity */
+.om-pulse {
+  animation: omPulse 3s ease-in-out infinite;
+}
+@keyframes omPulse {
+  0%, 100% { transform: scale(1); opacity: 0.08; }
+  50% { transform: scale(1.05); opacity: 0.12; }
+}
+
+/* Ticker Pause on Hover */
+.ticker-animate:hover {
+  animation-play-state: paused;
+}
+
+/* Table Row Hover */
+.table-row-hover:hover {
+  background: rgba(var(--sign-glow-rgb), 0.05);
+}
