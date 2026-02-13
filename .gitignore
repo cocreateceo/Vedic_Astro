@@ -41,6 +41,18 @@ out/
 
 # Temporary/Screenshot files
 image.png
+image copy*.png
+
+# Deploy scripts (contain AWS credentials)
+_deploy-*.ps1
+_deploy-*.mjs
+_deploy-*.txt
+_do-sync.ps1
+_sync-only.cmd
+_sync2.cmd
+
+# Windows nul artifacts
+nul
 
 # Large files (exceeds GitHub 100MB limit)
 documents/New_documents/Brihad Jatakam of Varahmihira with Mahidhar Tika - Khemraj.pdf
