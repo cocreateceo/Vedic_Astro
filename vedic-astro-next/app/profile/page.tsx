@@ -3,6 +3,9 @@
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import Link from 'next/link';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
+import BirthTimePicker from '@/components/ui/BirthTimePicker';
+import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 function ProfileContent() {
   const { user, updateBirthDetails, logout } = useAuth();
@@ -49,10 +52,10 @@ function ProfileContent() {
           <h2 className="font-heading text-lg text-sign-primary mb-4">Edit Birth Details</h2>
           <form onSubmit={handleSave} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><input type="date" name="dob" defaultValue={user.dob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-sign-primary" /></div>
-              <div><label className="text-text-muted text-sm block mb-1">Time of Birth</label><input type="time" name="tob" defaultValue={user.tob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-sign-primary" /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><BirthDatePicker name="dob" defaultValue={user.dob} /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Time of Birth</label><BirthTimePicker name="tob" defaultValue={user.tob} /></div>
             </div>
-            <div><label className="text-text-muted text-sm block mb-1">Place of Birth</label><input type="text" name="pob" defaultValue={user.pob} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-sign-primary" /></div>
+            <div><label className="text-text-muted text-sm block mb-1">Place of Birth</label><CityAutocomplete name="pob" defaultValue={user.pob} /></div>
             <div><label className="text-text-muted text-sm block mb-1">Timezone</label>
               <select name="timezone" defaultValue={user.timezone} className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus:outline-none focus:border-sign-primary">
                 <option value="Asia/Kolkata">India (IST)</option><option value="America/New_York">US Eastern</option><option value="Europe/London">UK (GMT)</option>

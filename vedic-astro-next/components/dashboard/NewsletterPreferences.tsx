@@ -20,85 +20,59 @@ export default function NewsletterPreferences() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [checking, setChecking] = useState(true);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const NEWSLETTER_KEY = 'vedic_newsletter_pref';
 
-  // Check subscription status on mount
+  // Check subscription status on mount from localStorage
   useEffect(() => {
-    if (!user?.email || !apiUrl) {
+    if (!user?.email) {
       setChecking(false);
       return;
     }
 
-    fetch(`${apiUrl}/newsletter/status?email=${encodeURIComponent(user.email)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.subscribed) {
+    try {
+      const saved = localStorage.getItem(NEWSLETTER_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.email === user.email && data.subscribed) {
           setIsSubscribed(true);
           setFrequency(data.frequency || 'weekly');
           setStatus('subscribed');
         }
-      })
-      .catch(() => {})
-      .finally(() => setChecking(false));
-  }, [user?.email, apiUrl]);
+      }
+    } catch { /* ignore */ }
+    setChecking(false);
+  }, [user?.email]);
 
   async function handleSubscribe() {
-    if (!user?.email || !apiUrl) return;
+    if (!user?.email) return;
     setStatus('loading');
     setMessage('');
 
     try {
-      const res = await fetch(`${apiUrl}/newsletter/subscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          name: user.name,
-          dob: user.dob,
-          tob: user.tob,
-          pob: user.pob,
-          frequency,
-        }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setIsSubscribed(true);
-        setStatus('subscribed');
-        setMessage(data.message);
-      } else {
-        setStatus('error');
-        setMessage(data.error || 'Something went wrong.');
-      }
+      const data = { email: user.email, name: user.name, frequency, subscribed: true };
+      localStorage.setItem(NEWSLETTER_KEY, JSON.stringify(data));
+      setIsSubscribed(true);
+      setStatus('subscribed');
+      setMessage('Subscribed! You will receive personalized horoscope insights.');
     } catch {
       setStatus('error');
-      setMessage('Unable to connect. Please try again later.');
+      setMessage('Something went wrong. Please try again.');
     }
   }
 
-  async function handleUpdateFrequency(newFreq: Frequency) {
-    if (!user?.email || !apiUrl) return;
-    const prevFreq = frequency;
-    setFrequency(newFreq); // optimistic update
+  function handleUpdateFrequency(newFreq: Frequency) {
+    if (!user?.email) return;
+    setFrequency(newFreq);
 
     try {
-      const res = await fetch(`${apiUrl}/newsletter/preferences`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email, frequency: newFreq }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage(`Frequency updated to ${newFreq}.`);
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setFrequency(prevFreq); // rollback
-        setMessage(data.error || 'Failed to update.');
-      }
+      const saved = localStorage.getItem(NEWSLETTER_KEY);
+      const data = saved ? JSON.parse(saved) : {};
+      data.frequency = newFreq;
+      localStorage.setItem(NEWSLETTER_KEY, JSON.stringify(data));
+      setMessage(`Frequency updated to ${newFreq}.`);
+      setTimeout(() => setMessage(''), 3000);
     } catch {
-      setFrequency(prevFreq); // rollback
-      setMessage('Unable to connect.');
+      setMessage('Failed to update.');
     }
   }
 

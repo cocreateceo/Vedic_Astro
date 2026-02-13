@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Image from 'next/image';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
+import BirthTimePicker from '@/components/ui/BirthTimePicker';
+import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 function GoogleIcon() {
   return (
@@ -427,17 +430,17 @@ export default function LoginPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-text-muted text-sm block mb-1.5">Date of Birth</label>
-                      <input type="date" name="dob" required className={inputClass} />
+                      <BirthDatePicker name="dob" required />
                     </div>
                     <div>
                       <label className="text-text-muted text-sm block mb-1.5">Time of Birth</label>
-                      <input type="time" name="tob" required className={inputClass} />
+                      <BirthTimePicker name="tob" required />
                     </div>
                   </div>
 
                   <div>
                     <label className="text-text-muted text-sm block mb-1.5">Place of Birth</label>
-                    <input type="text" name="pob" required placeholder="City, Country" className={inputClass} />
+                    <CityAutocomplete name="pob" required />
                   </div>
                   <div>
                     <label className="text-text-muted text-sm block mb-1.5">Timezone</label>

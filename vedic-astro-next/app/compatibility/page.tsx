@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
 import { getNakshatraIndex, calculateGunaScores, getVerdict } from '@/lib/compatibility-calc';
 import { GunaScore } from '@/types';
 
@@ -37,12 +38,12 @@ export default function CompatibilityPage() {
               <div className="space-y-4">
                 <h3 className="font-heading text-sign-primary">Partner 1</h3>
                 <div><label className="text-text-muted text-sm block mb-1">Name</label><input type="text" name="name1" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
-                <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><input type="date" name="dob1" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+                <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><BirthDatePicker name="dob1" required /></div>
               </div>
               <div className="space-y-4">
                 <h3 className="font-heading text-sign-primary">Partner 2</h3>
                 <div><label className="text-text-muted text-sm block mb-1">Name</label><input type="text" name="name2" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
-                <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><input type="date" name="dob2" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+                <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><BirthDatePicker name="dob2" required /></div>
               </div>
             </div>
             <button type="submit" className="btn-premium w-full mt-6 bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all">Check Compatibility</button>

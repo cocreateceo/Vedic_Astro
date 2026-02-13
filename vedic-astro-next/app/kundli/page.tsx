@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
+import BirthDatePicker from '@/components/ui/BirthDatePicker';
+import BirthTimePicker from '@/components/ui/BirthTimePicker';
+import CityAutocomplete from '@/components/ui/CityAutocomplete';
 import {
   computeFullChart, type FullChartResult,
   planetNames, calculateNavamsaSign, calculateNakshatraPada,
@@ -128,11 +131,11 @@ export default function KundliPage() {
           <form onSubmit={handleSubmit} className="glass-card p-8 space-y-4">
             <div><label className="text-text-muted text-sm block mb-1">Full Name</label><input type="text" name="name" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><input type="date" name="birth-date" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
-              <div><label className="text-text-muted text-sm block mb-1">Time of Birth</label><input type="time" name="birth-time" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><BirthDatePicker name="birth-date" required /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Time of Birth</label><BirthTimePicker name="birth-time" required /></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="text-text-muted text-sm block mb-1">Place of Birth</label><input type="text" name="birth-place" required placeholder="City, Country" className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Place of Birth</label><CityAutocomplete name="birth-place" required /></div>
               <div><label className="text-text-muted text-sm block mb-1">Chart Style</label>
                 <select name="chart-style" className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow">
                   <option value="north">North Indian</option><option value="south">South Indian</option>

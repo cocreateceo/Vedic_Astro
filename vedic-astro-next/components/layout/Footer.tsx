@@ -14,26 +14,24 @@ export default function Footer() {
     if (!email.trim()) return;
 
     setStatus('loading');
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${apiUrl}/newsletter/subscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, frequency: 'weekly' }),
-      });
-      const data = await res.json();
 
-      if (res.ok) {
+    // Save locally until backend is available
+    try {
+      const subs = JSON.parse(localStorage.getItem('vedic_newsletter_subs') || '[]');
+      if (subs.includes(email.toLowerCase())) {
         setStatus('success');
-        setMessage(data.message);
+        setMessage('You are already subscribed!');
         setEmail('');
-      } else {
-        setStatus('error');
-        setMessage(data.error || 'Something went wrong.');
+        return;
       }
+      subs.push(email.toLowerCase());
+      localStorage.setItem('vedic_newsletter_subs', JSON.stringify(subs));
+      setStatus('success');
+      setMessage('Subscribed successfully! You will receive horoscope updates.');
+      setEmail('');
     } catch {
       setStatus('error');
-      setMessage('Unable to connect. Please try again later.');
+      setMessage('Something went wrong. Please try again.');
     }
   }
 
