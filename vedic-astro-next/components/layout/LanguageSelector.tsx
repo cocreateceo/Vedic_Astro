@@ -8,8 +8,17 @@ const LANGUAGES = [
   { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
   { code: 'te', label: 'Telugu', native: 'తెలుగు' },
   { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
-  { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
+  { code: 'ml', label: 'Malayalam', native: 'മലయാളം' },
 ];
+
+const LANG_CODES = new Set(LANGUAGES.map(l => l.code));
+
+/** Read active language from Google Translate cookie (format: /en/ta) */
+function getGoogTransLang(): string {
+  const match = document.cookie.match(/googtrans=\/[a-z]{2}\/([a-z]{2})/);
+  if (match && LANG_CODES.has(match[1])) return match[1];
+  return 'en';
+}
 
 declare global {
   interface Window {
@@ -30,6 +39,11 @@ export default function LanguageSelector() {
   const [currentLang, setCurrentLang] = useState('en');
   const ref = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+
+  // Sync state with Google Translate cookie on mount
+  useEffect(() => {
+    setCurrentLang(getGoogTransLang());
+  }, []);
 
   // Load Google Translate script once
   useEffect(() => {
