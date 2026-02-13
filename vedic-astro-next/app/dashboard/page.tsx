@@ -551,15 +551,25 @@ function DashboardContent() {
                       <div className="flex items-center gap-2">
                         <span className="text-text-muted text-xs">Location:</span>
                         <select value={selectedCityName} onChange={(e) => handleCityChange(e.target.value)}
-                          className={`border text-sm rounded px-2 py-1 focus:outline-none focus:border-sign-primary ${citySource === 'geo' ? 'bg-green-500/10 border-green-500/40 text-green-300' : 'bg-cosmic-bg border-sign-primary/30 text-text-primary'}`}>
+                          className={`text-sm rounded px-2 py-1 focus:outline-none ${citySource === 'geo' ? 'bg-cosmic-bg border-2 border-amber-500 text-amber-400 font-medium' : 'bg-cosmic-bg border border-sign-primary/30 text-text-primary'}`}>
                           <optgroup label="India">
-                            {INDIA_CITIES.map(c => (<option key={c.name} value={c.name}>{c.name}</option>))}
+                            {INDIA_CITIES.map(c => (
+                              <option key={c.name} value={c.name}
+                                style={citySource === 'geo' && c.name === selectedCityName ? { color: '#d97706', fontWeight: 'bold', background: '#1a1a2e' } : { color: '#000', background: '#fff' }}>
+                                {citySource === 'geo' && c.name === selectedCityName ? `📍 ${c.name}` : c.name}
+                              </option>
+                            ))}
                           </optgroup>
                           <optgroup label="International">
-                            {INTL_CITIES.map(c => (<option key={c.name} value={c.name}>{c.name}, {c.region}</option>))}
+                            {INTL_CITIES.map(c => (
+                              <option key={c.name} value={c.name}
+                                style={citySource === 'geo' && c.name === selectedCityName ? { color: '#d97706', fontWeight: 'bold', background: '#1a1a2e' } : { color: '#000', background: '#fff' }}>
+                                {citySource === 'geo' && c.name === selectedCityName ? `📍 ${c.name}, ${c.region}` : `${c.name}, ${c.region}`}
+                              </option>
+                            ))}
                           </optgroup>
                         </select>
-                        {citySource === 'geo' && <span className="text-green-400 text-xs flex items-center gap-1" title="Auto-detected via IP location">&#x1F4CD; Detected</span>}
+                        {citySource === 'geo' && <span className="text-amber-400 text-xs flex items-center gap-1 font-medium" title="Auto-detected via IP location">&#x1F4CD; Detected</span>}
                         <button type="button" onClick={handleDetectLocation} className="text-sign-primary/70 hover:text-sign-primary text-xs flex items-center gap-0.5 transition-colors" title="Detect my location">&#x1F4CD;</button>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-text-muted">
