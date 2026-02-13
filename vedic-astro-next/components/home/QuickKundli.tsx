@@ -19,11 +19,17 @@ export default function QuickKundli() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
+    const email = (form.elements.namedItem('qk-email') as HTMLInputElement).value.trim();
     const dob = (form.elements.namedItem('qk-dob') as HTMLInputElement).value;
     const time = (form.elements.namedItem('qk-time') as HTMLInputElement).value;
-
-    const place = (form.elements.namedItem('qk-place') as HTMLInputElement).value;
+    const place = (form.elements.namedItem('qk-place') as HTMLInputElement).value.trim();
     if (!dob || !time) return;
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
 
     const { moonData, ascendant: asc, positions } = computeFullChart(dob, time, { place });
     const chartSvg = generateNorthIndianChart(positions, asc.signIndex, 'rashi');
@@ -50,6 +56,10 @@ export default function QuickKundli() {
               <div>
                 <label className="text-text-muted text-sm block mb-1">Name</label>
                 <input type="text" name="qk-name" placeholder="Enter your name" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow transition-colors" />
+              </div>
+              <div>
+                <label className="text-text-muted text-sm block mb-1">Email ID</label>
+                <input type="email" name="qk-email" placeholder="Enter your email" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="Enter a valid email address (e.g. name@example.com)" className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow transition-colors" />
               </div>
               <div>
                 <label className="text-text-muted text-sm block mb-1">Date of Birth</label>

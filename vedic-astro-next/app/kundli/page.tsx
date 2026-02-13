@@ -14,7 +14,7 @@ import {
   planetNames, calculateNavamsaSign, calculateNakshatraPada,
   signNames, hindiSignNames, calculateDashaWithRatings,
 } from '@/lib/kundli-calc';
-import { generateNorthIndianChart, generateSouthIndianChart } from '@/lib/chart-svg';
+import { generateNorthIndianChart, generateSouthIndianChart, generateEastIndianChart, generateWestIndianChart } from '@/lib/chart-svg';
 import {
   isBeneficForAscendant, getMostMalefic, getHouseInfo,
   generatePlanetAnalysis, nakshatraDetails, rashiDetails,
@@ -73,11 +73,19 @@ export default function KundliPage() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
+    const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const birthDate = (form.elements.namedItem('birth-date') as HTMLInputElement).value;
     const birthTime = (form.elements.namedItem('birth-time') as HTMLInputElement).value;
-    const birthPlace = (form.elements.namedItem('birth-place') as HTMLInputElement).value;
+    const birthPlace = (form.elements.namedItem('birth-place') as HTMLInputElement).value.trim();
     const style = (form.elements.namedItem('chart-style') as HTMLSelectElement).value;
+
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
 
     const placeOpts = { place: birthPlace };
     const fullChart = computeFullChart(birthDate, birthTime, placeOpts);
@@ -118,11 +126,15 @@ export default function KundliPage() {
     triggerPetals();
   }
 
-  const chartSvg = result
-    ? (chartStyle === 'north'
-      ? generateNorthIndianChart(result.positions, result.ascendant.signIndex, 'rashi')
-      : generateSouthIndianChart(result.positions, result.ascendant.signIndex, 'rashi'))
-    : '';
+  const generateChart = (positions: Record<string, Planet>, ascIdx: number, mode: 'rashi' | 'navamsa') => {
+    switch (chartStyle) {
+      case 'north': return generateNorthIndianChart(positions, ascIdx, mode);
+      case 'east': return generateEastIndianChart(positions, ascIdx, mode);
+      case 'west': return generateWestIndianChart(positions, ascIdx, mode);
+      default: return generateSouthIndianChart(positions, ascIdx, mode);
+    }
+  };
+  const chartSvg = result ? generateChart(result.positions, result.ascendant.signIndex, 'rashi') : '';
 
   const moonNakshatraData = result ? nakshatraDetails[result.moonData.nakshatra] : null;
   const moonRashiData = result ? rashiDetails[result.moonData.signIndex] : null;
@@ -135,7 +147,10 @@ export default function KundliPage() {
 
         <div className="max-w-2xl mx-auto mb-12">
           <form onSubmit={handleSubmit} className="glass-card p-8 space-y-4">
-            <div><label className="text-text-muted text-sm block mb-1">Full Name</label><input type="text" name="name" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className="text-text-muted text-sm block mb-1">Full Name</label><input type="text" name="name" required className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+              <div><label className="text-text-muted text-sm block mb-1">Email ID</label><input type="email" name="email" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="Enter a valid email address (e.g. name@example.com)" className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow" /></div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label className="text-text-muted text-sm block mb-1">Date of Birth</label><BirthDatePicker name="birth-date" required /></div>
               <div><label className="text-text-muted text-sm block mb-1">Time of Birth</label><BirthTimePicker name="birth-time" required /></div>
@@ -144,7 +159,7 @@ export default function KundliPage() {
               <div><label className="text-text-muted text-sm block mb-1">Place of Birth</label><CityAutocomplete name="birth-place" required /></div>
               <div><label className="text-text-muted text-sm block mb-1">Chart Style</label>
                 <select name="chart-style" className="w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary focus-glow">
-                  <option value="north">North Indian</option><option value="south">South Indian</option>
+                  <option value="north">North Indian</option><option value="south">South Indian</option><option value="east">East Indian</option><option value="west">West Indian</option>
                 </select>
               </div>
             </div>
@@ -237,7 +252,7 @@ export default function KundliPage() {
                 </div>
 
                 <div className="flex gap-2 justify-center">
-                  {['north', 'south'].map(s => (
+                  {['north', 'south', 'east', 'west'].map(s => (
                     <button key={s} onClick={() => setChartStyle(s)}
                       className={`px-4 py-2 rounded text-sm capitalize ${chartStyle === s ? 'bg-sign-primary/20 text-sign-primary border border-sign-primary/40' : 'text-text-muted'}`}>
                       {s} Indian
@@ -252,7 +267,7 @@ export default function KundliPage() {
                   </div>
                   <div className="glass-card p-6">
                     <h3 className="font-heading text-sign-primary mb-4 text-center">Navamsa Chart (D-9)</h3>
-                    <div className="max-w-[350px] mx-auto" dangerouslySetInnerHTML={{ __html: chartStyle === 'north' ? generateNorthIndianChart(result.positions, result.ascendant.signIndex, 'navamsa') : generateSouthIndianChart(result.positions, result.ascendant.signIndex, 'navamsa') }} />
+                    <div className="max-w-[350px] mx-auto" dangerouslySetInnerHTML={{ __html: generateChart(result.positions, result.ascendant.signIndex, 'navamsa') }} />
                   </div>
                 </div>
               </div>
