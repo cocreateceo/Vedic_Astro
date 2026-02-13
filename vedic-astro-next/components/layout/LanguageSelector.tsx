@@ -82,7 +82,7 @@ export default function LanguageSelector() {
   const activeLang = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative notranslate" ref={ref} translate="no">
       {/* Hidden Google Translate element */}
       <div id="google_translate_element" className="hidden" />
 
