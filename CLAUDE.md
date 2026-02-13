@@ -54,6 +54,46 @@ attrib +R vedic-astro-next\lib\astro\*.ts
 
 ---
 
+## Deployment — ALWAYS follow `documents/DEPLOY_GUIDE.md`
+
+When the user asks to **deploy**, **commit and deploy**, or **push and deploy**, follow these steps exactly:
+
+### 1. Build (MUST run before every deploy)
+```powershell
+powershell -Command "$env:Path = 'C:\Program Files\nodejs;' + $env:Path; Set-Location 'C:\Projects\Vedic_Astro\vedic-astro-next'; npm run build"
+```
+Verify the build succeeds (all routes listed, no errors).
+
+### 2. Commit & Push
+```powershell
+git add <specific files>        # never git add -A blindly
+git commit -m "message"
+git push
+```
+
+### 3. Deploy to AWS
+```powershell
+powershell -ExecutionPolicy Bypass -File "C:\Projects\Vedic_Astro\_deploy-now.ps1"
+```
+
+### 4. Verify
+```powershell
+powershell -Command "Get-Content 'C:\Projects\Vedic_Astro\_deploy.log' -Tail 20"
+```
+Confirm: `S3 sync done` + `DEPLOY COMPLETE` + CloudFront invalidation created.
+
+### Key details
+| Resource    | Value |
+|------------|-------|
+| S3 Bucket  | `vedic-astro-production-vedicastrositeassetsbucket-vkhkhbnd` |
+| CloudFront | `E1CTOZPIJ1ZUKP` |
+| Live URL   | https://d3r8o59ewzr723.cloudfront.net |
+| Region     | us-east-1 |
+
+**Full reference:** `documents/DEPLOY_GUIDE.md`
+
+---
+
 ## Project Structure
 
 - `vedic-astro-next/` — Next.js app (main app)
