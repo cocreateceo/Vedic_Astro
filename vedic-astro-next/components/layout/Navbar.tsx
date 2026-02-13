@@ -64,6 +64,7 @@ export default function Navbar() {
   const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/');
   const initials = user?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
 
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-sign-primary/20"
@@ -115,7 +116,7 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 prefetch={false}
-                className={`text-[0.95rem] relative py-2 pb-3 transition-colors hover:text-sign-primary whitespace-nowrap ${isActive(link.href) ? 'text-sign-primary nav-diya' : 'text-text-primary animated-underline'}`}
+                className={`text-[0.95rem] relative px-3 py-1.5 border border-sign-primary/30 rounded-lg transition-all hover:text-sign-primary hover:border-sign-primary/60 hover:bg-sign-primary/5 whitespace-nowrap ${isActive(link.href) ? 'text-sign-primary border-sign-primary/60 bg-sign-primary/10 nav-diya' : 'text-text-primary'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -136,7 +137,7 @@ export default function Navbar() {
               title="Change theme"
             >
               <span className="w-4 h-4 rounded-full border-2 border-sign-primary" style={{ background: `var(--sign-primary)` }} />
-              <span className="hidden md:inline text-xs truncate max-w-[90px]">
+              <span className="hidden md:inline text-xs truncate max-w-[90px] notranslate" translate="no">
                 {overrideKey
                   ? isVisualThemeKey(overrideKey)
                     ? VISUAL_THEMES[overrideKey].name
@@ -239,9 +240,17 @@ export default function Navbar() {
                 </button>
               </div>
               {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[160px] shadow-lg border border-sign-primary/10 z-50">
-                  <Link href="/dashboard" prefetch={false} className="block px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors" onClick={() => setDropdownOpen(false)}>My Dashboard</Link>
-                  <button onClick={() => { logout(); setDropdownOpen(false); }} className="block w-full text-left px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors">Logout</button>
+                <div className="absolute right-0 top-full mt-2 bg-cosmic-card rounded-xl py-2 min-w-[200px] shadow-xl border border-sign-primary/20 z-50 backdrop-blur-sm">
+                  <Link href="/dashboard" prefetch={false} className="flex items-center gap-2.5 px-4 py-2.5 text-text-primary hover:bg-sign-primary/10 hover:text-sign-primary transition-colors text-sm" onClick={() => setDropdownOpen(false)}>
+                    <span className="text-base notranslate" translate="no">&#x1F3DB;&#xFE0F;</span> My Dashboard
+                  </Link>
+                  <Link href="/profile" prefetch={false} className="flex items-center gap-2.5 px-4 py-2.5 text-text-primary hover:bg-sign-primary/10 hover:text-sign-primary transition-colors text-sm" onClick={() => setDropdownOpen(false)}>
+                    <span className="text-base notranslate" translate="no">&#x1F464;</span> My Profile
+                  </Link>
+                  <div className="border-t border-sign-primary/10 my-1" />
+                  <button onClick={() => { logout(); setDropdownOpen(false); }} className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors text-sm">
+                    <span className="text-base notranslate" translate="no">&#x1F6AA;</span> Logout
+                  </button>
                 </div>
               )}
             </div>
