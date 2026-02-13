@@ -12,6 +12,8 @@ import type { PratyantardashaResult, PratyantardashaEntry } from '@/lib/pratyant
 import type { CombustionEntry, PlanetaryWarEntry, LongitudeEntry } from '@/lib/calc-tables';
 import type { GrahavasthaEntry, ShadbalaEntry, IshtaKashtaEntry, BhavabalaEntry, ShodasavargaEntry, SayanaEntry, BhavaTableEntry, KPEntry } from '@/lib/shadbala';
 import type { DashaPredictionEntry } from '@/lib/dasha-predictions';
+import { getPlanetEmoji } from '@/lib/navagraha';
+import { getRashiEmojiByName } from '@/lib/rashi-emoji';
 
 interface PdfReportProps {
   chart: VedicChart;
@@ -272,7 +274,7 @@ function pageFooter(pageNum?: number) {
         </span>
       )}
       <span style={{ fontSize: '9px', color: TEXT_LIGHT }}>
-        vedic-astro.vercel.app
+        vedicastro.co
       </span>
     </div>
   );
@@ -399,9 +401,9 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               margin: '0 0 4px 0',
               letterSpacing: '6px',
               fontFamily: "'Georgia', serif",
-            }}>VEDIC ASTRO</h1>
+            }}>VEDIC ASTRO ✨</h1>
             <p style={{ fontSize: '15px', color: TEXT_LIGHT, margin: '0 0 16px 0', letterSpacing: '3px' }}>
-              BIRTH CHART REPORT
+              🕉️ BIRTH CHART REPORT
             </p>
             <div style={{ width: '80px', height: '2px', background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)`, margin: '0 auto' }} />
           </div>
@@ -433,7 +435,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           {sanskritVerse()}
 
           {/* Birth Details */}
-          {sectionTitle('Birth Details')}
+          {sectionTitle('📜 Birth Details')}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 40px', marginBottom: '8px' }}>
             {[
               ['Date of Birth', formatDate(dob)],
@@ -458,7 +460,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           </div>
 
           {/* Charts */}
-          {sectionTitle('Birth Charts')}
+          {sectionTitle('📜 Birth Charts')}
           <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', margin: '12px 0 16px 0' }}>
             <div style={{ width: '300px', textAlign: 'center' }}>
               <p style={{ fontSize: '12px', color: GOLD, fontWeight: 700, marginBottom: '8px', letterSpacing: '0.5px' }}>
@@ -477,7 +479,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           </div>
 
           {/* Planetary Positions Table */}
-          {sectionTitle('Planetary Positions')}
+          {sectionTitle('📜 Planetary Positions')}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
             <thead>
               <tr>
@@ -492,14 +494,14 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 const malefic = name === dashaMalefic;
                 return (
                   <tr key={name} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                    <td style={{ ...tdStyle, fontWeight: 700, color: malefic ? RED : benefic ? GREEN : TEXT }}>{name}</td>
-                    <td style={tdStyle}>{p.sign} ({p.signHindi})</td>
+                    <td style={{ ...tdStyle, fontWeight: 700, color: malefic ? RED : benefic ? GREEN : TEXT }}>{getPlanetEmoji(name)} {name}</td>
+                    <td style={tdStyle}>{getRashiEmojiByName(p.sign)} {p.sign} ({p.signHindi})</td>
                     <td style={tdStyle}>{p.degree}&deg;</td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{p.house}</td>
                     <td style={tdStyle}>{p.nakshatra}</td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{p.nakshatraPada}</td>
                     <td style={{ ...tdStyle, textAlign: 'center', color: p.retrograde ? RED : GREEN, fontWeight: 600 }}>
-                      {p.retrograde ? 'Yes' : 'No'}
+                      {p.retrograde ? '🔄 Yes' : 'No'}
                     </td>
                     <td style={tdStyle}>{p.navamsaSign}</td>
                   </tr>
@@ -519,23 +521,23 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           {pageHeader('Table of Contents')}
           <div style={{ marginTop: '16px' }}>
             {[
-              { ch: 1, title: 'Your Birth Profile', desc: 'Birth details, charts, and planetary positions' },
-              { ch: 2, title: 'Planet Analysis', desc: 'Detailed analysis of each planet in your chart' },
-              { ch: 3, title: 'Important Life Questions & Answers', desc: '15 personalized questions answered from your birth chart' },
-              { ch: 4, title: 'Your Characteristics & Behaviour', desc: 'Panchanga-based personality predictions' },
-              { ch: 5, title: 'Influences on Your Life', desc: 'Bhava (house) predictions for all 12 houses' },
-              { ch: 6, title: 'Planetary Yogas', desc: 'Auspicious and inauspicious planetary combinations' },
-              { ch: 7, title: 'Dosha Analysis', desc: 'Assessment of Manglik, Kaal Sarp, and other doshas' },
-              { ch: 8, title: 'Gemstone Recommendations', desc: 'Recommended gemstones with wearing instructions' },
-              { ch: 9, title: 'Dasha Timeline', desc: 'Vimshottari Mahadasha and Antardasha periods' },
-              { ch: 10, title: '35-Year Prediction Summary', desc: 'Detailed predictions for each Dasha/Antardasha period' },
-              { ch: 11, title: 'Transit Predictions', desc: 'Current planetary transit effects on your chart' },
-              { ch: 12, title: 'Nakshatra Remedies', desc: 'Remedies based on your birth star' },
-              { ch: 13, title: 'Dasa Period Remedies', desc: 'Remedies for challenging Mahadasha periods' },
-              { ch: 14, title: 'Favourable Periods', desc: 'Best periods for career, business, and property' },
-              { ch: 15, title: 'AshtakaVarga Analysis', desc: 'Planetary strength and bindu distribution' },
-              { ch: 16, title: 'Pratyantardasha Predictions', desc: 'Detailed sub-sub-period predictions' },
-              { ch: 17, title: 'Calculations & Tables', desc: 'Longitude, combustion, planetary war, divisional charts, strength tables' },
+              { ch: 1, title: '📜 Your Birth Profile', desc: 'Birth details, charts, and planetary positions' },
+              { ch: 2, title: '🪐 Planet Analysis', desc: 'Detailed analysis of each planet in your chart' },
+              { ch: 3, title: '🔮 Important Life Questions & Answers', desc: '15 personalized questions answered from your birth chart' },
+              { ch: 4, title: '🌙 Your Characteristics & Behaviour', desc: 'Panchanga-based personality predictions' },
+              { ch: 5, title: '🏛️ Influences on Your Life', desc: 'Bhava (house) predictions for all 12 houses' },
+              { ch: 6, title: '⭐ Planetary Yogas', desc: 'Auspicious and inauspicious planetary combinations' },
+              { ch: 7, title: '🔴 Dosha Analysis', desc: 'Assessment of Manglik, Kaal Sarp, and other doshas' },
+              { ch: 8, title: '💎 Gemstone Recommendations', desc: 'Recommended gemstones with wearing instructions' },
+              { ch: 9, title: '⏳ Dasha Timeline', desc: 'Vimshottari Mahadasha and Antardasha periods' },
+              { ch: 10, title: '📊 35-Year Prediction Summary', desc: 'Detailed predictions for each Dasha/Antardasha period' },
+              { ch: 11, title: '🔄 Transit Predictions', desc: 'Current planetary transit effects on your chart' },
+              { ch: 12, title: '✨ Nakshatra Remedies', desc: 'Remedies based on your birth star' },
+              { ch: 13, title: '🙏 Dasa Period Remedies', desc: 'Remedies for challenging Mahadasha periods' },
+              { ch: 14, title: '📅 Favourable Periods', desc: 'Best periods for career, business, and property' },
+              { ch: 15, title: '📐 AshtakaVarga Analysis', desc: 'Planetary strength and bindu distribution' },
+              { ch: 16, title: '🔄 Pratyantardasha Predictions', desc: 'Detailed sub-sub-period predictions' },
+              { ch: 17, title: '🧮 Calculations & Tables', desc: 'Longitude, combustion, planetary war, divisional charts, strength tables' },
             ].map(item => (
               <div key={item.ch} style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
@@ -615,9 +617,9 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           <div style={decorativeBorder()} />
           {omWatermark()}
 
-          {chapterHeader(2, 'Planet Analysis')}
+          {chapterHeader(2, '🪐 Planet Analysis')}
           <p style={{ fontSize: '11px', color: TEXT_LIGHT, margin: '0 0 16px 0' }}>
-            Based on <strong style={{ color: TEXT }}>{chart.ascendant.name}</strong> Ascendant &bull; Most Malefic: <strong style={{ color: RED }}>{dashaMalefic}</strong>
+            Based on <strong style={{ color: TEXT }}>{chart.ascendant.name}</strong> Ascendant &bull; Most Malefic: <strong style={{ color: RED }}>{getPlanetEmoji(dashaMalefic)} {dashaMalefic}</strong>
           </p>
 
           {planetAnalysis.map((a: PlanetAnalysis) => {
@@ -635,7 +637,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: TEXT }}>{a.planet}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(a.planet)} {a.planet}</span>
                     <span style={{
                       display: 'inline-block',
                       padding: '2px 8px',
@@ -646,10 +648,10 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       color: badgeColor,
                       letterSpacing: '0.3px',
                     }}>
-                      {a.isMostMalefic ? 'MOST MALEFIC' : a.isBenefic ? 'BENEFIC' : 'NEUTRAL'}
+                      {a.isMostMalefic ? '🔴 MOST MALEFIC' : a.isBenefic ? '🟢 BENEFIC' : '🟡 NEUTRAL'}
                     </span>
                   </div>
-                  <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>{a.sign} &bull; House {a.house} &bull; {a.degree}&deg;</span>
+                  <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>{getRashiEmojiByName(a.sign)} {a.sign} &bull; House {a.house} &bull; {a.degree}&deg;</span>
                 </div>
                 <p style={{ fontSize: '10.5px', color: TEXT_MED, lineHeight: '1.6', margin: 0 }}>{a.interpretation}</p>
               </div>
@@ -671,7 +673,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {pageIdx === 0 ? chapterHeader(3, 'Important Life Questions & Answers') : pageHeader('Life Questions & Answers (contd.)')}
+              {pageIdx === 0 ? chapterHeader(3, '🔮 Important Life Questions & Answers') : pageHeader('🔮 Life Questions & Answers (contd.)')}
               {pageIdx === 0 && (
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
                   15 personalized questions about your life answered from your birth chart
@@ -720,7 +722,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(4, 'Your Characteristics & Behaviour')}
+            {chapterHeader(4, '🌙 Your Characteristics & Behaviour')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 16px 0' }}>
               Birth-time Panchanga analysis based on classical Vedic texts
             </p>
@@ -763,7 +765,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {pageHeader('Your Characteristics & Behaviour (contd.)')}
+            {pageHeader('🌙 Your Characteristics & Behaviour (contd.)')}
 
             {/* Birth Karanam */}
             {panchanga.birthKaranam && (
@@ -807,7 +809,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {chapterHeader(5, 'Influences on Your Life (Houses 1-6)')}
+              {chapterHeader(5, '🏛️ Influences on Your Life (Houses 1-6)')}
               <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
                 House analysis for {chart.ascendant.name} Ascendant
               </p>
@@ -826,12 +828,12 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       <span style={{ fontSize: '11px', fontWeight: 600, color: TEXT }}>{b.houseName}</span>
                     </div>
                     <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>
-                      Lord: {b.lordPlanet} in House {b.lordPlacedIn}
+                      Lord: {getPlanetEmoji(b.lordPlanet)} {b.lordPlanet} in House {b.lordPlacedIn}
                     </span>
                   </div>
                   {b.occupants.length > 0 && (
                     <div style={{ display: 'flex', gap: '4px', marginBottom: '5px' }}>
-                      {b.occupants.map(occ => badge(occ, GOLD, GOLD_BG))}
+                      {b.occupants.map(occ => badge(`${getPlanetEmoji(occ)} ${occ}`, GOLD, GOLD_BG))}
                     </div>
                   )}
                   <p style={{ fontSize: '10px', color: TEXT_MED, lineHeight: '1.6', margin: 0 }}>{truncate(b.prediction, 250)}</p>
@@ -851,7 +853,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {pageHeader('Influences on Your Life (Houses 7-12)')}
+              {pageHeader('🏛️ Influences on Your Life (Houses 7-12)')}
 
               {bhava.filter(b => b.house > 6).map(b => (
                 <div key={b.house} style={{
@@ -867,12 +869,12 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       <span style={{ fontSize: '11px', fontWeight: 600, color: TEXT }}>{b.houseName}</span>
                     </div>
                     <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>
-                      Lord: {b.lordPlanet} in House {b.lordPlacedIn}
+                      Lord: {getPlanetEmoji(b.lordPlanet)} {b.lordPlanet} in House {b.lordPlacedIn}
                     </span>
                   </div>
                   {b.occupants.length > 0 && (
                     <div style={{ display: 'flex', gap: '4px', marginBottom: '5px' }}>
-                      {b.occupants.map(occ => badge(occ, GOLD, GOLD_BG))}
+                      {b.occupants.map(occ => badge(`${getPlanetEmoji(occ)} ${occ}`, GOLD, GOLD_BG))}
                     </div>
                   )}
                   <p style={{ fontSize: '10px', color: TEXT_MED, lineHeight: '1.6', margin: 0 }}>{truncate(b.prediction, 250)}</p>
@@ -895,7 +897,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(6, 'Planetary Yogas')}
+            {chapterHeader(6, '⭐ Planetary Yogas')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               {yogas.length} yoga{yogas.length !== 1 ? 's' : ''} identified in your birth chart
             </p>
@@ -919,7 +921,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       {y.sanskrit !== y.name && (
                         <span style={{ fontSize: '9px', color: TEXT_LIGHT }}>({y.sanskrit})</span>
                       )}
-                      {badge(y.type.replace('_', ' '), typeColor, typeBg)}
+                      {badge(`${y.type === 'raja' ? '👑 ' : y.type === 'dhana' ? '💰 ' : ''}${y.type.replace('_', ' ')}`, typeColor, typeBg)}
                       {badge(y.strength, strengthColor, strengthBg)}
                     </div>
                   </div>
@@ -927,7 +929,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   <p style={{ fontSize: '10px', color: TEXT, lineHeight: '1.5', margin: '0 0 4px 0', fontWeight: 500 }}>{y.effects}</p>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {y.planets.map(p => (
-                      <span key={p} style={{ fontSize: '9px', padding: '2px 6px', background: GOLD_BG, color: GOLD, borderRadius: '8px', border: `1px solid ${BORDER}` }}>{p}</span>
+                      <span key={p} style={{ fontSize: '9px', padding: '2px 6px', background: GOLD_BG, color: GOLD, borderRadius: '8px', border: `1px solid ${BORDER}` }}>{getPlanetEmoji(p)} {p}</span>
                     ))}
                   </div>
                 </div>
@@ -944,7 +946,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(7, 'Dosha Analysis & Remedies')}
+            {chapterHeader(7, '🔴 Dosha Analysis & Remedies')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               Assessment of major doshas in your birth chart with remedial measures
             </p>
@@ -1018,7 +1020,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(8, 'Gemstone Recommendations')}
+            {chapterHeader(8, '💎 Gemstone Recommendations')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               Personalized gemstone prescriptions based on your planetary positions
             </p>
@@ -1034,7 +1036,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: TEXT }}>{g.primaryGem}</span>
                   {i === 0 && badge('Primary', GOLD, GOLD_BG)}
-                  <span style={{ fontSize: '10px', color: TEXT_LIGHT, marginLeft: 'auto' }}>For {g.planet}</span>
+                  <span style={{ fontSize: '10px', color: TEXT_LIGHT, marginLeft: 'auto' }}>For {getPlanetEmoji(g.planet)} {g.planet}</span>
                 </div>
                 <p style={{ fontSize: '10px', color: TEXT_MED, lineHeight: '1.5', margin: '0 0 8px 0' }}>{g.reason}</p>
 
@@ -1090,7 +1092,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(9, 'Dasha Timeline')}
+            {chapterHeader(9, '⏳ Dasha Timeline')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               Complete Mahadasha timeline with period assessments
             </p>
@@ -1114,14 +1116,14 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       fontWeight: d.isCurrent ? 600 : 400,
                     }}>
                       <td style={{ ...tdStyle, fontWeight: 700 }}>
-                        {d.planet}
+                        {getPlanetEmoji(d.planet)} {d.planet}
                         {d.isCurrent && <span style={{ fontSize: '8px', color: GOLD, marginLeft: '4px' }}>(Current)</span>}
                       </td>
                       <td style={tdStyle}>{d.startYear} &ndash; {d.endYear}</td>
                       <td style={{ ...tdStyle, textAlign: 'center' }}>{d.duration} yrs</td>
                       <td style={tdStyle}>
                         <span style={{ padding: '1px 6px', borderRadius: '8px', fontSize: '9px', fontWeight: 700, background: ratingBg, color: ratingColor, textTransform: 'capitalize' }}>
-                          {d.rating}
+                          {d.rating === 'excellent' ? '🌟 ' : d.rating === 'favourable' ? '✅ ' : d.rating === 'mixed' ? '⚖️ ' : '⚠️ '}{d.rating}
                         </span>
                       </td>
                       <td style={{ ...tdStyle, fontSize: '9px', color: TEXT_MED }}>{truncate(d.ratingReason, 100)}</td>
@@ -1134,7 +1136,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             {/* Current Mahadasha Antardashas */}
             {currentMahadasha && currentMahadasha.antardashas && currentMahadasha.antardashas.length > 0 && (
               <>
-                {subSectionTitle(`${currentMahadasha.planet} Mahadasha — Antardasha Sub-Periods`)}
+                {subSectionTitle(`${getPlanetEmoji(currentMahadasha.planet)} ${currentMahadasha.planet} Mahadasha — Antardasha Sub-Periods`)}
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
                   <thead>
                     <tr>
@@ -1149,7 +1151,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                         background: ad.isCurrent ? '#FDF6E3' : i % 2 === 0 ? '#FFFFFF' : '#FAFAF5',
                       }}>
                         <td style={{ ...tdStyle, fontWeight: 600, fontSize: '10px' }}>
-                          {currentMahadasha.planet}/{ad.planet}
+                          {getPlanetEmoji(currentMahadasha.planet)} {currentMahadasha.planet}/{getPlanetEmoji(ad.planet)} {ad.planet}
                         </td>
                         <td style={tdStyle}>{ad.startMonth}/{ad.startYear}</td>
                         <td style={tdStyle}>{ad.endMonth}/{ad.endYear}</td>
@@ -1182,7 +1184,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {pageIdx === 0 ? chapterHeader(10, '35-Year Prediction Summary') : pageHeader('Prediction Summary (contd.)')}
+              {pageIdx === 0 ? chapterHeader(10, '📊 35-Year Prediction Summary') : pageHeader('📊 Prediction Summary (contd.)')}
               {pageIdx === 0 && (
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 10px 0' }}>
                   Detailed predictions for each Mahadasha/Antardasha period based on planetary influences
@@ -1197,9 +1199,9 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: TEXT }}>{pred.mahadasha} / {pred.antardasha}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(pred.mahadasha)} {pred.mahadasha} / {getPlanetEmoji(pred.antardasha)} {pred.antardasha}</span>
                       {pred.isCurrent && badge('Current', '#FFF', GOLD)}
-                      {badge(pred.rating, pred.rating === 'excellent' ? GREEN : pred.rating === 'favourable' ? BLUE : pred.rating === 'mixed' ? '#B8860B' : RED, pred.rating === 'excellent' ? '#E8F5E9' : pred.rating === 'favourable' ? '#E3F2FD' : pred.rating === 'mixed' ? GOLD_BG : '#FFEBEE')}
+                      {badge(`${pred.rating === 'excellent' ? '🌟 ' : pred.rating === 'favourable' ? '✅ ' : pred.rating === 'mixed' ? '⚖️ ' : '⚠️ '}${pred.rating}`, pred.rating === 'excellent' ? GREEN : pred.rating === 'favourable' ? BLUE : pred.rating === 'mixed' ? '#B8860B' : RED, pred.rating === 'excellent' ? '#E8F5E9' : pred.rating === 'favourable' ? '#E3F2FD' : pred.rating === 'mixed' ? GOLD_BG : '#FFEBEE')}
                     </div>
                     <span style={{ fontSize: '9px', color: TEXT_LIGHT }}>{pred.startMonth}/{pred.startYear} — {pred.endMonth}/{pred.endYear}</span>
                   </div>
@@ -1218,7 +1220,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(11, 'Transit Predictions')}
+            {chapterHeader(11, '🔄 Transit Predictions')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               Current planetary transits from {chart.moonSign.name} Moon Sign
             </p>
@@ -1233,11 +1235,11 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: TEXT }}>{t.planet}</span>
-                    {badge(t.isPositive ? 'Favourable' : 'Challenging', t.isPositive ? GREEN : RED, t.isPositive ? '#E8F5E9' : '#FDECEA')}
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(t.planet)} {t.planet}</span>
+                    {badge(t.isPositive ? '✅ Favourable' : '⚠️ Challenging', t.isPositive ? GREEN : RED, t.isPositive ? '#E8F5E9' : '#FDECEA')}
                   </div>
                   <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>
-                    {t.transitSign} &bull; {t.houseFromMoon}{t.houseFromMoon === 1 ? 'st' : t.houseFromMoon === 2 ? 'nd' : t.houseFromMoon === 3 ? 'rd' : 'th'} from Moon
+                    {getRashiEmojiByName(t.transitSign)} {t.transitSign} &bull; {t.houseFromMoon}{t.houseFromMoon === 1 ? 'st' : t.houseFromMoon === 2 ? 'nd' : t.houseFromMoon === 3 ? 'rd' : 'th'} from Moon
                   </span>
                 </div>
                 <p style={{ fontSize: '10px', color: TEXT_MED, lineHeight: '1.6', margin: 0 }}>{t.effects}</p>
@@ -1259,7 +1261,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(12, 'Nakshatra Remedies')}
+            {chapterHeader(12, '✨ Nakshatra Remedies')}
             <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
               Nakshatra Remedies — {nakshatraRemedy.nakshatra} ({nakshatraRemedy.sign})
             </p>
@@ -1343,7 +1345,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {pageHeader(pageIdx === 0 ? 'Dasa Period Remedies' : 'Dasa Remedies (contd.)')}
+              {pageHeader(pageIdx === 0 ? '🙏 Dasa Period Remedies' : '🙏 Dasa Remedies (contd.)')}
               {pageIdx === 0 && (
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 12px 0' }}>
                   Remedies for unfavorable dasa periods to mitigate negative planetary influences
@@ -1359,7 +1361,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   background: '#FAFAF5',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: TEXT }}>{remedy.planet} Dasa</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(remedy.planet)} {remedy.planet} Dasa</span>
                     <span style={{ fontSize: '10px', color: TEXT_LIGHT }}>({remedy.sanskrit})</span>
                     {badge('Remedy Needed', RED, '#FDECEA')}
                   </div>
@@ -1453,7 +1455,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 <div style={decorativeBorder()} />
                 {omWatermark()}
 
-                {chapterHeader(14, 'Favourable Periods')}
+                {chapterHeader(14, '📅 Favourable Periods')}
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 8px 0' }}>
                   Analysis of Dasa/Antardasha periods for optimal timing of major life activities
                 </p>
@@ -1469,7 +1471,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 <div style={decorativeBorder()} />
                 {omWatermark()}
 
-                {pageHeader('Favourable Periods (contd.)')}
+                {pageHeader('📅 Favourable Periods (contd.)')}
 
                 {periodsTable(favourablePeriods.houseConstruction, 'Favourable Periods for House Construction', fpBasePageNum + 2)}
 
@@ -1516,7 +1518,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 <div style={decorativeBorder()} />
                 {omWatermark()}
 
-                {chapterHeader(15, 'AshtakaVarga Predictions')}
+                {chapterHeader(15, '📐 AshtakaVarga Predictions')}
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 8px 0' }}>
                   Planetary strength analysis based on eightfold bindhu system (Lagna in {chart.ascendant.name})
                 </p>
@@ -1541,7 +1543,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       const natalSign = chart.planets[p.planet]?.signIndex ?? 0;
                       return (
                         <tr key={p.planet} style={{ background: pi % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                          <td style={{ ...tdStyle, fontWeight: 700, fontSize: '9px', padding: '4px 6px' }}>{p.planet.slice(0, 3)}</td>
+                          <td style={{ ...tdStyle, fontWeight: 700, fontSize: '9px', padding: '4px 6px' }}>{getPlanetEmoji(p.planet)} {p.planet.slice(0, 3)}</td>
                           {p.bindhus.map((b, si) => (
                             <td key={si} style={{
                               ...tdStyle,
@@ -1585,7 +1587,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                       background: isWeak ? '#FFF5F5' : isStrong ? '#F5FFF5' : '#FAFAF5',
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: TEXT }}>{p.planet}</span>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(p.planet)} {p.planet}</span>
                         <span style={{
                           fontSize: '9px', padding: '1px 6px', borderRadius: '8px', fontWeight: 700,
                           background: isWeak ? '#FDECEA' : isStrong ? '#E8F5E9' : GOLD_BG,
@@ -1605,7 +1607,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 <div style={decorativeBorder()} />
                 {omWatermark()}
 
-                {pageHeader('Sarvashtakavarga Analysis')}
+                {pageHeader('📐 Sarvashtakavarga Analysis')}
 
                 {subSectionTitle('Collective Influence of Planets')}
                 <div style={{ padding: '12px 14px', background: GOLD_BG, borderRadius: '4px', border: `1px solid ${BORDER}`, marginBottom: '16px' }}>
@@ -1690,7 +1692,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <div style={decorativeBorder()} />
               {omWatermark()}
 
-              {pageHeader(pageIdx === 0 ? 'Detailed Period Predictions (Paryanthar Dasa)' : 'Period Predictions (contd.)')}
+              {pageHeader(pageIdx === 0 ? '🔄 Detailed Period Predictions (Paryanthar Dasa)' : '🔄 Period Predictions (contd.)')}
               {pageIdx === 0 && (
                 <p style={{ fontSize: '10px', color: TEXT_LIGHT, margin: '0 0 8px 0' }}>
                   Sub-sub-period predictions based on Vimshottari Dasa system ({entries.length} periods analyzed)
@@ -1710,7 +1712,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontSize: '11px', fontWeight: 700, color: TEXT }}>
-                          {entry.mahadasha}/{entry.antardasha}/{entry.pratyantardasha}
+                          {getPlanetEmoji(entry.mahadasha)} {entry.mahadasha}/{getPlanetEmoji(entry.antardasha)} {entry.antardasha}/{getPlanetEmoji(entry.pratyantardasha)} {entry.pratyantardasha}
                         </span>
                         {entry.isCurrent && badge('Current', GOLD, GOLD_BG)}
                       </div>
@@ -1743,7 +1745,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {chapterHeader(17, 'Calculations & Tables')}
+            {chapterHeader(17, '🧮 Calculations & Tables')}
 
             {/* Nirayana Longitude Table */}
             {subSectionTitle('Nirayana Longitude of Planets')}
@@ -1761,14 +1763,14 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <tbody>
                 {longitudeTable.map((l, i) => (
                   <tr key={l.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{l.planet}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(l.planet)} {l.planet}</td>
                     <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '9px' }}>{l.longitude}</td>
-                    <td style={tdStyle}>{l.sign} ({l.hindi})</td>
+                    <td style={tdStyle}>{getRashiEmojiByName(l.sign)} {l.sign} ({l.hindi})</td>
                     <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '9px' }}>{l.degreeInSign}</td>
                     <td style={tdStyle}>{l.nakshatra}</td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{l.pada}</td>
                     <td style={{ ...tdStyle, textAlign: 'center', color: l.retrograde ? RED : GREEN, fontWeight: 600 }}>
-                      {l.retrograde ? 'R' : '-'}
+                      {l.retrograde ? '🔄 R' : '-'}
                     </td>
                   </tr>
                 ))}
@@ -1793,12 +1795,12 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   <tbody>
                     {combustion.map((c, i) => (
                       <tr key={c.planet} style={{ background: c.isCombust ? '#FFF5F5' : i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                        <td style={{ ...tdStyle, fontWeight: 700 }}>{c.planet}</td>
+                        <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(c.planet)} {c.planet}</td>
                         <td style={{ ...tdStyle, textAlign: 'center' }}>{c.distanceFromSun}°</td>
                         <td style={{ ...tdStyle, textAlign: 'center' }}>{c.combustionThreshold}°</td>
                         <td style={tdStyle}>
                           {c.isCombust
-                            ? badge('Combust', RED, '#FDECEA')
+                            ? badge('🔥 Combust', RED, '#FDECEA')
                             : badge('Safe', GREEN, '#E8F5E9')
                           }
                         </td>
@@ -1823,9 +1825,9 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                     border: `1px solid ${BORDER}`, background: '#FFF3E0',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: TEXT }}>{w.planet1} vs {w.planet2}</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: TEXT }}>{getPlanetEmoji(w.planet1)} {w.planet1} vs {getPlanetEmoji(w.planet2)} {w.planet2}</span>
                       <span style={{ fontSize: '9px', color: TEXT_LIGHT }}>({w.distance}° apart)</span>
-                      {badge(`${w.winner} Wins`, GREEN, '#E8F5E9')}
+                      {badge(`${getPlanetEmoji(w.winner)} ${w.winner} Wins`, GREEN, '#E8F5E9')}
                     </div>
                     <p style={{ fontSize: '9px', color: TEXT_MED, lineHeight: '1.5', margin: 0 }}>{w.effect}</p>
                   </div>
@@ -1855,7 +1857,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {pageHeader('Calculations & Tables (contd.)')}
+            {pageHeader('🧮 Calculations & Tables (contd.)')}
 
             {subSectionTitle('Planetary Status (Grahavastha)')}
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
@@ -1865,18 +1867,18 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <tbody>
                 {grahavastha.map((g, i) => (
                   <tr key={g.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{g.planet}</td>
-                    <td style={tdStyle}>{g.sign}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(g.planet)} {g.planet}</td>
+                    <td style={tdStyle}>{getRashiEmojiByName(g.sign)} {g.sign}</td>
                     <td style={tdStyle}>{g.degree}°</td>
                     <td style={tdStyle}>{g.dignity}</td>
                     <td style={tdStyle}>
-                      {g.status === 'exalted' ? badge('Exalted', GREEN, '#E8F5E9') :
-                       g.status === 'debilitated' ? badge('Debilitated', RED, '#FFEBEE') :
+                      {g.status === 'exalted' ? badge('⬆️ Exalted', GREEN, '#E8F5E9') :
+                       g.status === 'debilitated' ? badge('⬇️ Debilitated', RED, '#FFEBEE') :
                        g.status === 'own' ? badge('Own', BLUE, '#E3F2FD') :
                        g.status === 'moolatrikona' ? badge('Moola.', GOLD, GOLD_BG) :
                        badge(g.status, TEXT_MED, '#F5F5F5')}
                     </td>
-                    <td style={{ ...tdStyle, textAlign: 'center', color: g.retrograde ? RED : GREEN }}>{g.retrograde ? 'R' : '—'}</td>
+                    <td style={{ ...tdStyle, textAlign: 'center', color: g.retrograde ? RED : GREEN }}>{g.retrograde ? '🔄 R' : '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1892,7 +1894,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   <tbody>
                     {shadbala.map((s, i) => (
                       <tr key={s.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                        <td style={{ ...tdStyle, fontWeight: 700 }}>{s.planet}</td>
+                        <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(s.planet)} {s.planet}</td>
                         <td style={{ ...tdStyle, textAlign: 'center' }}>{s.sthanaBala}</td>
                         <td style={{ ...tdStyle, textAlign: 'center' }}>{s.digBala}</td>
                         <td style={{ ...tdStyle, textAlign: 'center' }}>{s.naisargikaBala}</td>
@@ -1922,7 +1924,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   <tbody>
                     {ishtaKashta.map((ik, i) => (
                       <tr key={ik.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                        <td style={{ ...tdStyle, fontWeight: 700 }}>{ik.planet}</td>
+                        <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(ik.planet)} {ik.planet}</td>
                         <td style={{ ...tdStyle, textAlign: 'center', color: GREEN }}>{ik.ishtaPhala}</td>
                         <td style={{ ...tdStyle, textAlign: 'center', color: RED }}>{ik.kashtaPhala}</td>
                         <td style={tdStyle}>
@@ -1947,7 +1949,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {pageHeader('Calculations & Tables (contd.)')}
+            {pageHeader('🧮 Calculations & Tables (contd.)')}
 
             {subSectionTitle('House Strength (Bhavabala)')}
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
@@ -1958,8 +1960,8 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                 {bhavabala.map((b, i) => (
                   <tr key={b.house} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
                     <td style={{ ...tdStyle, textAlign: 'center', fontWeight: 700 }}>{b.house}</td>
-                    <td style={tdStyle}>{b.sign}</td>
-                    <td style={tdStyle}>{b.signLord}</td>
+                    <td style={tdStyle}>{getRashiEmojiByName(b.sign)} {b.sign}</td>
+                    <td style={tdStyle}>{getPlanetEmoji(b.signLord)} {b.signLord}</td>
                     <td style={{ ...tdStyle, textAlign: 'center' }}>{b.strength}</td>
                     <td style={tdStyle}>
                       {b.category === 'strong' ? badge('Strong', GREEN, '#E8F5E9') :
@@ -1986,7 +1988,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                     <tbody>
                       {shodasavarga.map((s, i) => (
                         <tr key={s.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                          <td style={{ ...tdStyle, fontWeight: 700, fontSize: '9px', padding: '5px 3px' }}>{s.planet}</td>
+                          <td style={{ ...tdStyle, fontWeight: 700, fontSize: '9px', padding: '5px 3px' }}>{getPlanetEmoji(s.planet)} {s.planet}</td>
                           {[s.d1, s.d2, s.d3, s.d4, s.d7, s.d9, s.d10, s.d12, s.d16, s.d20, s.d24, s.d27, s.d30, s.d60].map((v, j) => (
                             <td key={j} style={{ ...tdStyle, fontSize: '8px', padding: '5px 3px', textAlign: 'center' }}>{v}</td>
                           ))}
@@ -2008,7 +2010,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             <div style={decorativeBorder()} />
             {omWatermark()}
 
-            {pageHeader('Calculations & Tables (contd.)')}
+            {pageHeader('🧮 Calculations & Tables (contd.)')}
 
             {subSectionTitle('Western (Sayana/Tropical) Longitude')}
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
@@ -2018,11 +2020,11 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               <tbody>
                 {sayanaLongitude.map((s, i) => (
                   <tr key={s.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{s.planet}</td>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(s.planet)} {s.planet}</td>
                     <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px' }}>{s.nirayana}</td>
                     <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px', color: TEXT_LIGHT }}>{s.ayanamsa}</td>
                     <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px' }}>{s.sayana}</td>
-                    <td style={tdStyle}>{s.tropicalSign}</td>
+                    <td style={tdStyle}>{getRashiEmojiByName(s.tropicalSign)} {s.tropicalSign}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2039,11 +2041,11 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                     {bhavaTable.map((b, i) => (
                       <tr key={b.house} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
                         <td style={{ ...tdStyle, textAlign: 'center', fontWeight: 700 }}>{b.house}</td>
-                        <td style={tdStyle}>{b.sign}</td>
+                        <td style={tdStyle}>{getRashiEmojiByName(b.sign)} {b.sign}</td>
                         <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px' }}>{b.startDegree}</td>
                         <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px' }}>{b.midDegree}</td>
                         <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '10px' }}>{b.endDegree}</td>
-                        <td style={tdStyle}>{b.planetsInHouse.join(', ') || '—'}</td>
+                        <td style={tdStyle}>{b.planetsInHouse.map(p => `${getPlanetEmoji(p)} ${p}`).join(', ') || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -2061,12 +2063,12 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
                   <tbody>
                     {kpTable.map((k, i) => (
                       <tr key={k.planet} style={{ background: i % 2 === 0 ? '#FFFFFF' : '#FAFAF5' }}>
-                        <td style={{ ...tdStyle, fontWeight: 700 }}>{k.planet}</td>
+                        <td style={{ ...tdStyle, fontWeight: 700 }}>{getPlanetEmoji(k.planet)} {k.planet}</td>
                         <td style={{ ...tdStyle, fontSize: '10px' }}>{k.signDegree}</td>
                         <td style={tdStyle}>{k.nakshatra}</td>
-                        <td style={{ ...tdStyle, fontWeight: 600 }}>{k.nakshatraLord}</td>
-                        <td style={{ ...tdStyle, fontWeight: 600 }}>{k.subLord}</td>
-                        <td style={tdStyle}>{k.subSubLord}</td>
+                        <td style={{ ...tdStyle, fontWeight: 600 }}>{getPlanetEmoji(k.nakshatraLord)} {k.nakshatraLord}</td>
+                        <td style={{ ...tdStyle, fontWeight: 600 }}>{getPlanetEmoji(k.subLord)} {k.subLord}</td>
+                        <td style={tdStyle}>{getPlanetEmoji(k.subSubLord)} {k.subSubLord}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -2087,7 +2089,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           {/* Nakshatra Details */}
           {nakshatraData && (
             <>
-              {sectionTitle(`Nakshatra — ${chart.nakshatra}`)}
+              {sectionTitle(`✨ Nakshatra — ${chart.nakshatra}`)}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -2134,7 +2136,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           )}
 
           {/* Current Dasha */}
-          {sectionTitle('Current Dasha Period')}
+          {sectionTitle('⏳ Current Dasha Period')}
           <div style={{
             padding: '16px 20px',
             background: GOLD_BG,
@@ -2142,10 +2144,10 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
             border: `1px solid ${BORDER}`,
           }}>
             <p style={{ fontSize: '16px', color: TEXT, fontWeight: 700, margin: '0 0 4px 0' }}>
-              {currentDashaLord} Mahadasha
+              {getPlanetEmoji(currentDashaLord)} {currentDashaLord} Mahadasha
             </p>
             <p style={{ fontSize: '12px', color: TEXT_LIGHT, margin: '0 0 8px 0' }}>
-              {dashaOrder[(currentDashaIndex + 1) % 9]} Antardasha
+              {getPlanetEmoji(dashaOrder[(currentDashaIndex + 1) % 9])} {dashaOrder[(currentDashaIndex + 1) % 9]} Antardasha
             </p>
             <p style={{
               fontSize: '12px',
@@ -2160,7 +2162,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           {/* Recommendations */}
           {(horoscope?.gem || horoscope?.deity || horoscope?.element || horoscope?.ruler) && (
             <>
-              {sectionTitle('Recommendations')}
+              {sectionTitle('💎 Recommendations')}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -2201,7 +2203,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
           {/* Compatibility */}
           {horoscope?.compatibility && horoscope.compatibility.length > 0 && (
             <>
-              {sectionTitle('Compatible Signs')}
+              {sectionTitle('🤝 Compatible Signs')}
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {horoscope.compatibility.map(s => (
                   <span key={s} style={{
@@ -2235,7 +2237,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
               Generated by <strong style={{ color: GOLD }}>Vedic Astro</strong>
             </p>
             <p style={{ fontSize: '9px', color: '#999', margin: 0 }}>
-              vedic-astro.vercel.app
+              vedicastro.co
             </p>
           </div>
         </div>
