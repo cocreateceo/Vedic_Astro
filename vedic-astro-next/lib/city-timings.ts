@@ -182,6 +182,70 @@ export function findCityOrDefault(name: string): CityData {
  * Get the UTC offset in hours for a timezone string.
  * Uses Intl API when available, falls back to known offsets.
  */
+/**
+ * Haversine distance between two lat/lng points in kilometres.
+ */
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Find the nearest city in CITIES array to the given coordinates.
+ */
+export function findNearestCity(lat: number, lng: number): CityData {
+  let best = CITIES[0];
+  let bestDist = Infinity;
+  for (const city of CITIES) {
+    const d = haversineDistance(lat, lng, city.lat, city.lng);
+    if (d < bestDist) {
+      bestDist = d;
+      best = city;
+    }
+  }
+  return best;
+}
+
+const SESSION_KEY = 'vedic-geoip-city';
+
+/**
+ * Async city detection via IP geolocation (ipapi.co).
+ * Returns the nearest city from our database to the user's IP location.
+ * Caches result in sessionStorage so only 1 API call per browser session.
+ * Falls back to timezone-based detectCity() on any error.
+ */
+export async function detectCityAsync(): Promise<CityData> {
+  try {
+    const cached = sessionStorage.getItem(SESSION_KEY);
+    if (cached) {
+      const city = findCityByName(cached);
+      if (city) return city;
+    }
+  } catch { /* sessionStorage unavailable */ }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return detectCity();
+    const data = await res.json();
+    if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+      const nearest = findNearestCity(data.latitude, data.longitude);
+      try { sessionStorage.setItem(SESSION_KEY, nearest.name); } catch { /* ignore */ }
+      return nearest;
+    }
+  } catch { /* network error or timeout */ }
+
+  return detectCity();
+}
+
 export function getUtcOffsetHours(tz: string): number {
   const knownOffsets: Record<string, number> = {
     'Asia/Kolkata': 5.5,

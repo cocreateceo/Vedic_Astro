@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { rashiDetails, dailyPredictions, weeklyThemes, monthlyFocus, calculateDailyTimings } from '@/lib/horoscope-data';
-import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, findCityByName } from '@/lib/city-timings';
+import { getElementEmoji } from '@/lib/rashi-emoji';
+import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, detectCityAsync, findCityByName } from '@/lib/city-timings';
 import type { CityData } from '@/lib/city-timings';
 
 const signKeys = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
-const signSymbols = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+const signSymbols = ['🐏', '🐂', '👯', '🦀', '🦁', '👩', '⚖️', '🦂', '🏹', '🐐', '🏺', '🐟'];
 
 function SignImg({ index, size = 32, className = '' }: { index: number; size?: number; className?: string }) {
   const [err, setErr] = useState(false);
@@ -33,13 +34,23 @@ export default function HoroscopesPage() {
   const [currentSignIndex, setCurrentSignIndex] = useState(0);
   const [currentPeriod, setCurrentPeriod] = useState('daily');
   const [selectedCityName, setSelectedCityName] = useState('Delhi');
+  const [citySource, setCitySource] = useState<'default' | 'geo' | 'manual'>('default');
 
   useEffect(() => {
     const saved = localStorage.getItem('vedic-muhurat-city');
     if (saved && findCityByName(saved)) {
       setSelectedCityName(saved);
+      setCitySource('manual');
     } else {
+      // Phase 1: instant timezone-based detection
       setSelectedCityName(detectCity().name);
+      // Phase 2: async IP geolocation
+      detectCityAsync().then(geo => {
+        if (!localStorage.getItem('vedic-muhurat-city')) {
+          setSelectedCityName(geo.name);
+          setCitySource('geo');
+        }
+      });
     }
   }, []);
 
@@ -81,7 +92,21 @@ export default function HoroscopesPage() {
 
   const handleCityChange = (name: string) => {
     setSelectedCityName(name);
+    setCitySource('manual');
     localStorage.setItem('vedic-muhurat-city', name);
+  };
+
+  const handleDetectLocation = () => {
+    localStorage.removeItem('vedic-muhurat-city');
+    sessionStorage.removeItem('vedic-geoip-city');
+    setCitySource('default');
+    setSelectedCityName(detectCity().name);
+    detectCityAsync().then(geo => {
+      if (!localStorage.getItem('vedic-muhurat-city')) {
+        setSelectedCityName(geo.name);
+        setCitySource('geo');
+      }
+    });
   };
 
   const baseRating = isPositiveDay ? 65 : 45;
@@ -105,7 +130,7 @@ export default function HoroscopesPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader title="Horoscopes" description="Your daily, weekly, monthly & yearly Vedic predictions" />
+        <SectionHeader title="Horoscopes" description="Your daily, weekly, monthly & yearly Vedic predictions" emoji="⭐" />
 
         <div className="flex flex-wrap justify-center gap-2 mb-8">
           {signKeys.map((key, idx) => (
@@ -133,9 +158,9 @@ export default function HoroscopesPage() {
                 <div className="flex justify-center mb-2">
                   <SignImg index={currentSignIndex} size={120} className="rounded-xl" />
                 </div>
-                <h2 className="font-heading text-xl text-sign-primary mt-2">{rashi.sanskrit} ({rashi.name})</h2>
+                <h2 className="font-heading text-xl text-sign-primary mt-2">{signSymbols[currentSignIndex]} {rashi.sanskrit} ({rashi.name})</h2>
                 <p className="text-text-muted text-sm mt-1">{dateText}</p>
-                <p className="text-text-muted text-xs mt-1">Ruled by {rashi.ruler} &bull; {rashi.element} &bull; {rashi.quality}</p>
+                <p className="text-text-muted text-xs mt-1">Ruled by {rashi.ruler} &bull; {getElementEmoji(rashi.element)} {rashi.element} &bull; {rashi.quality}</p>
               </div>
 
               {currentPeriod === 'daily' && (
@@ -156,7 +181,7 @@ export default function HoroscopesPage() {
                         <select
                           value={selectedCityName}
                           onChange={(e) => handleCityChange(e.target.value)}
-                          className="bg-cosmic-bg border border-sign-primary/30 text-text-primary text-sm rounded px-2 py-1 focus:outline-none focus:border-sign-primary"
+                          className={`border text-sm rounded px-2 py-1 focus:outline-none focus:border-sign-primary ${citySource === 'geo' ? 'bg-green-500/10 border-green-500/40 text-green-300' : 'bg-cosmic-bg border-sign-primary/30 text-text-primary'}`}
                         >
                           <optgroup label="India">
                             {INDIA_CITIES.map(c => (
@@ -169,6 +194,8 @@ export default function HoroscopesPage() {
                             ))}
                           </optgroup>
                         </select>
+                        {citySource === 'geo' && <span className="text-green-400 text-xs flex items-center gap-1" title="Auto-detected via IP location">&#x1F4CD; Detected</span>}
+                        <button type="button" onClick={handleDetectLocation} className="text-sign-primary/70 hover:text-sign-primary text-xs flex items-center gap-0.5 transition-colors" title="Detect my location">&#x1F4CD;</button>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-text-muted">
                         <span className="bg-sign-primary/10 text-sign-primary px-2 py-0.5 rounded">{cityTiming.tzLabel}</span>

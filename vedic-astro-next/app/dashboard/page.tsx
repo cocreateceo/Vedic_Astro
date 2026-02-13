@@ -8,7 +8,7 @@ import { calculateDashaWithRatings, signNames, hindiSignNames } from '@/lib/kund
 import Image from 'next/image';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { PlanetAnalysis, YogaResult, DoshaResult, GemstoneRecommendation, TransitPrediction, SadeSatiResult, DashaWithAntardasha, WeeklyPrediction, MonthlyPrediction, BhavaPrediction, PanchangaPrediction, DayHighlight, ActivityRecommendation, MonthlyPhase, AuspiciousDate, InauspiciousDate, MonthlyTransit, LifeQuestion } from '@/types';
-import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, findCityByName } from '@/lib/city-timings';
+import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, detectCityAsync, findCityByName } from '@/lib/city-timings';
 import { identifyYogas } from '@/lib/yoga-calc';
 import { analyzeAllDoshas } from '@/lib/dosha-calc';
 import { recommendGemstones } from '@/lib/gemstone-calc';
@@ -27,6 +27,7 @@ import DayExpandedDetail from '@/components/dashboard/DayExpandedDetail';
 import PdfReport from '@/components/dashboard/PdfReport';
 import NewsletterPreferences from '@/components/dashboard/NewsletterPreferences';
 import { downloadBirthChartPdf } from '@/lib/pdf-download';
+import { getPlanetEmoji } from '@/lib/navagraha';
 import BirthDatePicker from '@/components/ui/BirthDatePicker';
 import BirthTimePicker from '@/components/ui/BirthTimePicker';
 import CityAutocomplete from '@/components/ui/CityAutocomplete';
@@ -36,6 +37,7 @@ function DashboardContent() {
   const [activeTab, setActiveTab] = useState('daily');
   const [editing, setEditing] = useState(false);
   const [selectedCityName, setSelectedCityName] = useState('Delhi');
+  const [citySource, setCitySource] = useState<'default' | 'geo' | 'manual'>('default');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
@@ -47,8 +49,17 @@ function DashboardContent() {
     const saved = localStorage.getItem('vedic-muhurat-city');
     if (saved && findCityByName(saved)) {
       setSelectedCityName(saved);
+      setCitySource('manual');
     } else {
+      // Phase 1: instant timezone-based detection
       setSelectedCityName(detectCity().name);
+      // Phase 2: async IP geolocation
+      detectCityAsync().then(geo => {
+        if (!localStorage.getItem('vedic-muhurat-city')) {
+          setSelectedCityName(geo.name);
+          setCitySource('geo');
+        }
+      });
     }
     const savedPhoto = localStorage.getItem('vedic-profile-photo');
     if (savedPhoto) setProfilePhoto(savedPhoto);
@@ -177,7 +188,21 @@ function DashboardContent() {
 
   const handleCityChange = (name: string) => {
     setSelectedCityName(name);
+    setCitySource('manual');
     localStorage.setItem('vedic-muhurat-city', name);
+  };
+
+  const handleDetectLocation = () => {
+    localStorage.removeItem('vedic-muhurat-city');
+    sessionStorage.removeItem('vedic-geoip-city');
+    setCitySource('default');
+    setSelectedCityName(detectCity().name);
+    detectCityAsync().then(geo => {
+      if (!localStorage.getItem('vedic-muhurat-city')) {
+        setSelectedCityName(geo.name);
+        setCitySource('geo');
+      }
+    });
   };
 
   function handleBirthEdit(e: React.FormEvent<HTMLFormElement>) {
@@ -526,7 +551,7 @@ function DashboardContent() {
                       <div className="flex items-center gap-2">
                         <span className="text-text-muted text-xs">Location:</span>
                         <select value={selectedCityName} onChange={(e) => handleCityChange(e.target.value)}
-                          className="bg-cosmic-bg border border-sign-primary/30 text-text-primary text-sm rounded px-2 py-1 focus:outline-none focus:border-sign-primary">
+                          className={`border text-sm rounded px-2 py-1 focus:outline-none focus:border-sign-primary ${citySource === 'geo' ? 'bg-green-500/10 border-green-500/40 text-green-300' : 'bg-cosmic-bg border-sign-primary/30 text-text-primary'}`}>
                           <optgroup label="India">
                             {INDIA_CITIES.map(c => (<option key={c.name} value={c.name}>{c.name}</option>))}
                           </optgroup>
@@ -534,6 +559,8 @@ function DashboardContent() {
                             {INTL_CITIES.map(c => (<option key={c.name} value={c.name}>{c.name}, {c.region}</option>))}
                           </optgroup>
                         </select>
+                        {citySource === 'geo' && <span className="text-green-400 text-xs flex items-center gap-1" title="Auto-detected via IP location">&#x1F4CD; Detected</span>}
+                        <button type="button" onClick={handleDetectLocation} className="text-sign-primary/70 hover:text-sign-primary text-xs flex items-center gap-0.5 transition-colors" title="Detect my location">&#x1F4CD;</button>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-text-muted">
                         <span className="bg-sign-primary/10 text-sign-primary px-2 py-0.5 rounded">{cityTiming.tzLabel}</span>
@@ -682,7 +709,7 @@ function DashboardContent() {
                     {transits.map(t => (
                       <div key={t.planet} className={`p-3 rounded-lg border ${t.isPositive ? 'border-green-500/20 bg-green-500/5' : 'border-yellow-500/20 bg-yellow-500/5'}`}>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-text-primary text-sm font-medium">{t.planet} Transit</span>
+                          <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(t.planet)} {t.planet} Transit</span>
                           <span className={`text-xs px-1.5 py-0.5 rounded ${t.isPositive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                             {t.isPositive ? 'Favourable' : 'Challenging'}
                           </span>
@@ -711,7 +738,7 @@ function DashboardContent() {
                           <div key={planet} className="p-3 rounded-lg bg-cosmic-bg/30 hover-glow transition-all">
                             <div className="flex items-center gap-2 mb-1">
                               <span className={`w-2 h-2 rounded-full ${malefic ? 'bg-red-400' : benefic ? 'bg-green-400' : 'bg-yellow-400'}`} />
-                              <span className="text-text-primary text-sm font-medium">{planet}{data.retrograde ? ' (R)' : ''}</span>
+                              <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(planet)} {planet}{data.retrograde ? ' (R)' : ''}</span>
                             </div>
                             <span className="text-text-muted text-xs block">{data.sign} {data.degree}&deg; &bull; House {data.house}</span>
                             {data.nakshatra && <span className="text-text-muted text-xs block">{data.nakshatra}{data.nakshatraPada ? ` Pada ${data.nakshatraPada}` : ''}</span>}
@@ -731,7 +758,7 @@ function DashboardContent() {
                       {planetAnalysis.map((a: PlanetAnalysis) => (
                         <div key={a.planet} className={`p-3 rounded-lg border hover-lift transition-all ${a.isMostMalefic ? 'border-red-500/30 bg-red-500/5' : a.isBenefic ? 'border-green-500/20 bg-green-500/5' : 'border-sign-primary/10 bg-cosmic-bg/30'}`}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-text-primary font-medium text-sm">{a.planet}</span>
+                            <span className="text-text-primary font-medium text-sm">{getPlanetEmoji(a.planet)} {a.planet}</span>
                             <span className="text-xs px-2 py-0.5 rounded-full"
                               style={{ background: a.isMostMalefic ? 'rgba(239,68,68,0.15)' : a.isBenefic ? 'rgba(34,197,94,0.15)' : 'rgba(var(--sign-glow-rgb),0.1)',
                                        color: a.isMostMalefic ? '#f87171' : a.isBenefic ? '#4ade80' : 'var(--sign-primary)' }}>
@@ -996,7 +1023,7 @@ function DashboardContent() {
                               {m.keyTransits.map((t: MonthlyTransit, i: number) => (
                                 <div key={i} className={`p-3 rounded-lg border ${t.isPositive ? 'border-green-500/15 bg-green-500/5' : 'border-yellow-500/15 bg-yellow-500/5'}`}>
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-text-primary text-sm font-medium">{t.planet}</span>
+                                    <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(t.planet)} {t.planet}</span>
                                     <span className={`text-xs px-1.5 py-0.5 rounded ${t.isPositive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                                       {t.isPositive ? 'Favourable' : 'Challenging'}
                                     </span>
@@ -1307,7 +1334,7 @@ function DashboardContent() {
                           className={`w-full text-left p-4 rounded-lg transition-all ${d.isCurrent ? 'bg-sign-primary/10 border border-sign-primary/30' : 'bg-cosmic-bg/30 hover:bg-cosmic-bg/50'}`}>
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                              <span className="text-text-primary font-medium">{d.planet} Mahadasha</span>
+                              <span className="text-text-primary font-medium">{getPlanetEmoji(d.planet)} {d.planet} Mahadasha</span>
                               {d.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Current</span>}
                               <span className={`text-xs px-2 py-0.5 rounded ${
                                 d.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
@@ -1330,7 +1357,7 @@ function DashboardContent() {
                               <div key={`${d.planet}-${ad.planet}`}
                                 className={`flex justify-between items-center p-2.5 rounded text-sm ${ad.isCurrent ? 'bg-sign-primary/10 border border-sign-primary/20' : 'bg-cosmic-bg/20'}`}>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-text-primary text-xs font-medium">{d.planet}/{ad.planet}</span>
+                                  <span className="text-text-primary text-xs font-medium">{getPlanetEmoji(d.planet)} {d.planet}/{getPlanetEmoji(ad.planet)} {ad.planet}</span>
                                   {ad.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-1.5 py-0.5 rounded">Active</span>}
                                 </div>
                                 <span className="text-text-muted text-xs">{ad.startMonth}/{ad.startYear} - {ad.endMonth}/{ad.endYear}</span>
@@ -1407,7 +1434,7 @@ function DashboardContent() {
                         <div className="flex items-center gap-2 mb-3">
                           <span className="text-text-primary font-medium">{g.primaryGem}</span>
                           {i === 0 && <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Primary</span>}
-                          <span className="text-text-muted text-xs ml-auto">For {g.planet}</span>
+                          <span className="text-text-muted text-xs ml-auto">For {getPlanetEmoji(g.planet)} {g.planet}</span>
                         </div>
                         <p className="text-text-muted text-sm mb-3">{g.reason}</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
@@ -1550,7 +1577,7 @@ function DashboardContent() {
                       <tbody>
                         {ashtakavargaData.planets.map(p => (
                           <tr key={p.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{p.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(p.planet)} {p.planet}</td>
                             {p.bindhus.map((b, si) => (
                               <td key={si} className={`text-center py-2 px-1 ${
                                 b >= 5 ? 'text-green-400' : b >= 4 ? 'text-text-primary' : b >= 3 ? 'text-yellow-400' : 'text-red-400'
@@ -1617,7 +1644,7 @@ function DashboardContent() {
                         'border-red-500/20 bg-red-500/5'
                       }`}>
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-text-primary font-medium text-sm">{p.planet}</span>
+                          <span className="text-text-primary font-medium text-sm">{getPlanetEmoji(p.planet)} {p.planet}</span>
                           <span className={`text-xs px-2 py-0.5 rounded ${
                             p.natalSignBindhus >= 5 ? 'bg-green-500/20 text-green-400' :
                             p.natalSignBindhus >= 4 ? 'bg-sign-primary/20 text-sign-primary' :
@@ -1831,7 +1858,7 @@ function DashboardContent() {
                       {dasaRemediesList.map(({ planet, remedy }) => (
                         <div key={planet} className="p-4 rounded-lg border border-sign-primary/10 bg-cosmic-bg/30">
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-text-primary font-medium">{remedy.planet} Dasa</span>
+                            <span className="text-text-primary font-medium">{getPlanetEmoji(remedy.planet)} {remedy.planet} Dasa</span>
                             <span className="text-sign-primary/60 text-xs">({remedy.sanskrit})</span>
                           </div>
                           <p className="text-text-muted text-sm mb-3">{remedy.overview}</p>
@@ -1918,7 +1945,7 @@ function DashboardContent() {
                       <tbody>
                         {longitudeTableData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             <td className="text-text-muted py-2 px-2 font-mono">{entry.longitude}</td>
                             <td className="text-text-primary py-2 px-2">{entry.sign} <span className="text-text-muted">({entry.hindi})</span></td>
                             <td className="text-text-muted py-2 px-2 font-mono">{entry.degreeInSign}</td>
@@ -1944,7 +1971,7 @@ function DashboardContent() {
                       }`}>
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-text-primary text-sm font-medium">{entry.planet}</span>
+                            <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</span>
                             <span className={`text-xs px-2 py-0.5 rounded ${
                               entry.isCombust ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'
                             }`}>{entry.isCombust ? 'Combust' : 'Not Combust'}</span>
@@ -2002,7 +2029,7 @@ function DashboardContent() {
                       <tbody>
                         {grahavasthaData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             <td className="text-text-muted py-2 px-2">{entry.sign}</td>
                             <td className="text-text-muted py-2 px-2 font-mono">{entry.degree}</td>
                             <td className="py-2 px-2">
@@ -2029,7 +2056,7 @@ function DashboardContent() {
                     {shadbalaData.map(entry => (
                       <div key={entry.planet} className="p-3 rounded-lg border border-sign-primary/10 bg-cosmic-bg/20">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-text-primary text-sm font-medium">{entry.planet}</span>
+                          <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</span>
                           <span className={`text-xs px-2 py-0.5 rounded ${
                             entry.percentage >= 70 ? 'bg-green-500/20 text-green-400' :
                             entry.percentage >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
@@ -2070,7 +2097,7 @@ function DashboardContent() {
                       <tbody>
                         {ishtaKashtaData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             <td className="text-center text-green-400 py-2 px-2">{entry.ishtaPhala}</td>
                             <td className="text-center text-red-400 py-2 px-2">{entry.kashtaPhala}</td>
                             <td className="text-center py-2 px-2">
@@ -2126,7 +2153,7 @@ function DashboardContent() {
                       <tbody>
                         {shodasavargaData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             {[entry.d1,entry.d2,entry.d3,entry.d4,entry.d7,entry.d9,entry.d10,entry.d12,entry.d16,entry.d20,entry.d24,entry.d27,entry.d30,entry.d60].map((v, i) => (
                               <td key={i} className="text-center text-text-muted py-1 px-1" style={{ fontSize: '10px' }}>{v}</td>
                             ))}
@@ -2155,7 +2182,7 @@ function DashboardContent() {
                       <tbody>
                         {sayanaData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             <td className="text-text-primary py-2 px-2">{entry.tropicalSign}</td>
                             <td className="text-text-muted py-2 px-2 font-mono">{entry.sayana}</td>
                             <td className="text-text-muted py-2 px-2">{entry.nirayana}</td>
@@ -2218,7 +2245,7 @@ function DashboardContent() {
                       <tbody>
                         {kpTableData.map(entry => (
                           <tr key={entry.planet} className="border-b border-sign-primary/5">
-                            <td className="text-text-primary py-2 px-2 font-medium">{entry.planet}</td>
+                            <td className="text-text-primary py-2 px-2 font-medium">{getPlanetEmoji(entry.planet)} {entry.planet}</td>
                             <td className="text-text-muted py-2 px-2 font-mono">{entry.signDegree}</td>
                             <td className="text-text-primary py-2 px-2">{entry.nakshatra}</td>
                             <td className="text-text-primary py-2 px-2">{entry.nakshatraLord}</td>
