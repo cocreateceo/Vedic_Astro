@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSignTheme } from '@/hooks/useSignTheme';
 import { VISUAL_THEME_KEYS, VISUAL_THEMES, SIGN_PALETTES, isVisualThemeKey, isSignKey } from '@/lib/sign-themes';
 import LanguageSelector from './LanguageSelector';
+import Toran from '@/components/ui/Toran';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -72,8 +73,9 @@ export default function Navbar() {
       }}
     >
       <div className="absolute bottom-[-1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sign-primary to-transparent animate-[headerShimmer_3s_ease-in-out_infinite]" style={{ opacity: 0.8 }} />
-      <nav className="max-w-[1200px] mx-auto flex items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2 group">
+      <nav className="max-w-[1200px] mx-auto flex items-center px-4 py-4">
+        {/* Left: Logo */}
+        <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <Image
             src="/images/vedic-astro-logo.jpg"
             alt="Vedic Astro"
@@ -81,13 +83,14 @@ export default function Navbar() {
             height={40}
             className="rounded-full group-hover:drop-shadow-[0_0_12px_rgba(var(--sign-glow-rgb),0.5)] transition-all"
           />
-          <span className="font-heading text-xl text-sign-primary font-semibold group-hover:drop-shadow-[0_0_15px_rgba(var(--sign-glow-rgb),0.6)] transition-all hidden sm:inline">
+          <span className="font-heading text-xl brass-metallic font-semibold group-hover:drop-shadow-[0_0_15px_rgba(var(--sign-glow-rgb),0.6)] transition-all hidden sm:inline">
             Vedic_Astro
           </span>
         </Link>
 
+        {/* Mobile hamburger */}
         <button
-          className="lg:hidden bg-transparent border-none cursor-pointer p-2"
+          className="lg:hidden bg-transparent border-none cursor-pointer p-2 ml-auto"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle navigation"
         >
@@ -97,7 +100,8 @@ export default function Navbar() {
           </div>
         </button>
 
-        <ul className={`lg:flex items-center gap-6 ${menuOpen ? 'flex flex-col absolute top-full left-0 right-0 bg-cosmic-bg/98 p-4 border-b border-sign-primary/20' : 'hidden'}`}>
+        {/* Center: Nav links */}
+        <ul className={`lg:flex flex-1 items-center justify-center gap-5 ${menuOpen ? 'flex flex-col absolute top-full left-0 right-0 bg-cosmic-bg/98 p-4 border-b border-sign-primary/20 z-40' : 'hidden'}`}>
           {[
             { href: '/', label: 'Home' },
             { href: '/horoscopes', label: 'Horoscopes' },
@@ -111,151 +115,148 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 prefetch={false}
-                className={`text-[0.95rem] relative py-2 transition-colors hover:text-sign-primary animated-underline ${isActive(link.href) ? 'text-sign-primary' : 'text-text-primary'}`}
+                className={`text-[0.95rem] relative py-2 pb-3 transition-colors hover:text-sign-primary whitespace-nowrap ${isActive(link.href) ? 'text-sign-primary nav-diya' : 'text-text-primary animated-underline'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
               </Link>
             </li>
           ))}
+        </ul>
 
-          {/* Language Selector */}
-          <li>
-            <LanguageSelector />
-          </li>
+        {/* Right: Actions (language, theme, login) */}
+        <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
+          <LanguageSelector />
 
           {/* Theme Selector */}
-          <li>
-            <div className="relative" ref={themeRef}>
-              <button
-                onClick={() => setThemeOpen(!themeOpen)}
-                className="flex items-center gap-1.5 text-[0.95rem] py-2 transition-colors hover:text-sign-primary text-text-primary"
-                title="Change theme"
-              >
-                <span className="w-4 h-4 rounded-full border-2 border-sign-primary" style={{ background: `var(--sign-primary)` }} />
-                <span className="hidden md:inline text-xs truncate max-w-[90px]">
-                  {overrideKey
-                    ? isVisualThemeKey(overrideKey)
-                      ? VISUAL_THEMES[overrideKey].name
-                      : isSignKey(overrideKey)
-                        ? SIGN_PALETTES[overrideKey].name
-                        : 'Theme'
-                    : userSignKey
-                      ? SIGN_PALETTES[userSignKey].name
-                      : VISUAL_THEMES['vedic-ember'].name}
-                </span>
-              </button>
-              {themeOpen && (
-                <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[220px] shadow-lg border border-sign-primary/10 z-50 max-h-[400px] overflow-y-auto">
-                  <div className="px-3 py-1.5 text-text-muted text-xs uppercase tracking-wider border-b border-sign-primary/10 mb-1">Themes</div>
-                  {VISUAL_THEME_KEYS.map(key => {
-                    const theme = VISUAL_THEMES[key];
-                    const isActive = overrideKey === key || (!overrideKey && !userSignKey && key === 'vedic-ember');
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => { setOverride(key); setThemeOpen(false); }}
-                        className={`w-full text-left px-3 py-2 flex items-center gap-3 transition-colors hover:bg-sign-primary/10 ${isActive ? 'bg-sign-primary/5' : ''}`}
+          <div className="relative" ref={themeRef}>
+            <button
+              onClick={() => setThemeOpen(!themeOpen)}
+              className="flex items-center gap-1.5 text-[0.95rem] py-2 transition-colors hover:text-sign-primary text-text-primary"
+              title="Change theme"
+            >
+              <span className="w-4 h-4 rounded-full border-2 border-sign-primary" style={{ background: `var(--sign-primary)` }} />
+              <span className="hidden md:inline text-xs truncate max-w-[90px]">
+                {overrideKey
+                  ? isVisualThemeKey(overrideKey)
+                    ? VISUAL_THEMES[overrideKey].name
+                    : isSignKey(overrideKey)
+                      ? SIGN_PALETTES[overrideKey].name
+                      : 'Theme'
+                  : userSignKey
+                    ? SIGN_PALETTES[userSignKey].name
+                    : VISUAL_THEMES['vedic-ember'].name}
+              </span>
+            </button>
+            {themeOpen && (
+              <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[220px] shadow-lg border border-sign-primary/10 z-50 max-h-[400px] overflow-y-auto">
+                <div className="px-3 py-1.5 text-text-muted text-xs uppercase tracking-wider border-b border-sign-primary/10 mb-1">Themes</div>
+                {VISUAL_THEME_KEYS.map(key => {
+                  const theme = VISUAL_THEMES[key];
+                  const isActive = overrideKey === key || (!overrideKey && !userSignKey && key === 'vedic-ember');
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => { setOverride(key); setThemeOpen(false); }}
+                      className={`w-full text-left px-3 py-2 flex items-center gap-3 transition-colors hover:bg-sign-primary/10 ${isActive ? 'bg-sign-primary/5' : ''}`}
+                    >
+                      <span
+                        className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-white"
+                        style={{ background: theme.primary }}
                       >
-                        <span
-                          className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-white"
-                          style={{ background: theme.primary }}
-                        >
-                          {isActive ? '\u2713' : ''}
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="text-text-primary text-sm">{theme.name}</span>
-                          <span className="text-text-muted text-[10px] leading-tight">{theme.description}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                  {userSignKey && (
-                    <>
-                      <div className="border-t border-sign-primary/10 my-1" />
-                      <div className="px-3 py-1.5 text-text-muted text-xs uppercase tracking-wider">Your Sign</div>
-                      <button
-                        onClick={() => { setOverride(null); setThemeOpen(false); }}
-                        className={`w-full text-left px-3 py-2 flex items-center gap-3 transition-colors hover:bg-sign-primary/10 ${!overrideKey ? 'bg-sign-primary/5' : ''}`}
+                        {isActive ? '\u2713' : ''}
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-text-primary text-sm">{theme.name}</span>
+                        <span className="text-text-muted text-[10px] leading-tight">{theme.description}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+                {userSignKey && (
+                  <>
+                    <div className="border-t border-sign-primary/10 my-1" />
+                    <div className="px-3 py-1.5 text-text-muted text-xs uppercase tracking-wider">Your Sign</div>
+                    <button
+                      onClick={() => { setOverride(null); setThemeOpen(false); }}
+                      className={`w-full text-left px-3 py-2 flex items-center gap-3 transition-colors hover:bg-sign-primary/10 ${!overrideKey ? 'bg-sign-primary/5' : ''}`}
+                    >
+                      <span
+                        className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-white"
+                        style={{ background: SIGN_PALETTES[userSignKey].primary }}
                       >
-                        <span
-                          className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-white"
-                          style={{ background: SIGN_PALETTES[userSignKey].primary }}
-                        >
-                          {!overrideKey ? '\u2713' : ''}
-                        </span>
-                        <span className="text-text-primary text-sm">{SIGN_PALETTES[userSignKey].name} ({SIGN_PALETTES[userSignKey].hindi})</span>
-                      </button>
-                    </>
+                        {!overrideKey ? '\u2713' : ''}
+                      </span>
+                      <span className="text-text-primary text-sm">{SIGN_PALETTES[userSignKey].name} ({SIGN_PALETTES[userSignKey].hindi})</span>
+                    </button>
+                  </>
+                )}
+                {overrideKey && (
+                  <>
+                    <div className="border-t border-sign-primary/10 my-1" />
+                    <button
+                      onClick={() => { setOverride(null); setThemeOpen(false); }}
+                      className="w-full text-left px-3 py-1.5 text-text-muted text-xs hover:bg-sign-primary/10 transition-colors"
+                    >
+                      {userSignKey ? 'Reset to Sign Theme' : 'Reset to Default'}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Login / Profile */}
+          {isLoggedIn ? (
+            <div className="relative" ref={dropdownRef}>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg font-bold text-sm flex items-center justify-center cursor-pointer border-2 border-sign-primary/40"
+                >
+                  {profilePhoto ? (
+                    <img src={profilePhoto} alt={initials} className="w-full h-full object-cover" />
+                  ) : (
+                    initials
                   )}
-                  {overrideKey && (
-                    <>
-                      <div className="border-t border-sign-primary/10 my-1" />
-                      <button
-                        onClick={() => { setOverride(null); setThemeOpen(false); }}
-                        className="w-full text-left px-3 py-1.5 text-text-muted text-xs hover:bg-sign-primary/10 transition-colors"
-                      >
-                        {userSignKey ? 'Reset to Sign Theme' : 'Reset to Default'}
-                      </button>
-                    </>
-                  )}
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); photoInputRef.current?.click(); }}
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-sign-primary flex items-center justify-center cursor-pointer border border-cosmic-bg hover:scale-110 transition-transform"
+                  title="Upload photo"
+                >
+                  <svg className="w-2.5 h-2.5 text-cosmic-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[160px] shadow-lg border border-sign-primary/10 z-50">
+                  <Link href="/dashboard" prefetch={false} className="block px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors" onClick={() => setDropdownOpen(false)}>My Dashboard</Link>
+                  <button onClick={() => { logout(); setDropdownOpen(false); }} className="block w-full text-left px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors">Logout</button>
                 </div>
               )}
             </div>
-          </li>
-
-          <li>
-            {isLoggedIn ? (
-              <div className="relative" ref={dropdownRef}>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                <div className="relative">
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg font-bold text-sm flex items-center justify-center cursor-pointer border-2 border-sign-primary/40"
-                  >
-                    {profilePhoto ? (
-                      <img src={profilePhoto} alt={initials} className="w-full h-full object-cover" />
-                    ) : (
-                      initials
-                    )}
-                  </button>
-                  {/* Camera badge */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); photoInputRef.current?.click(); }}
-                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-sign-primary flex items-center justify-center cursor-pointer border border-cosmic-bg hover:scale-110 transition-transform"
-                    title="Upload photo"
-                  >
-                    <svg className="w-2.5 h-2.5 text-cosmic-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-                </div>
-                {dropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 bg-bg-card rounded-lg py-2 min-w-[160px] shadow-lg border border-sign-primary/10 z-50">
-                    <Link href="/dashboard" prefetch={false} className="block px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors" onClick={() => setDropdownOpen(false)}>My Dashboard</Link>
-                    <button onClick={() => { logout(); setDropdownOpen(false); }} className="block w-full text-left px-4 py-2 text-text-muted hover:bg-sign-primary/10 hover:text-sign-primary transition-colors">Logout</button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="btn-premium bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg px-6 py-2 rounded-lg font-medium transition-all inline-block"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
-            )}
-          </li>
-        </ul>
+          ) : (
+            <Link
+              href="/login"
+              className="btn-premium bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg px-6 py-2 rounded-lg font-medium transition-all inline-block"
+              onClick={() => setMenuOpen(false)}
+            >
+              Login
+            </Link>
+          )}
+        </div>
       </nav>
+      <Toran className="absolute left-0 right-0 top-full opacity-70" />
     </header>
   );
 }
