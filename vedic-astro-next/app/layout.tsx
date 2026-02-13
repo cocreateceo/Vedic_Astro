@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import OmSound from '@/components/layout/OmSound';
 import PageTransition from '@/components/layout/PageTransition';
 import ScrollProgress from '@/components/ui/ScrollProgress';
+import SmoothScroll from '@/components/layout/SmoothScroll';
 import TempleGopuramFrame from '@/components/ui/TempleGopuramFrame';
 import './globals.css';
 
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <SignThemeProvider>
             <SignBackgroundOverlay />
+            <SmoothScroll />
             <ScrollProgress />
             <TempleGopuramFrame />
             <OmSound />
