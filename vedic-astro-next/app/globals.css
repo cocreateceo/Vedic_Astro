@@ -29,6 +29,16 @@ html.translated-rtl font {
 .goog-te-balloon-frame {
   display: none !important;
 }
+/* Hide Google Translate floating widget / popup icon */
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-SmKAyb,
+.VIpgJd-ZVi9od-xl07Ob-lTBxed,
+.VIpgJd-ZVi9od-ORHb,
+#goog-gt-vt,
+.goog-te-spinner-pos {
+  display: none !important;
+}
 
 /* ===== Custom Theme Variables ===== */
 @theme {
