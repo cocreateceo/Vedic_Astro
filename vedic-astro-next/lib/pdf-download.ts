@@ -29,9 +29,10 @@ export async function downloadBirthChartPdf(
     throw new Error('No PDF pages found');
   }
 
+  const totalPages = pages.length;
   const pdf = new jsPDF('p', 'mm', 'a4');
 
-  for (let i = 0; i < pages.length; i++) {
+  for (let i = 0; i < totalPages; i++) {
     const page = pages[i];
 
     const canvas = await html2canvas(page, {
@@ -56,7 +57,34 @@ export async function downloadBirthChartPdf(
     } else {
       pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
     }
+
+    // Footer: page number centered at bottom
+    const pageNum = i + 1;
+    const footerY = A4_H - 8;
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(150, 130, 90); // muted gold
+    pdf.text(
+      `Page ${pageNum} of ${totalPages}`,
+      A4_W / 2,
+      footerY,
+      { align: 'center' }
+    );
+    // Thin decorative line above page number
+    pdf.setDrawColor(200, 180, 130);
+    pdf.setLineWidth(0.3);
+    pdf.line(30, footerY - 3, A4_W - 30, footerY - 3);
   }
+
+  // Set PDF page labels so Adobe Reader "Go to page" starts at 1
+  // jsPDF internal: set PageLabels in the catalog
+  const pdfInternal = pdf.internal as Record<string, unknown>;
+  const events = pdfInternal.events as { subscribe: (event: string, cb: () => void) => void };
+  events.subscribe('putCatalog', function (this: void) {
+    const out = pdfInternal.out as (s: string) => void;
+    // PageLabels dictionary: start numbering from page 1 with decimal digits
+    out('/PageLabels << /Nums [0 << /S /D /St 1 >>] >>');
+  });
 
   // Restore
   Object.assign(element.style, orig);
