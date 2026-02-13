@@ -360,7 +360,7 @@ const PdfReport = forwardRef<HTMLDivElement, PdfReportProps>(
       <div
         ref={ref}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           left: '-9999px',
           top: 0,
           zIndex: -1,

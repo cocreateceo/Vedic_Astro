@@ -4,7 +4,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   aries: {
     key: 'aries',
     name: 'Mesha (Aries)',
-    symbol: '♈',
+    symbol: '🐏',
     element: 'Fire',
     ruler: 'Mars (Mangal)',
     quality: 'Cardinal',
@@ -18,7 +18,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   taurus: {
     key: 'taurus',
     name: 'Vrishabha (Taurus)',
-    symbol: '♉',
+    symbol: '🐂',
     element: 'Earth',
     ruler: 'Venus (Shukra)',
     quality: 'Fixed',
@@ -32,7 +32,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   gemini: {
     key: 'gemini',
     name: 'Mithuna (Gemini)',
-    symbol: '♊',
+    symbol: '👯',
     element: 'Air',
     ruler: 'Mercury (Budha)',
     quality: 'Mutable',
@@ -46,7 +46,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   cancer: {
     key: 'cancer',
     name: 'Karka (Cancer)',
-    symbol: '♋',
+    symbol: '🦀',
     element: 'Water',
     ruler: 'Moon (Chandra)',
     quality: 'Cardinal',
@@ -60,7 +60,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   leo: {
     key: 'leo',
     name: 'Simha (Leo)',
-    symbol: '♌',
+    symbol: '🦁',
     element: 'Fire',
     ruler: 'Sun (Surya)',
     quality: 'Fixed',
@@ -74,7 +74,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   virgo: {
     key: 'virgo',
     name: 'Kanya (Virgo)',
-    symbol: '♍',
+    symbol: '👩',
     element: 'Earth',
     ruler: 'Mercury (Budha)',
     quality: 'Mutable',
@@ -88,7 +88,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   libra: {
     key: 'libra',
     name: 'Tula (Libra)',
-    symbol: '♎',
+    symbol: '⚖️',
     element: 'Air',
     ruler: 'Venus (Shukra)',
     quality: 'Cardinal',
@@ -102,7 +102,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   scorpio: {
     key: 'scorpio',
     name: 'Vrishchika (Scorpio)',
-    symbol: '♏',
+    symbol: '🦂',
     element: 'Water',
     ruler: 'Mars (Mangal)',
     quality: 'Fixed',
@@ -116,7 +116,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   sagittarius: {
     key: 'sagittarius',
     name: 'Dhanu (Sagittarius)',
-    symbol: '♐',
+    symbol: '🏹',
     element: 'Fire',
     ruler: 'Jupiter (Guru)',
     quality: 'Mutable',
@@ -130,7 +130,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   capricorn: {
     key: 'capricorn',
     name: 'Makara (Capricorn)',
-    symbol: '♑',
+    symbol: '🐐',
     element: 'Earth',
     ruler: 'Saturn (Shani)',
     quality: 'Cardinal',
@@ -144,7 +144,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   aquarius: {
     key: 'aquarius',
     name: 'Kumbha (Aquarius)',
-    symbol: '♒',
+    symbol: '🏺',
     element: 'Air',
     ruler: 'Saturn (Shani)',
     quality: 'Fixed',
@@ -158,7 +158,7 @@ export const zodiacData: Record<string, ZodiacSign> = {
   pisces: {
     key: 'pisces',
     name: 'Meena (Pisces)',
-    symbol: '♓',
+    symbol: '🐟',
     element: 'Water',
     ruler: 'Jupiter (Guru)',
     quality: 'Mutable',
@@ -172,18 +172,18 @@ export const zodiacData: Record<string, ZodiacSign> = {
 };
 
 export const zodiacWheelSigns: ZodiacWheelSign[] = [
-  { key: 'aries', symbol: '♈', hindi: 'मेष', english: 'Aries' },
-  { key: 'taurus', symbol: '♉', hindi: 'वृषभ', english: 'Taurus' },
-  { key: 'gemini', symbol: '♊', hindi: 'मिथुन', english: 'Gemini' },
-  { key: 'cancer', symbol: '♋', hindi: 'कर्क', english: 'Cancer' },
-  { key: 'leo', symbol: '♌', hindi: 'सिंह', english: 'Leo' },
-  { key: 'virgo', symbol: '♍', hindi: 'कन्या', english: 'Virgo' },
-  { key: 'libra', symbol: '♎', hindi: 'तुला', english: 'Libra' },
-  { key: 'scorpio', symbol: '♏', hindi: 'वृश्चिक', english: 'Scorpio' },
-  { key: 'sagittarius', symbol: '♐', hindi: 'धनु', english: 'Sagittarius' },
-  { key: 'capricorn', symbol: '♑', hindi: 'मकर', english: 'Capricorn' },
-  { key: 'aquarius', symbol: '♒', hindi: 'कुम्भ', english: 'Aquarius' },
-  { key: 'pisces', symbol: '♓', hindi: 'मीन', english: 'Pisces' }
+  { key: 'aries', symbol: '🐏', hindi: 'मेष', english: 'Aries' },
+  { key: 'taurus', symbol: '🐂', hindi: 'वृषभ', english: 'Taurus' },
+  { key: 'gemini', symbol: '👯', hindi: 'मिथुन', english: 'Gemini' },
+  { key: 'cancer', symbol: '🦀', hindi: 'कर्क', english: 'Cancer' },
+  { key: 'leo', symbol: '🦁', hindi: 'सिंह', english: 'Leo' },
+  { key: 'virgo', symbol: '👩', hindi: 'कन्या', english: 'Virgo' },
+  { key: 'libra', symbol: '⚖️', hindi: 'तुला', english: 'Libra' },
+  { key: 'scorpio', symbol: '🦂', hindi: 'वृश्चिक', english: 'Scorpio' },
+  { key: 'sagittarius', symbol: '🏹', hindi: 'धनु', english: 'Sagittarius' },
+  { key: 'capricorn', symbol: '🐐', hindi: 'मकर', english: 'Capricorn' },
+  { key: 'aquarius', symbol: '🏺', hindi: 'कुम्भ', english: 'Aquarius' },
+  { key: 'pisces', symbol: '🐟', hindi: 'मीन', english: 'Pisces' }
 ];
 
 export const signKeys = Object.keys(zodiacData);

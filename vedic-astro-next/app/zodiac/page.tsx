@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { rashiDetails } from '@/lib/horoscope-data';
+import { getElementEmoji } from '@/lib/rashi-emoji';
 
-const signSymbols = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+const signSymbols = ['🐏', '🐂', '👯', '🦀', '🦁', '👩', '⚖️', '🦂', '🏹', '🐐', '🏺', '🐟'];
 const signImageKeys = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
 const vedicDates = [
   'Apr 14 - May 14', 'May 15 - Jun 14', 'Jun 15 - Jul 14', 'Jul 15 - Aug 14',
@@ -34,7 +35,7 @@ export default function ZodiacPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="राशि" title="Zodiac Signs" description="Explore the 12 Rashis of Vedic Astrology" />
+        <SectionHeader sanskrit="राशि" title="Zodiac Signs" description="Explore the 12 Rashis of Vedic Astrology" emoji="✨" />
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-3 mb-12">
           {Array.from({ length: 12 }, (_, i) => {
             const sign = rashiDetails[i];
@@ -44,7 +45,7 @@ export default function ZodiacPage() {
                 <div className="flex justify-center mb-1">
                   <SignImage index={i} size={40} />
                 </div>
-                <span className="text-xs text-text-primary block mt-1">{sign.name}</span>
+                <span className="text-xs text-text-primary block mt-1">{signSymbols[i]} {sign.name}</span>
               </button>
             );
           })}
@@ -58,14 +59,14 @@ export default function ZodiacPage() {
                 <div className="flex justify-center mb-3">
                   <SignImage index={selectedSign} size={160} className="rounded-xl" />
                 </div>
-                <h2 className="font-heading text-2xl text-sign-primary mt-2">{sign.sanskrit} ({sign.name})</h2>
+                <h2 className="font-heading text-2xl text-sign-primary mt-2">{signSymbols[selectedSign]} {sign.sanskrit} ({sign.name})</h2>
                 <p className="text-text-muted text-sm mt-1">{vedicDates[selectedSign]}</p>
               </div>
               <p className="text-text-muted mb-6 text-center">{sign.characteristics}</p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: 'Element', value: sign.element },
+                  { label: 'Element', value: `${getElementEmoji(sign.element)} ${sign.element}` },
                   { label: 'Ruler', value: sign.ruler },
                   { label: 'Quality', value: sign.quality },
                   { label: 'Nature', value: sign.nature },
@@ -155,13 +156,13 @@ export default function ZodiacPage() {
                       <SignImage index={i} size={56} />
                     </div>
                     <div>
-                      <h3 className="font-heading text-lg text-text-primary">{sign.sanskrit} ({sign.name})</h3>
+                      <h3 className="font-heading text-lg text-text-primary">{signSymbols[i]} {sign.sanskrit} ({sign.name})</h3>
                       <p className="text-text-muted text-xs">{vedicDates[i]}</p>
                     </div>
                   </div>
                   <p className="text-text-muted text-sm mb-3">{sign.characteristics}</p>
                   <div className="flex gap-2 flex-wrap mb-3">
-                    <span className="text-xs bg-sign-primary/10 text-sign-primary px-2 py-1 rounded">{sign.element}</span>
+                    <span className="text-xs bg-sign-primary/10 text-sign-primary px-2 py-1 rounded">{getElementEmoji(sign.element)} {sign.element}</span>
                     <span className="text-xs bg-sign-primary/10 text-sign-primary px-2 py-1 rounded">{sign.ruler}</span>
                     <span className="text-xs bg-sign-primary/10 text-sign-primary px-2 py-1 rounded">{sign.nature}</span>
                   </div>

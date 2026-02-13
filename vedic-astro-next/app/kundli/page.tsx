@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import SectionHeader from '@/components/ui/SectionHeader';
+import { usePetalConfetti } from '@/components/ui/PetalConfetti';
+import { getPlanetEmoji, getPlanetSanskrit } from '@/lib/navagraha';
+import { getRashiEmojiByName } from '@/lib/rashi-emoji';
+import { getAuspiciousMarker } from '@/lib/shubh-ashubh';
 import BirthDatePicker from '@/components/ui/BirthDatePicker';
 import BirthTimePicker from '@/components/ui/BirthTimePicker';
 import CityAutocomplete from '@/components/ui/CityAutocomplete';
@@ -64,6 +68,7 @@ export default function KundliPage() {
   const [chartStyle, setChartStyle] = useState('north');
   const [activeTab, setActiveTab] = useState<TabKey>('chart');
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
+  const triggerPetals = usePetalConfetti();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -110,6 +115,7 @@ export default function KundliPage() {
     });
     setChartStyle(style);
     setActiveTab('chart');
+    triggerPetals();
   }
 
   const chartSvg = result
@@ -125,7 +131,7 @@ export default function KundliPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="कुण्डली" title="Free Kundli Generator" description="Generate your complete Vedic birth chart with detailed analysis" />
+        <SectionHeader sanskrit="कुण्डली" title="Free Kundli Generator" description="Generate your complete Vedic birth chart with detailed analysis" emoji="📜" kalash />
 
         <div className="max-w-2xl mx-auto mb-12">
           <form onSubmit={handleSubmit} className="glass-card p-8 space-y-4">
@@ -215,14 +221,17 @@ export default function KundliPage() {
                     { label: 'Nakshatra', value: result.moonData.nakshatra },
                     { label: 'Pada', value: `${result.moonData.nakshatraPada}` },
                     { label: 'Ascendant', value: `${result.ascendant.symbol} ${result.ascendant.signHindi}` },
-                    { label: 'Sun Sign', value: result.sunSign },
-                    { label: 'Tithi', value: result.tithi },
-                    { label: 'Yoga', value: result.yoga },
+                    { label: 'Sun Sign', value: `${getRashiEmojiByName(result.sunSign)} ${result.sunSign}` },
+                    { label: 'Tithi', value: result.tithi, marker: getAuspiciousMarker('tithi', result.tithi) },
+                    { label: 'Yoga', value: result.yoga, marker: getAuspiciousMarker('yoga', result.yoga) },
                     { label: 'Nakshatra Lord', value: moonNakshatraData?.ruler || '-' },
                   ].map((b, i) => (
                     <div key={b.label} className="glass-card hover-lift p-3 text-center animate-fade-up" style={{ '--stagger': i } as React.CSSProperties}>
                       <span className="text-sign-primary/60 text-xs block">{b.label}</span>
                       <span className="text-sign-primary text-sm font-medium">{b.value}</span>
+                      {'marker' in b && b.marker && (
+                        <span className={`text-[10px] block mt-0.5 ${b.marker.className}`}>{b.marker.emoji} {b.marker.labelHindi}</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -324,7 +333,7 @@ export default function KundliPage() {
                     {result.transits.slice(0, 3).map(t => (
                       <div key={t.planet} className={`p-3 rounded-lg border ${t.isPositive ? 'border-green-500/20 bg-green-500/5' : 'border-yellow-500/20 bg-yellow-500/5'}`}>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-text-primary text-sm font-medium">{t.planet}</span>
+                          <span className="text-text-primary text-sm font-medium">{getPlanetEmoji(t.planet)} {t.planet}</span>
                           <span className={`text-xs px-1.5 py-0.5 rounded ${t.isPositive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                             {t.isPositive ? 'Favourable' : 'Challenging'}
                           </span>
@@ -456,7 +465,7 @@ export default function KundliPage() {
                                   p === getMostMalefic(result.ascendant.signIndex) ? 'bg-red-500/20 text-red-400' :
                                   isBeneficForAscendant(p, result.ascendant.signIndex) ? 'bg-green-500/20 text-green-400' :
                                   'bg-yellow-500/20 text-yellow-400'
-                                }`}>{p}</span>
+                                }`}>{getPlanetEmoji(p)} {p}</span>
                               ))}
                             </div>
                           )}
@@ -511,7 +520,7 @@ export default function KundliPage() {
                         const navamsaSign = calculateNavamsaSign(d.signIndex, d.nakshatraPada);
                         return (
                           <tr key={planet} className="border-b border-sign-primary/10">
-                            <td className="py-2 text-text-primary font-medium">{planet}{d.retrograde ? ' (R)' : ''}</td>
+                            <td className="py-2 text-text-primary font-medium"><span className="mr-1">{getPlanetEmoji(planet)}</span>{planet}{d.retrograde ? ' (R)' : ''}</td>
                             <td className="py-2 text-text-muted">{d.signHindi} ({d.sign})</td>
                             <td className="py-2 text-text-muted">{d.degree}&deg;</td>
                             <td className="py-2 text-text-muted">{d.house}</td>
@@ -538,7 +547,7 @@ export default function KundliPage() {
                       {result.planetAnalysis.map((a: PlanetAnalysis) => (
                         <div key={a.planet} className={`p-4 rounded-lg border ${a.isMostMalefic ? 'border-red-500/30 bg-red-500/5' : a.isBenefic ? 'border-green-500/20 bg-green-500/5' : 'border-sign-primary/10 bg-cosmic-bg/30'}`}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-text-primary font-medium">{a.planet}</span>
+                            <span className="text-text-primary font-medium"><span className="mr-1">{getPlanetEmoji(a.planet)}</span>{a.planet} <span className="text-text-muted text-xs font-normal">({getPlanetSanskrit(a.planet)})</span></span>
                             <span className="text-xs px-2 py-0.5 rounded-full"
                               style={{ background: a.isMostMalefic ? 'rgba(239,68,68,0.15)' : a.isBenefic ? 'rgba(34,197,94,0.15)' : 'rgba(var(--sign-glow-rgb),0.1)',
                                        color: a.isMostMalefic ? '#f87171' : a.isBenefic ? '#4ade80' : 'var(--sign-primary)' }}>
@@ -572,7 +581,7 @@ export default function KundliPage() {
                         >
                           <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                              <span className="text-text-primary font-medium">{d.planet} Mahadasha</span>
+                              <span className="text-text-primary font-medium"><span className="mr-1">{getPlanetEmoji(d.planet)}</span>{d.planet} Mahadasha</span>
                               {d.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-2 py-0.5 rounded">Current</span>}
                               <span className={`text-xs px-2 py-0.5 rounded ${
                                 d.rating === 'excellent' ? 'bg-green-500/20 text-green-400' :
@@ -600,7 +609,7 @@ export default function KundliPage() {
                                   ad.isCurrent ? 'bg-sign-primary/10 border border-sign-primary/20' : 'bg-cosmic-bg/20'
                                 }`}>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-text-primary text-xs font-medium">{d.planet}/{ad.planet}</span>
+                                  <span className="text-text-primary text-xs font-medium">{getPlanetEmoji(d.planet)} {d.planet}/{getPlanetEmoji(ad.planet)} {ad.planet}</span>
                                   {ad.isCurrent && <span className="text-xs bg-sign-primary/20 text-sign-primary px-1.5 py-0.5 rounded">Active</span>}
                                 </div>
                                 <span className="text-text-muted text-xs">

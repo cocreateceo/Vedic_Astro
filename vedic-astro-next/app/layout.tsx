@@ -6,6 +6,9 @@ import SignBackgroundOverlay from '@/components/theme/SignBackgroundOverlay';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import OmSound from '@/components/layout/OmSound';
+import PageTransition from '@/components/layout/PageTransition';
+import ScrollProgress from '@/components/ui/ScrollProgress';
+import TempleGopuramFrame from '@/components/ui/TempleGopuramFrame';
 import './globals.css';
 
 const cinzel = Cinzel({
@@ -42,9 +45,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <SignThemeProvider>
             <SignBackgroundOverlay />
+            <ScrollProgress />
+            <TempleGopuramFrame />
             <OmSound />
             <Navbar />
-            <main className="pt-[72px]">{children}</main>
+            <main className="pt-[72px]">
+              <PageTransition>{children}</PageTransition>
+            </main>
             <Footer />
           </SignThemeProvider>
         </AuthProvider>

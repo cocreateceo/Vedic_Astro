@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import SectionHeader from '@/components/ui/SectionHeader';
+import { usePetalConfetti } from '@/components/ui/PetalConfetti';
+import SparkleWrap from '@/components/ui/SparkleWrap';
+import PetalScatter from '@/components/ui/PetalScatter';
 import { computeFullChart } from '@/lib/kundli-calc';
 import { generateNorthIndianChart } from '@/lib/chart-svg';
 import BirthDatePicker from '@/components/ui/BirthDatePicker';
@@ -11,6 +14,7 @@ import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 export default function QuickKundli() {
   const [result, setResult] = useState<{ chartSvg: string; moonSign: string; moonSymbol: string; nakshatra: string; ascendant: string; ascSymbol: string } | null>(null);
+  const triggerPetals = usePetalConfetti();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,12 +36,13 @@ export default function QuickKundli() {
       ascendant: asc.signHindi,
       ascSymbol: asc.symbol,
     });
+    triggerPetals();
   }
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 sandalwood-bg">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="कुण्डली" title="Quick Kundli Preview" description="Enter your birth details to see a preview of your Vedic birth chart" />
+        <SectionHeader sanskrit="कुण्डली" title="Quick Kundli Preview" description="Enter your birth details to see a preview of your Vedic birth chart" emoji="🕉️" typewriter />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="glass-card p-8">
             <h3 className="font-heading text-sign-primary mb-6">Birth Details</h3>
@@ -58,9 +63,11 @@ export default function QuickKundli() {
                 <label className="text-text-muted text-sm block mb-1">Place of Birth</label>
                 <CityAutocomplete name="qk-place" required />
               </div>
-              <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all">
-                Generate Preview
-              </button>
+              <PetalScatter count={10} className="w-full">
+                <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all">
+                  Generate Preview
+                </button>
+              </PetalScatter>
             </form>
           </div>
           <div className="glass-card p-8 flex items-center justify-center">
@@ -85,7 +92,7 @@ export default function QuickKundli() {
               </div>
             ) : (
               <div className="text-center">
-                <div className="text-4xl mb-4">&#10024;</div>
+                <div className="text-4xl mb-4 notranslate" translate="no">&#10024;</div>
                 <p className="text-text-muted">Your birth chart preview will appear here once you enter your details.</p>
               </div>
             )}

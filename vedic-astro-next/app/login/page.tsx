@@ -229,7 +229,7 @@ export default function LoginPage() {
           {/* Features */}
           <div className="relative z-10 space-y-4 my-8">
             {[
-              { icon: '♈', title: 'Personalized Kundli', desc: 'Detailed birth chart with Rashi, Navamsa & Dasha periods' },
+              { icon: '🐏', title: 'Personalized Kundli', desc: 'Detailed birth chart with Rashi, Navamsa & Dasha periods' },
               { icon: '🔮', title: 'Daily Horoscopes', desc: 'Predictions based on your Moon sign & Nakshatra' },
               { icon: '✦', title: 'Planetary Transits', desc: 'Real-time Graha positions & their impact on your life' },
             ].map((feature) => (

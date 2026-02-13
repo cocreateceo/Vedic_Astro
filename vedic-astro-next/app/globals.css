@@ -12,6 +12,23 @@ body {
 .goog-te-gadget {
   font-size: 0 !important;
 }
+/* Suppress Google Translate hover highlight on translated text */
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+html.translated-ltr font,
+html.translated-rtl font {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.goog-te-balloon-frame {
+  display: none !important;
+}
 
 /* ===== Custom Theme Variables ===== */
 @theme {
@@ -509,6 +526,87 @@ body.theme-loading * {
   to { background-position: 200% center; }
 }
 
+/* ===== Temple Gradient Text — Saffron / Kumkum / Gold ===== */
+.temple-gradient {
+  background: linear-gradient(
+    105deg,
+    #E8A020,       /* saffron */
+    var(--sign-primary),
+    #FF6B2C,       /* kumkum orange */
+    var(--sign-secondary),
+    #C0392B,       /* sindoor red */
+    var(--sign-primary),
+    #E8A020        /* saffron */
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: templeGradientShift 6s ease-in-out infinite alternate;
+}
+
+@keyframes templeGradientShift {
+  0% { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
+/* Sanskrit glow pulse for Devanagari subtitle */
+.sanskrit-glow {
+  text-shadow: 0 0 8px rgba(var(--sign-glow-rgb), 0.4),
+               0 0 20px rgba(var(--sign-glow-rgb), 0.15);
+  animation: sanskritPulse 3s ease-in-out infinite;
+}
+
+@keyframes sanskritPulse {
+  0%, 100% { text-shadow: 0 0 8px rgba(var(--sign-glow-rgb), 0.3), 0 0 20px rgba(var(--sign-glow-rgb), 0.1); }
+  50% { text-shadow: 0 0 14px rgba(var(--sign-glow-rgb), 0.6), 0 0 30px rgba(var(--sign-glow-rgb), 0.25); }
+}
+
+/* ===== Brass Metallic Text — Engraved temple brass look ===== */
+.brass-metallic {
+  background: linear-gradient(
+    170deg,
+    #CD9B1D 0%,
+    #FCEABB 18%,
+    #D4A843 32%,
+    #B8860B 50%,
+    #DAA520 65%,
+    #FCEABB 78%,
+    #CD9B1D 100%
+  );
+  background-size: 100% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brassSheen 4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+}
+
+@keyframes brassSheen {
+  0% { background-position: 50% 0%; }
+  100% { background-position: 50% 100%; }
+}
+
+/* Copper variant — slightly redder, for secondary accents */
+.copper-metallic {
+  background: linear-gradient(
+    170deg,
+    #B87333 0%,
+    #E8C09A 20%,
+    #CD7F32 40%,
+    #A0522D 55%,
+    #DA8A3B 70%,
+    #E8C09A 85%,
+    #B87333 100%
+  );
+  background-size: 100% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brassSheen 5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+}
+
 /* ===== Header Shimmer ===== */
 @keyframes headerShimmer {
   0%, 100% { opacity: 0.5; }
@@ -556,6 +654,8 @@ body.theme-loading * {
   backdrop-filter: blur(10px);
   box-shadow: 0 0 15px rgba(var(--sign-glow-rgb), 0.05);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .glass-card:hover {
@@ -563,6 +663,53 @@ body.theme-loading * {
   box-shadow: 0 0 25px rgba(var(--sign-glow-rgb), 0.2);
   transform: translateY(-2px);
 }
+
+/* Brass/copper sheen sweep on hover */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(184, 115, 51, 0.03) 30%,
+    rgba(205, 149, 70, 0.08) 45%,
+    rgba(255, 215, 0, 0.1) 50%,
+    rgba(205, 149, 70, 0.08) 55%,
+    rgba(184, 115, 51, 0.03) 70%,
+    transparent 100%
+  );
+  transform: skewX(-15deg);
+  transition: left 0s 0.3s;
+  pointer-events: none;
+  z-index: 1;
+}
+.glass-card:hover::before {
+  left: 125%;
+  transition: left 0.6s ease-in-out;
+}
+
+/* ===== Rangoli Card Corners ===== */
+.rangoli-card {
+  position: relative;
+}
+.rangoli-corner {
+  position: absolute;
+  color: var(--sign-primary);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.rangoli-card:hover .rangoli-corner {
+  opacity: 1;
+}
+.rangoli-tl { top: 4px; left: 4px; }
+.rangoli-tr { top: 4px; right: 4px; transform: scaleX(-1); }
+.rangoli-bl { bottom: 4px; left: 4px; transform: scaleY(-1); }
+.rangoli-br { bottom: 4px; right: 4px; transform: scale(-1, -1); }
 
 /* ===== Scroll Reveal ===== */
 .scroll-reveal {
@@ -597,10 +744,7 @@ body.theme-loading * {
   pointer-events: none;
 }
 
-/* ===== Button Glow ===== */
-.btn-glow {
-  animation: btnGlow 2s ease-in-out infinite alternate;
-}
+/* ===== Button Glow (base keyframe — main styles in btn-premium section) ===== */
 
 @keyframes btnGlow {
   from { box-shadow: 0 0 12px rgba(var(--sign-glow-rgb), 0.5); }
@@ -692,21 +836,25 @@ body.theme-loading * {
 
 /* ===== Premium Interaction Utilities ===== */
 
-/* Hover Lift — card hover with vertical shift + glow shadow */
+/* Hover Lift — card hover with vertical shift + copper glow shadow */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(var(--sign-glow-rgb), 0.15);
+  box-shadow:
+    0 8px 25px rgba(var(--sign-glow-rgb), 0.15),
+    inset 0 1px 0 rgba(205, 149, 70, 0.15);
 }
 
-/* Hover Glow — subtle glow on hover */
+/* Hover Glow — copper-tinted glow on hover */
 .hover-glow {
   transition: box-shadow 0.3s ease;
 }
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(var(--sign-glow-rgb), 0.2);
+  box-shadow:
+    0 0 20px rgba(var(--sign-glow-rgb), 0.2),
+    0 0 40px rgba(184, 115, 51, 0.08);
 }
 
 /* Stagger Items — fade+translate with variable delay */
@@ -749,8 +897,48 @@ body.theme-loading * {
   width: 100%;
 }
 
-/* Premium Button — scale + enhanced glow */
+/* ===== Nav Diya — tiny flame indicator for active nav link ===== */
+.nav-diya {
+  position: relative;
+}
+.nav-diya::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 60%, #FFFBE6 0%, #FFD700 40%, var(--sign-primary) 80%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(255, 165, 0, 0.5),
+              0 0 12px 4px rgba(var(--sign-glow-rgb), 0.25);
+  animation: navFlame 1.2s ease-in-out infinite alternate;
+}
+/* Diya body (tiny bowl) */
+.nav-diya::before {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 4px;
+  border-radius: 0 0 50% 50%;
+  background: linear-gradient(to bottom, #D4A843, #B8860B);
+  opacity: 0.7;
+}
+@keyframes navFlame {
+  0% { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.9; }
+  30% { transform: translateX(-50%) scaleX(0.85) scaleY(1.15); opacity: 1; }
+  60% { transform: translateX(-50%) scaleX(1.1) scaleY(0.9); opacity: 0.85; }
+  100% { transform: translateX(-50%) scaleX(0.95) scaleY(1.05); opacity: 1; }
+}
+
+/* Premium Button — scale + enhanced glow + golden ripple */
 .btn-premium {
+  position: relative;
+  overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-premium:hover {
@@ -759,6 +947,115 @@ body.theme-loading * {
 }
 .btn-premium:active {
   transform: scale(0.99);
+}
+
+/* Golden ripple on click */
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(var(--sign-glow-rgb),0.2) 40%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: none;
+}
+.btn-premium:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 1;
+  transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+/* Btn Glow — also add golden ripple */
+.btn-glow {
+  animation: btnGlow 2s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255,215,0,0.08) 45%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,215,0,0.08) 55%,
+    transparent 70%
+  );
+  animation: btnSheen 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes btnSheen {
+  0% { transform: translateX(-80%) translateY(-80%) rotate(45deg); }
+  100% { transform: translateX(80%) translateY(80%) rotate(45deg); }
+}
+
+/* ===== Sparkle Wrap — festive hover sparkles on CTAs ===== */
+.sparkle-wrap {
+  position: relative;
+  display: inline-block;
+}
+.sparkle-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  animation: sparkleFloat 0.7s ease-out forwards;
+  box-shadow: 0 0 4px currentColor;
+}
+@keyframes sparkleFloat {
+  0% {
+    opacity: 1;
+    transform: scale(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) translateY(-12px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(-28px);
+  }
+}
+
+/* ===== Petal Scatter — flower petals burst on CTA hover ===== */
+.petal-scatter-wrap {
+  position: relative;
+  display: inline-block;
+}
+.petal-dot {
+  position: absolute;
+  border-radius: 50% 50% 50% 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  animation: petalBurst 0.8s ease-out forwards;
+}
+@keyframes petalBurst {
+  0% {
+    opacity: 0.9;
+    transform: translate(0, 0) rotate(0deg) scale(0.3);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translate(
+      calc(var(--petal-tx) * 0.7),
+      calc(var(--petal-ty) * 0.7)
+    ) rotate(var(--petal-rot)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--petal-tx), var(--petal-ty)) rotate(var(--petal-rot)) scale(0.4);
+  }
 }
 
 /* Shimmer Border — animated gradient border */
@@ -818,13 +1115,391 @@ body.theme-loading * {
   0%, 100% { transform: scale(1); opacity: 0.08; }
   50% { transform: scale(1.05); opacity: 0.12; }
 }
+.om-chakra-pulse {
+  animation: omChakraPulse 3s ease-in-out infinite;
+}
+@keyframes omChakraPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
 
 /* Ticker Pause on Hover */
 .ticker-animate:hover {
   animation-play-state: paused;
 }
 
-/* Table Row Hover */
-.table-row-hover:hover {
-  background: rgba(var(--sign-glow-rgb), 0.05);
+/* Table Row Hover — brass-tinted */
+.table-row-hover {
+  transition: background 0.2s ease;
 }
+.table-row-hover:hover {
+  background: linear-gradient(90deg,
+    rgba(184, 115, 51, 0.04) 0%,
+    rgba(var(--sign-glow-rgb), 0.06) 50%,
+    rgba(184, 115, 51, 0.04) 100%
+  );
+}
+
+/* ===== Diya Divider Animations ===== */
+@keyframes flameFlicker {
+  0% { transform: scaleX(1) scaleY(1) rotate(0deg); }
+  25% { transform: scaleX(0.92) scaleY(1.05) rotate(-1deg); }
+  50% { transform: scaleX(1.04) scaleY(0.96) rotate(1deg); }
+  75% { transform: scaleX(0.96) scaleY(1.03) rotate(-0.5deg); }
+  100% { transform: scaleX(1.02) scaleY(0.98) rotate(0.5deg); }
+}
+
+@keyframes diyaGlow {
+  0% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.15); }
+  100% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* Testimonial card flip */
+.testimonial-flipper {
+  perspective: 1200px;
+}
+.testimonial-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+@keyframes flipIn {
+  0% {
+    transform: rotateY(90deg) scale(0.92);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes flipOut {
+  0% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    transform: rotateY(-90deg) scale(0.92);
+    opacity: 0;
+  }
+}
+.testimonial-flip-in {
+  animation: flipIn 0.5s ease-out forwards;
+}
+.testimonial-flip-out {
+  animation: flipOut 0.5s ease-in forwards;
+}
+
+/* ===== E3 — Haldi (Turmeric) Yellow Accents ===== */
+.haldi-accent {
+  color: #E8B830;
+  text-shadow: 0 0 8px rgba(232, 184, 48, 0.3);
+}
+.haldi-bg {
+  background: rgba(232, 184, 48, 0.08);
+  border-left: 3px solid #E8B830;
+}
+.haldi-badge {
+  background: linear-gradient(135deg, rgba(232, 184, 48, 0.15), rgba(255, 183, 0, 0.1));
+  border: 1px solid rgba(232, 184, 48, 0.3);
+  color: #E8B830;
+}
+.haldi-glow {
+  box-shadow: 0 0 12px rgba(232, 184, 48, 0.2), inset 0 0 8px rgba(232, 184, 48, 0.05);
+}
+
+/* ===== E4 — Sandalwood Warm Section Backgrounds ===== */
+.sandalwood-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(139, 90, 43, 0.04) 0%,
+    rgba(160, 110, 55, 0.08) 30%,
+    rgba(180, 130, 70, 0.06) 70%,
+    rgba(139, 90, 43, 0.03) 100%
+  );
+}
+.sandalwood-bg-alt {
+  background: linear-gradient(
+    180deg,
+    rgba(205, 133, 63, 0.03) 0%,
+    rgba(210, 150, 80, 0.07) 40%,
+    rgba(200, 140, 70, 0.05) 60%,
+    rgba(205, 133, 63, 0.02) 100%
+  );
+}
+
+/* ===== E5 — Vermillion (Sindoor) Red Accents ===== */
+.sindoor-accent {
+  color: #E23D28;
+  text-shadow: 0 0 6px rgba(226, 61, 40, 0.25);
+}
+.sindoor-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FF6347, #C0392B);
+  box-shadow: 0 0 6px rgba(192, 57, 43, 0.4);
+}
+.sindoor-dot-sm {
+  width: 5px;
+  height: 5px;
+}
+.sindoor-border {
+  border-color: rgba(226, 61, 40, 0.4);
+}
+.sindoor-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #E23D28, #C0392B, transparent);
+  opacity: 0.4;
+}
+
+/* ===== E6 — Animated Gradient Dividers ===== */
+.gradient-divider {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(232, 184, 48, 0.3) 15%,
+    rgba(var(--sign-glow-rgb), 0.6) 30%,
+    rgba(226, 61, 40, 0.4) 50%,
+    rgba(var(--sign-glow-rgb), 0.6) 70%,
+    rgba(232, 184, 48, 0.3) 85%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: gradientFlow 4s ease-in-out infinite;
+}
+@keyframes gradientFlow {
+  0% { background-position: 100% 0; }
+  50% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+.gradient-divider-vertical {
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(232, 184, 48, 0.3) 20%,
+    rgba(var(--sign-glow-rgb), 0.5) 50%,
+    rgba(232, 184, 48, 0.3) 80%,
+    transparent 100%
+  );
+  background-size: 100% 200%;
+  animation: gradientFlowV 3s ease-in-out infinite;
+}
+@keyframes gradientFlowV {
+  0% { background-position: 0 100%; }
+  50% { background-position: 0 0%; }
+  100% { background-position: 0 100%; }
+}
+
+/* ===== F2 — Decorative Drop Caps ===== */
+.article-content > p:first-of-type::first-letter,
+.drop-cap::first-letter {
+  float: left;
+  font-family: var(--font-heading);
+  font-size: 3.5em;
+  line-height: 0.85;
+  margin-right: 0.08em;
+  margin-top: 0.05em;
+  background: linear-gradient(
+    170deg,
+    #CD9B1D 0%,
+    #FCEABB 25%,
+    #D4A843 50%,
+    #B8860B 75%,
+    #DAA520 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(184, 115, 51, 0.3));
+}
+
+/* ===== F3 — Glowing Devanagari Headers ===== */
+.devanagari-glow {
+  font-family: var(--font-devanagari);
+  color: var(--sign-primary);
+  text-shadow:
+    0 0 10px rgba(var(--sign-glow-rgb), 0.5),
+    0 0 25px rgba(var(--sign-glow-rgb), 0.25),
+    0 0 50px rgba(var(--sign-glow-rgb), 0.12);
+  animation: devanagariPulse 3s ease-in-out infinite;
+}
+@keyframes devanagariPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(var(--sign-glow-rgb), 0.4),
+      0 0 25px rgba(var(--sign-glow-rgb), 0.2),
+      0 0 50px rgba(var(--sign-glow-rgb), 0.1);
+  }
+  50% {
+    text-shadow:
+      0 0 15px rgba(var(--sign-glow-rgb), 0.7),
+      0 0 35px rgba(var(--sign-glow-rgb), 0.4),
+      0 0 60px rgba(var(--sign-glow-rgb), 0.2),
+      0 0 80px rgba(var(--sign-glow-rgb), 0.1);
+  }
+}
+
+/* ===== G3 — Scroll Progress Bar (Rangoli Style) ===== */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  z-index: 9999;
+  background: linear-gradient(
+    90deg,
+    #E8B830,
+    var(--sign-primary),
+    #E23D28,
+    var(--sign-secondary),
+    #E8B830
+  );
+  background-size: 300% 100%;
+  animation: scrollProgressShimmer 3s linear infinite;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 8px rgba(var(--sign-glow-rgb), 0.5);
+}
+.scroll-progress-bar::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sign-primary);
+  box-shadow: 0 0 10px rgba(var(--sign-glow-rgb), 0.8);
+}
+@keyframes scrollProgressShimmer {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
+}
+
+/* ===== G5 — Pooja Thali Loading Screen ===== */
+.pooja-thali-loader {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+.pooja-thali-plate {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(var(--sign-glow-rgb), 0.3);
+  background: radial-gradient(circle at center, rgba(var(--sign-glow-rgb), 0.05) 0%, transparent 70%);
+  animation: thaliRotate 8s linear infinite;
+}
+.pooja-thali-item {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  animation: thaliItemPulse 2s ease-in-out infinite;
+}
+.pooja-thali-item:nth-child(2) { top: 8px; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+.pooja-thali-item:nth-child(3) { top: 25%; right: 8px; animation-delay: 0.3s; }
+.pooja-thali-item:nth-child(4) { bottom: 25%; right: 8px; animation-delay: 0.6s; }
+.pooja-thali-item:nth-child(5) { bottom: 8px; left: 50%; transform: translateX(-50%); animation-delay: 0.9s; }
+.pooja-thali-item:nth-child(6) { bottom: 25%; left: 8px; animation-delay: 1.2s; }
+.pooja-thali-item:nth-child(7) { top: 25%; left: 8px; animation-delay: 1.5s; }
+.pooja-thali-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  animation: thaliCenterGlow 2s ease-in-out infinite;
+}
+@keyframes thaliRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes thaliItemPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.pooja-thali-item:nth-child(2),
+.pooja-thali-item:nth-child(5) {
+  /* Override the translateX for top/bottom items during pulse */
+}
+@keyframes thaliCenterGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(var(--sign-glow-rgb), 0.3)); }
+  50% { filter: drop-shadow(0 0 12px rgba(var(--sign-glow-rgb), 0.7)); }
+}
+
+/* ===== G6 — Temple Gopuram Page Frame ===== */
+.gopuram-frame {
+  position: relative;
+}
+.gopuram-frame::before,
+.gopuram-frame::after {
+  content: '';
+  position: fixed;
+  top: 72px;
+  bottom: 0;
+  width: 4px;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(205, 149, 70, 0.4) 0%,
+    rgba(var(--sign-glow-rgb), 0.15) 20%,
+    rgba(205, 149, 70, 0.08) 50%,
+    rgba(var(--sign-glow-rgb), 0.15) 80%,
+    rgba(205, 149, 70, 0.4) 100%
+  );
+  background-size: 100% 200%;
+  animation: gopuramShimmer 6s ease-in-out infinite;
+}
+.gopuram-frame::before { left: 0; }
+.gopuram-frame::after { right: 0; }
+@keyframes gopuramShimmer {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 0 100%; }
+}
+.gopuram-top {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(205, 149, 70, 0.5),
+    rgba(var(--sign-glow-rgb), 0.2) 20%,
+    transparent 50%,
+    rgba(var(--sign-glow-rgb), 0.2) 80%,
+    rgba(205, 149, 70, 0.5)
+  );
+}
+.gopuram-corner {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  z-index: 41;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.gopuram-corner svg {
+  width: 100%;
+  height: 100%;
+}
+.gopuram-corner-tl { top: 72px; left: 0; }
+.gopuram-corner-tr { top: 72px; right: 0; transform: scaleX(-1); }
+.gopuram-corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.gopuram-corner-br { bottom: 0; right: 0; transform: scale(-1, -1); }

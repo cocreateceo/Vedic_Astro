@@ -61,7 +61,7 @@ export default function Navbar() {
     return () => document.removeEventListener('click', handleClick);
   }, []);
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(path + '/');
   const initials = user?.name?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
 
   return (

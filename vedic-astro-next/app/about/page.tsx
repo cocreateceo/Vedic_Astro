@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[800px] mx-auto px-4">
-        <SectionHeader sanskrit={"परिचय"} title="About Vedic_Astro" description="Your trusted source for authentic Vedic astrology" />
+        <SectionHeader sanskrit={"परिचय"} title="About Vedic_Astro" description="Your trusted source for authentic Vedic astrology" emoji="🙏" />
 
         <div className="glass-card p-8 space-y-6 text-text-muted text-sm leading-relaxed">
           <p>

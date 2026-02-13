@@ -59,9 +59,9 @@ export default function ZodiacWheel() {
   const hoveredData = hoveredSign ? zodiacData[hoveredSign] : null;
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-16 md:py-24 sandalwood-bg-alt">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="राशि चक्र" title="Zodiac Signs" description="Explore the 12 Rashis of Vedic Astrology" />
+        <SectionHeader sanskrit="राशि चक्र" title="Zodiac Signs" description="Explore the 12 Rashis of Vedic Astrology" emoji="✨" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="flex justify-center">
             <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[500px]">
@@ -99,7 +99,7 @@ export default function ZodiacWheel() {
                 </g>
               ))}
               <circle cx={cx} cy={cy} r={innerR - 10} fill="var(--sign-cosmic-bg)" stroke="rgba(var(--sign-glow-rgb),0.5)" strokeWidth="1.5"/>
-              <text x={cx} y={cy - 10} textAnchor="middle" fill="rgba(var(--sign-glow-rgb),0.7)" fontSize="40" dominantBaseline="central" fontFamily="'Noto Sans Devanagari', serif" className="om-pulse" style={{ transformOrigin: `${cx}px ${cy}px` }}>&#x0950;</text>
+              <text x={cx} y={cy - 10} textAnchor="middle" fill="var(--sign-primary)" fontSize="40" dominantBaseline="central" fontFamily="'Noto Sans Devanagari', serif" className="om-chakra-pulse" style={{ transformOrigin: `${cx}px ${cy}px` }}>&#x0950;</text>
               <text x={cx} y={cy + 25} textAnchor="middle" fill="rgba(var(--sign-glow-rgb),0.7)" fontSize="10" letterSpacing="2">RASHI CHAKRA</text>
             </svg>
           </div>

@@ -1,5 +1,8 @@
 import Mandala from './Mandala';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import LotusBloom from '@/components/ui/LotusBloom';
+import SriYantra from '@/components/ui/SriYantra';
+import NavagrahaOrbit from '@/components/ui/NavagrahaOrbit';
 
 const benefits = [
   { icon: '\u263D', title: 'Moon Sign Based', desc: 'Predictions based on Moon sign for deeper emotional and karmic insights' },
@@ -10,12 +13,15 @@ const benefits = [
 
 export default function WhyVedic() {
   return (
-    <section className="py-16 md:py-24 bg-bg-light">
-      <div className="max-w-[1200px] mx-auto px-4">
+    <section className="py-16 md:py-24 bg-bg-light relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sign-primary">
+        <SriYantra size={600} opacity={0.03} />
+      </div>
+      <div className="max-w-[1200px] mx-auto px-4 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="font-heading text-3xl md:text-4xl text-sign-primary mb-6 drop-shadow-[0_0_20px_rgba(var(--sign-glow-rgb),0.3)]">
-              Why Vedic Astrology?
+            <h2 className="font-heading text-3xl md:text-4xl mb-6 temple-gradient drop-shadow-[0_0_20px_rgba(var(--sign-glow-rgb),0.3)]">
+              <span className="notranslate" translate="no">🕉️</span> Why Vedic Astrology?
             </h2>
             <p className="text-text-muted mb-8 leading-relaxed">
               Vedic astrology, also known as Jyotish Shastra, is an ancient Indian science dating back over 5,000 years. Unlike Western astrology, Vedic astrology uses the sidereal zodiac, accounting for the precession of equinoxes for more accurate planetary positions.
@@ -24,9 +30,9 @@ export default function WhyVedic() {
               {benefits.map((b, i) => (
                 <ScrollReveal key={b.title} delay={i}>
                   <div className="flex gap-4 items-start hover-lift rounded-lg p-2 -m-2">
-                    <span className="text-2xl w-12 h-12 flex items-center justify-center bg-sign-primary/10 rounded-lg shrink-0 hover-glow">{b.icon}</span>
+                    <span className="text-2xl w-12 h-12 flex items-center justify-center bg-sign-primary/10 rounded-lg shrink-0 hover-glow haldi-glow notranslate" translate="no">{b.icon}</span>
                     <div>
-                      <strong className="text-text-primary block mb-1">{b.title}</strong>
+                      <strong className="brass-metallic block mb-1 text-lg">{b.title}</strong>
                       <p className="text-text-muted text-sm">{b.desc}</p>
                     </div>
                   </div>
@@ -34,7 +40,9 @@ export default function WhyVedic() {
               ))}
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-6">
+            <NavagrahaOrbit size={300} />
+            <LotusBloom size={100} />
             <Mandala />
           </div>
         </div>

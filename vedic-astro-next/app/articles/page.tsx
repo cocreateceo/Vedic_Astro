@@ -205,7 +205,7 @@ export default function ArticlesPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit={"ज्ञान"} title="Learn Vedic Astrology" description="Articles and guides on planets, houses, nakshatras, and more" />
+        <SectionHeader sanskrit={"ज्ञान"} title="Learn Vedic Astrology" description="Articles and guides on planets, houses, nakshatras, and more" emoji="📿" />
 
         <div className="flex flex-wrap gap-2 justify-center mb-8">
           {categories.map(c => (
@@ -237,7 +237,7 @@ export default function ArticlesPage() {
                 <h3 className="font-heading text-lg text-text-primary mb-3">{a.title}</h3>
                 <p className="text-text-muted text-sm mb-4">{a.desc}</p>
                 {isExpanded && (
-                  <div className="text-text-muted text-sm leading-relaxed mb-4 whitespace-pre-line border-t border-sign-primary/10 pt-4">
+                  <div className="article-content text-text-muted text-sm leading-relaxed mb-4 whitespace-pre-line border-t border-sign-primary/10 pt-4">
                     {a.content.split('\n').map((line, i) => {
                       if (line.startsWith('**') && line.endsWith('**')) {
                         return <h4 key={i} className="font-heading text-text-primary mt-4 mb-2">{line.replace(/\*\*/g, '')}</h4>;

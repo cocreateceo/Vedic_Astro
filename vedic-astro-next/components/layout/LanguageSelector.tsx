@@ -68,6 +68,41 @@ export default function LanguageSelector() {
     document.head.appendChild(script);
   }, []);
 
+  // Block Google Translate hover tooltip (it hides translated words on mouseover)
+  useEffect(() => {
+    const blockGtHover = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'FONT' && document.documentElement.classList.contains('translated-ltr')) {
+        e.stopPropagation();
+      }
+    };
+    document.addEventListener('mouseover', blockGtHover, true);
+    document.addEventListener('mouseout', blockGtHover, true);
+    return () => {
+      document.removeEventListener('mouseover', blockGtHover, true);
+      document.removeEventListener('mouseout', blockGtHover, true);
+    };
+  }, []);
+
+  // Auto-protect emojis from Google Translate
+  useEffect(() => {
+    const emojiRegex = /^[\p{Emoji}\p{Emoji_Presentation}\p{Emoji_Modifier}\p{Emoji_Component}\uFE0F\u200D\s]+$/u;
+
+    const protectEmojis = () => {
+      document.querySelectorAll('font').forEach((el) => {
+        const text = el.textContent?.trim() || '';
+        if (emojiRegex.test(text) && !el.classList.contains('notranslate')) {
+          el.classList.add('notranslate');
+          el.setAttribute('translate', 'no');
+        }
+      });
+    };
+
+    const observer = new MutationObserver(protectEmojis);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

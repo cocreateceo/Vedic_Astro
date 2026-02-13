@@ -24,7 +24,7 @@ export default function CosmicTicker() {
           <div key={i} className="inline-flex items-center gap-2 px-6">
             <span className="text-sign-primary font-medium text-sm">{item.label}:</span>
             <span className="text-text-primary text-sm">{item.value}</span>
-            <span className="text-sign-primary/40 mx-2">&#10022;</span>
+            <span className="mx-2"><span className="sindoor-dot sindoor-dot-sm"></span></span>
           </div>
         ))}
       </div>

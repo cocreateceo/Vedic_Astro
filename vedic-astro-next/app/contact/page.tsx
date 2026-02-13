@@ -39,7 +39,7 @@ export default function ContactPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[800px] mx-auto px-4">
-        <SectionHeader sanskrit={"संपर्क"} title="Contact Us" description="We'd love to hear from you" />
+        <SectionHeader sanskrit={"संपर्क"} title="Contact Us" description="We'd love to hear from you" emoji="🙏" />
 
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -30,7 +30,7 @@ export default function CompatibilityPage() {
   return (
     <div className="py-16 md:py-24">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="गुण मिलान" title="Compatibility Check" description="Ashtakoot Gun Milan for marriage compatibility" />
+        <SectionHeader sanskrit="गुण मिलान" title="Compatibility Check" description="Ashtakoot Gun Milan for marriage compatibility" emoji="💞" kalash />
 
         <div className="max-w-2xl mx-auto mb-12">
           <form onSubmit={handleSubmit} className="glass-card p-8">
@@ -62,7 +62,14 @@ export default function CompatibilityPage() {
                   </div>
                 </div>
               </div>
-              <h3 className="font-heading text-lg text-sign-primary mb-2">{verdict.title}</h3>
+              <h3 className="font-heading text-lg text-sign-primary mb-2">
+                {result.total >= 24 ? '🟢' : result.total >= 18 ? '🟡' : '🔴'} {verdict.title}
+              </h3>
+              <span className={`text-xs inline-block mb-2 px-3 py-1 rounded-full ${
+                result.total >= 24 ? 'text-green-400 bg-green-500/10' : result.total >= 18 ? 'text-yellow-400 bg-yellow-500/10' : 'text-red-400 bg-red-500/10'
+              }`}>
+                {result.total >= 24 ? 'शुभ — Highly Auspicious' : result.total >= 18 ? 'सामान्य — Acceptable' : 'अशुभ — Inauspicious'}
+              </span>
               <p className="text-text-muted">{verdict.description}</p>
             </div>
 
@@ -79,14 +86,16 @@ export default function CompatibilityPage() {
                     <tr key={s.name} className="border-b border-sign-primary/10 table-row-hover transition-colors">
                       <td className="py-2 text-text-primary font-medium">{s.name}</td>
                       <td className="py-2 text-text-muted">{s.max}</td>
-                      <td className={`py-2 font-medium ${s.obtained >= s.max * 0.7 ? 'text-green-400' : s.obtained >= s.max * 0.4 ? 'text-yellow-400' : 'text-red-400'}`}>{s.obtained}</td>
+                      <td className={`py-2 font-medium ${s.obtained >= s.max * 0.7 ? 'text-green-400' : s.obtained >= s.max * 0.4 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        {s.obtained >= s.max * 0.7 ? '🟢' : s.obtained >= s.max * 0.4 ? '🟡' : '🔴'} {s.obtained}
+                      </td>
                       <td className="py-2 text-text-muted">{s.desc}</td>
                     </tr>
                   ))}
                   <tr className="border-t-2 border-sign-primary/30">
                     <td className="py-2 text-text-primary font-bold">Total</td>
                     <td className="py-2 text-text-primary font-bold">36</td>
-                    <td className={`py-2 font-bold ${result.total >= 18 ? 'text-green-400' : 'text-red-400'}`}>{result.total}</td>
+                    <td className={`py-2 font-bold ${result.total >= 18 ? 'text-green-400' : 'text-red-400'}`}>{result.total >= 24 ? '🟢' : result.total >= 18 ? '🟡' : '🔴'} {result.total}</td>
                     <td className="py-2 text-text-primary font-bold">{result.percentage}% Match</td>
                   </tr>
                 </tbody>

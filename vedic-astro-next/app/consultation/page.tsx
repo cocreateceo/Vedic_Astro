@@ -10,6 +10,8 @@ export default function ConsultationPage() {
           sanskrit="परामर्श"
           title="Expert Consultation"
           description="Connect with experienced Vedic astrologers for personalized guidance — choose a tier that fits your needs"
+          emoji="🔮"
+          kalash
         />
 
         <TierSelector />
