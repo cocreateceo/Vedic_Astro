@@ -224,6 +224,9 @@ class ReportBuilder {
     this.sectionTitle('2. Personality & Characteristics');
     this.bodyText(`Moon Sign: ${data.rashiData.name} (${data.rashiData.sanskrit})`);
     this.bodyText(data.rashiData.characteristics);
+    if (data.rashiData.classicalDescription) {
+      this.mutedText(`Classical Reference: ${data.rashiData.classicalDescription}`);
+    }
     this.y += 2;
     this.mutedText(`Strengths: ${data.rashiData.strengths.join(', ')}`);
     this.mutedText(`Challenges: ${data.rashiData.challenges.join(', ')}`);
@@ -236,6 +239,9 @@ class ReportBuilder {
       this.y += 2;
       this.bodyText(`Ascendant: ${data.ascRashiData.name} (${data.ascRashiData.sanskrit})`);
       this.bodyText(data.ascRashiData.characteristics);
+      if (data.ascRashiData.classicalDescription) {
+        this.mutedText(`Classical Reference: ${data.ascRashiData.classicalDescription}`);
+      }
       this.mutedText(`Strengths: ${data.ascRashiData.strengths.join(', ')}`);
       this.mutedText(`Challenges: ${data.ascRashiData.challenges.join(', ')}`);
     }

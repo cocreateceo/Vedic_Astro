@@ -5,7 +5,7 @@
 import { jsPDF } from 'jspdf';
 import { VedicChart, PlanetAnalysis, HoroscopeData, YogaResult, DoshaResult, GemstoneRecommendation, TransitPrediction, SadeSatiResult, DashaWithAntardasha, PanchangaPrediction, BhavaPrediction, LifeQuestion } from '@/types';
 import { signNames, signAbbrev, planetAbbrev, hindiSignNames } from '@/lib/vedic-constants';
-import { generatePlanetAnalysis, nakshatraDetails, getMostMalefic, isBeneficForAscendant } from '@/lib/horoscope-data';
+import { generatePlanetAnalysis, nakshatraDetails, rashiDetails, getMostMalefic, isBeneficForAscendant } from '@/lib/horoscope-data';
 import type { NakshatraRemedy } from '@/lib/nakshatra-remedies';
 import type { DasaRemedy } from '@/lib/dasa-remedies';
 import type { FavourablePeriodsResult, FavourablePeriod } from '@/lib/favourable-periods';
@@ -831,6 +831,32 @@ class PdfReportBuilder {
       this.doc.text(lines, M + 4, this.y);
       this.y += lines.length * 4 + 6;
     }
+
+    // Classical reference for Moon Sign
+    const moonRashi = rashiDetails[d.chart.moonSign.index];
+    if (moonRashi?.classicalDescription) {
+      this.ensureSpace(20);
+      this.sectionTitle('Classical Reference — Moon Sign');
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(...C.textMed);
+      const classLines = this.doc.splitTextToSize(moonRashi.classicalDescription, CW - 8);
+      this.doc.text(classLines, M + 4, this.y);
+      this.y += classLines.length * 3.5 + 4;
+    }
+
+    // Classical reference for Ascendant (if different from Moon)
+    const ascRashi = rashiDetails[d.chart.ascendant.index];
+    if (ascRashi?.classicalDescription && d.chart.ascendant.index !== d.chart.moonSign.index) {
+      this.ensureSpace(20);
+      this.sectionTitle('Classical Reference — Ascendant');
+      this.doc.setFont('helvetica', 'italic');
+      this.doc.setFontSize(8);
+      this.doc.setTextColor(...C.textMed);
+      const ascLines = this.doc.splitTextToSize(ascRashi.classicalDescription, CW - 8);
+      this.doc.text(ascLines, M + 4, this.y);
+      this.y += ascLines.length * 3.5 + 4;
+    }
   }
 
   private ch5Houses(d: PdfReportData) {
@@ -1318,10 +1344,15 @@ class PdfReportBuilder {
 
     // Star details grid
     this.sectionTitle('Star Details');
-    const starDetails = [
+    const starDetails: [string, string][] = [
       ['Star Lord', nr.starLord], ['Sign Lord', nr.signLord], ['Element', nr.element],
       ['Animal', nr.animal], ['Tree', nr.tree], ['Bird', nr.bird],
     ];
+    if (nr.guna) starDetails.push(['Guna', nr.guna]);
+    if (nr.motivation) starDetails.push(['Motivation', nr.motivation]);
+    if (nr.gender) starDetails.push(['Gender', nr.gender]);
+    if (nr.caste) starDetails.push(['Caste', nr.caste]);
+    if (nr.bodyPart) starDetails.push(['Body Part', nr.bodyPart]);
     for (let i = 0; i < starDetails.length; i += 3) {
       this.ensureSpace(5);
       for (let j = 0; j < 3 && i + j < starDetails.length; j++) {

@@ -374,6 +374,9 @@ function DashboardContent() {
               <div className="glass-card hover-lift p-6">
                 <h3 className="font-heading text-sign-primary text-sm mb-3">Personality</h3>
                 <p className="text-text-muted text-xs mb-3">{moonRashiData.characteristics}</p>
+                {moonRashiData.classicalDescription && (
+                  <p className="text-sign-primary/50 text-[11px] italic mb-3 border-l-2 border-sign-primary/20 pl-2">{moonRashiData.classicalDescription}</p>
+                )}
                 <div className="space-y-2">
                   <div>
                     <span className="text-green-400 text-xs font-medium">Strengths</span>
@@ -1812,6 +1815,40 @@ function DashboardContent() {
                         <span className="text-sign-primary/60 text-xs block">Bird</span>
                         <span className="text-text-primary text-sm">{nakshatraRemedy.bird}</span>
                       </div>
+                    </div>
+
+                    {/* Classical Attributes */}
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                      {nakshatraRemedy.guna && (
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block">Guna</span>
+                          <span className="text-text-primary text-sm">{nakshatraRemedy.guna}</span>
+                        </div>
+                      )}
+                      {nakshatraRemedy.motivation && (
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block">Motivation</span>
+                          <span className="text-text-primary text-sm">{nakshatraRemedy.motivation}</span>
+                        </div>
+                      )}
+                      {nakshatraRemedy.gender && (
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block">Gender</span>
+                          <span className="text-text-primary text-sm">{nakshatraRemedy.gender}</span>
+                        </div>
+                      )}
+                      {nakshatraRemedy.caste && (
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block">Caste</span>
+                          <span className="text-text-primary text-sm">{nakshatraRemedy.caste}</span>
+                        </div>
+                      )}
+                      {nakshatraRemedy.bodyPart && (
+                        <div className="p-3 rounded-lg bg-cosmic-bg/30 border border-sign-primary/10">
+                          <span className="text-sign-primary/60 text-xs block">Body Part</span>
+                          <span className="text-text-primary text-sm">{nakshatraRemedy.bodyPart}</span>
+                        </div>
+                      )}
                     </div>
 
                     {nakshatraRemedy.hostileDasas.length > 0 && (

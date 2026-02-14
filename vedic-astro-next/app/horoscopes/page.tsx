@@ -305,6 +305,9 @@ export default function HoroscopesPage() {
               {currentPeriod === 'yearly' && (
                 <div className="space-y-4 tab-content-enter" key="yearly">
                   <p className="text-text-muted text-sm">{rashi.characteristics}</p>
+                  {rashi.classicalDescription && (
+                    <p className="text-sign-primary/50 text-xs italic mt-2 border-l-2 border-sign-primary/20 pl-3">{rashi.classicalDescription}</p>
+                  )}
                   <div className="grid grid-cols-2 gap-4">
                     <div><h4 className="text-green-400 font-medium mb-2">Strengths</h4>
                       <ul className="space-y-1">{rashi.strengths.map((s, i) => <li key={i} className="text-text-muted text-sm flex gap-2"><span className="text-green-400">&#10003;</span>{s}</li>)}</ul>

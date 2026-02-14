@@ -367,6 +367,9 @@ export default function KundliPage() {
                 <div className="glass-card p-6">
                   <h3 className="font-heading text-sign-primary mb-3">Rashi Characteristics — {moonRashiData.name} ({moonRashiData.sanskrit})</h3>
                   <p className="text-text-muted text-sm mb-4">{moonRashiData.characteristics}</p>
+                  {moonRashiData.classicalDescription && (
+                    <p className="text-sign-primary/50 text-xs italic mb-4 border-l-2 border-sign-primary/20 pl-3">{moonRashiData.classicalDescription}</p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h4 className="text-green-400 text-xs font-medium mb-2">Strengths</h4>
@@ -410,6 +413,9 @@ export default function KundliPage() {
                   <div className="glass-card p-6">
                     <h3 className="font-heading text-sign-primary mb-3">Ascendant Personality — {ascRashiData.name} ({ascRashiData.sanskrit})</h3>
                     <p className="text-text-muted text-sm mb-4">{ascRashiData.characteristics}</p>
+                    {ascRashiData.classicalDescription && (
+                      <p className="text-sign-primary/50 text-xs italic mb-4 border-l-2 border-sign-primary/20 pl-3">{ascRashiData.classicalDescription}</p>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <h4 className="text-green-400 text-xs font-medium mb-2">Strengths</h4>
