@@ -1,59 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { CITIES, type CityData, CITY_ALIASES } from '@/lib/city-timings';
+import { searchCities, type CityData } from '@/lib/city-timings';
 
 interface CityAutocompleteProps {
   name: string;
   required?: boolean;
   defaultValue?: string;
   className?: string;
-}
-
-function searchCities(query: string): CityData[] {
-  if (!query || query.length < 2) return [];
-  const lower = query.trim().toLowerCase();
-
-  // Check alias first
-  const aliasTarget = CITY_ALIASES[lower];
-
-  const results: CityData[] = [];
-  const seen = new Set<string>();
-
-  // Alias match first
-  if (aliasTarget) {
-    const city = CITIES.find(c => c.name === aliasTarget);
-    if (city) { results.push(city); seen.add(city.name); }
-  }
-
-  // Starts-with matches
-  for (const city of CITIES) {
-    if (seen.has(city.name)) continue;
-    if (city.name.toLowerCase().startsWith(lower)) {
-      results.push(city);
-      seen.add(city.name);
-    }
-  }
-
-  // Partial alias matches
-  for (const [alias, target] of Object.entries(CITY_ALIASES)) {
-    if (seen.has(target)) continue;
-    if (alias.startsWith(lower)) {
-      const city = CITIES.find(c => c.name === target);
-      if (city) { results.push(city); seen.add(city.name); }
-    }
-  }
-
-  // Contains matches
-  for (const city of CITIES) {
-    if (seen.has(city.name)) continue;
-    if (city.name.toLowerCase().includes(lower)) {
-      results.push(city);
-      seen.add(city.name);
-    }
-  }
-
-  return results.slice(0, 8);
 }
 
 export default function CityAutocomplete({ name, required, defaultValue, className }: CityAutocompleteProps) {

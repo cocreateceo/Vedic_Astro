@@ -165,6 +165,39 @@ export const CITY_ALIASES: Record<string, string> = {
   'nellai': 'Tirunelveli',
 };
 
+/** Search cities by query — alias match, starts-with, contains. Max 8 results. */
+export function searchCities(query: string): CityData[] {
+  if (!query || query.length < 2) return [];
+  const lower = query.trim().toLowerCase();
+  const results: CityData[] = [];
+  const seen = new Set<string>();
+  // Alias exact match
+  const aliasTarget = CITY_ALIASES[lower];
+  if (aliasTarget) {
+    const city = CITIES.find(c => c.name === aliasTarget);
+    if (city) { results.push(city); seen.add(city.name); }
+  }
+  // Starts-with
+  for (const city of CITIES) {
+    if (seen.has(city.name)) continue;
+    if (city.name.toLowerCase().startsWith(lower)) { results.push(city); seen.add(city.name); }
+  }
+  // Partial alias
+  for (const [alias, target] of Object.entries(CITY_ALIASES)) {
+    if (seen.has(target)) continue;
+    if (alias.startsWith(lower)) {
+      const city = CITIES.find(c => c.name === target);
+      if (city) { results.push(city); seen.add(city.name); }
+    }
+  }
+  // Contains
+  for (const city of CITIES) {
+    if (seen.has(city.name)) continue;
+    if (city.name.toLowerCase().includes(lower)) { results.push(city); seen.add(city.name); }
+  }
+  return results.slice(0, 8);
+}
+
 export function findCityByName(name: string): CityData | undefined {
   if (!name) return undefined;
   const lower = name.trim().toLowerCase();
