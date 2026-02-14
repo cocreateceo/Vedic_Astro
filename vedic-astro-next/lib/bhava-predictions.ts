@@ -390,6 +390,81 @@ function getAspectedHouses(planet: string, fromHouse: number): number[] {
 }
 
 // ---------------------------------------------------------------------------
+// Aspect Effect Templates — BPHS & Saravali: planet's drishti (glance) on a house
+// ---------------------------------------------------------------------------
+const aspectEffects: Record<string, Record<number, string>> = {
+  Sun: {
+    1: "The Sun's aspect on the 1st house strengthens your confidence, vitality, and leadership qualities. Government favor and paternal blessings are indicated.",
+    2: "The Sun's aspect on the 2nd house enhances family prestige and authoritative speech. Wealth may come through government or leadership positions.",
+    4: "The Sun's aspect on the 4th house brings paternal influence on home life and potential for government-related property. Education and comfort are supported.",
+    5: "The Sun's aspect on the 5th house enhances creative intelligence, political leanings, and pride in children's achievements.",
+    7: "The Sun's aspect on the 7th house brings an authoritative quality to partnerships. Your spouse may be dignified, and business dealings carry prestige.",
+    9: "The Sun's aspect on the 9th house strengthens dharma, fortune, and connection with father. Pilgrimage and higher learning are favored.",
+    10: "The Sun's aspect on the 10th house powerfully supports career advancement, fame, and government recognition.",
+    11: "The Sun's aspect on the 11th house brings gains through authority figures, government sources, and prestigious connections.",
+  },
+  Moon: {
+    1: "The Moon's aspect gives a nurturing, emotionally receptive quality. Public popularity and emotional intelligence are enhanced.",
+    2: "The Moon's aspect on the 2nd house enhances emotional attachment to family and fluctuating finances that trend positively.",
+    4: "The Moon's aspect on the 4th house deepens domestic happiness, strengthens the bond with mother, and brings emotional security.",
+    5: "The Moon's aspect on the 5th house enhances creativity, romantic feelings, and emotional connection with children.",
+    7: "The Moon's aspect on the 7th house brings emotional depth to partnerships and attracts a nurturing, caring spouse.",
+    10: "The Moon's aspect on the 10th house brings public fame and success in careers involving the masses, women, or caregiving.",
+    11: "The Moon's aspect on the 11th house brings gains through public dealings, women, and emotionally fulfilling friendships.",
+  },
+  Mars: {
+    1: "Mars' aspect on the 1st house adds courage, energy, and assertiveness to your personality. Physical vitality is strengthened.",
+    4: "Mars' aspect on the 4th house brings energy to domestic matters but may create occasional friction at home. Property acquisition is favored.",
+    5: "Mars' aspect on the 5th house sharpens competitive intelligence and brings athletic or spirited children.",
+    7: "Mars' aspect on the 7th house brings passion and intensity to partnerships. The spouse is likely energetic and independent.",
+    8: "Mars' aspect on the 8th house enhances investigative abilities and resilience. Inheritance through property is possible.",
+    10: "Mars' aspect on the 10th house strongly supports careers in engineering, military, sports, surgery, or any field requiring courage.",
+    11: "Mars' aspect on the 11th house brings gains through competitive endeavors, property, and bold initiative.",
+  },
+  Jupiter: {
+    1: "Jupiter's benevolent aspect on the 1st house is one of the finest blessings — granting wisdom, optimism, and divine protection.",
+    2: "Jupiter's aspect on the 2nd house enhances family wealth, truthful speech, and moral values within the household.",
+    4: "Jupiter's aspect on the 4th house blesses domestic life with peace, excellent education, and valuable property.",
+    5: "Jupiter's aspect on the 5th house is a tremendous blessing for children, creative intelligence, and spiritual merit.",
+    7: "Jupiter's aspect on the 7th house brings a wise, virtuous spouse and harmonious, dharmic partnerships.",
+    9: "Jupiter's aspect on the 9th house maximizes fortune, spiritual wisdom, and blessings from teachers and father.",
+    10: "Jupiter's aspect on the 10th house brings career success through righteous means, teaching, or advisory roles.",
+    11: "Jupiter's aspect on the 11th house is excellent for financial gains, influential friends, and fulfillment of noble desires.",
+  },
+  Venus: {
+    1: "Venus' aspect on the 1st house adds charm, beauty, and artistic sensibility to your personality.",
+    2: "Venus' aspect on the 2nd house enhances family harmony, beautiful speech, and wealth through artistic or luxury ventures.",
+    4: "Venus' aspect on the 4th house brings luxurious home comforts, beautiful vehicles, and a graceful mother.",
+    5: "Venus' aspect on the 5th house enhances romantic life, artistic creativity, and beauty in creative expression.",
+    7: "Venus' aspect on the 7th house is one of the best influences for a beautiful, loving, and harmonious marriage.",
+    10: "Venus' aspect on the 10th house supports careers in arts, entertainment, fashion, and luxury industries.",
+    11: "Venus' aspect on the 11th house brings gains through beauty, art, romance, and socially delightful connections.",
+  },
+  Saturn: {
+    1: "Saturn's aspect on the 1st house brings discipline, maturity, and a serious disposition. Success comes through patience and hard work.",
+    3: "Saturn's aspect on the 3rd house strengthens determination and perseverance in communication. Results come slowly but are lasting.",
+    4: "Saturn's aspect on the 4th house may bring delays in domestic happiness but builds a solid, enduring home foundation.",
+    5: "Saturn's aspect on the 5th house may delay children or bring a disciplined approach to creativity and education.",
+    7: "Saturn's aspect on the 7th house may delay marriage but brings a stable, committed, and enduring partnership.",
+    10: "Saturn's aspect on the 10th house demands hard work in career but rewards with lasting authority and recognition.",
+    11: "Saturn's aspect on the 11th house brings slow but steady gains and loyal, long-term friendships.",
+  },
+  Rahu: {
+    1: "Rahu's aspect on the 1st house adds an unconventional, ambitious quality. Foreign influences and innovation shape your personality.",
+    5: "Rahu's aspect on the 5th house brings unconventional creativity, interest in technology, and unique approaches to education.",
+    7: "Rahu's aspect on the 7th house may bring a foreign or unconventional spouse and unusual business partnerships.",
+    9: "Rahu's aspect on the 9th house creates an unconventional spiritual path and fortune through foreign connections.",
+    10: "Rahu's aspect on the 10th house drives ambitious career goals, success through technology, and fame in unconventional fields.",
+  },
+  Ketu: {
+    1: "Ketu's aspect on the 1st house adds spiritual depth and introspective qualities. Past-life wisdom enriches your personality.",
+    5: "Ketu's aspect on the 5th house brings intuitive intelligence and interest in spiritual or esoteric subjects.",
+    7: "Ketu's aspect on the 7th house may create detachment in partnerships or attract a spiritually inclined partner.",
+    9: "Ketu's aspect on the 9th house grants innate spiritual wisdom and past-life merit in dharmic matters.",
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Main export: generateAllBhavaPredictions
 // ---------------------------------------------------------------------------
 export function generateAllBhavaPredictions(vedicChart: VedicChart): BhavaPrediction[] {
@@ -439,8 +514,6 @@ export function generateAllBhavaPredictions(vedicChart: VedicChart): BhavaPredic
       }
     }
 
-    const prediction = parts.join(' ');
-
     // 6. Collect aspects: find planets that aspect this house
     const aspects: string[] = [];
     for (const [name, data] of planetEntries) {
@@ -449,6 +522,16 @@ export function generateAllBhavaPredictions(vedicChart: VedicChart): BhavaPredic
         aspects.push(name);
       }
     }
+
+    // c. Aspect effects — add interpretation for aspecting planets
+    for (const asp of aspects) {
+      const aspEffect = aspectEffects[asp]?.[houseNum];
+      if (aspEffect) {
+        parts.push(aspEffect);
+      }
+    }
+
+    const prediction = parts.join(' ');
 
     predictions.push({
       house: houseNum,

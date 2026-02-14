@@ -107,7 +107,7 @@ function DashboardContent() {
 
   // New calculations
   const yogas = useMemo(() => identifyYogas(planetPositions, chart.ascendant.index), [planetPositions, chart.ascendant.index]);
-  const doshas = useMemo(() => analyzeAllDoshas(planetPositions), [planetPositions]);
+  const doshas = useMemo(() => analyzeAllDoshas(planetPositions, chart.ascendant.index), [planetPositions, chart.ascendant.index]);
   const gemstones = useMemo(() => recommendGemstones(planetPositions, chart.ascendant.index), [planetPositions, chart.ascendant.index]);
   const transits = useMemo(() => analyzeTransits(chart.moonSign.index), [chart.moonSign.index]);
   const sadeSati = useMemo(() => detectSadeSati(chart.moonSign.index), [chart.moonSign.index]);
@@ -206,7 +206,7 @@ function DashboardContent() {
     });
   };
 
-  function handleBirthEdit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleBirthEdit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const dob = (form.elements.namedItem('edit-dob') as HTMLInputElement).value;
@@ -214,7 +214,7 @@ function DashboardContent() {
     const pob = (form.elements.namedItem('edit-pob') as HTMLInputElement).value;
     const tz = (form.elements.namedItem('edit-timezone') as HTMLSelectElement).value;
     if (dob && tob && pob && tz) {
-      updateBirthDetails(dob, tob, pob, tz);
+      await updateBirthDetails(dob, tob, pob, tz);
       setEditing(false);
     }
   }

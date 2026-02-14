@@ -107,7 +107,7 @@ export default function KundliPage() {
     };
 
     const yogas = identifyYogas(positions, ascendant.signIndex);
-    const doshas = analyzeAllDoshas(positions);
+    const doshas = analyzeAllDoshas(positions, ascendant.signIndex);
     const gemstones = recommendGemstones(positions, ascendant.signIndex);
     const transits = analyzeTransits(moonData.signIndex);
     const sadeSati = detectSadeSati(moonData.signIndex);

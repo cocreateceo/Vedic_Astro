@@ -112,14 +112,14 @@ export interface VedicChart {
 }
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  password: string;
   dob: string;
   tob: string;
   pob: string;
   timezone: string;
+  emailVerified?: boolean;
   vedicChart: VedicChart;
   horoscope: HoroscopeData | null;
   horoscopeHistory: HoroscopeData[];
@@ -199,6 +199,7 @@ export interface RashiDetail {
   gem: string;
   deity: string;
   characteristics: string;
+  classicalDescription?: string; // From Saravali/Brihat Jataka
   strengths: string[];
   challenges: string[];
   compatibleSigns: number[];
@@ -317,7 +318,7 @@ export interface SignTheme {
 export interface YogaResult {
   name: string;
   sanskrit: string;
-  type: 'raja' | 'dhana' | 'pancha_mahapurusha' | 'lunar' | 'solar' | 'special' | 'cancellation';
+  type: 'raja' | 'dhana' | 'pancha_mahapurusha' | 'lunar' | 'solar' | 'special' | 'cancellation' | 'nabhasa' | 'arishta' | 'parivartana';
   description: string;
   effects: string;
   planets: string[];
