@@ -132,10 +132,10 @@ export default function PanchangWidget() {
     <section className="py-16 md:py-24" id="panchang-section">
       <div className="max-w-[1200px] mx-auto px-4">
         <SectionHeader
-          sanskrit="\u0906\u091C \u0915\u093E \u092A\u0902\u091A\u093E\u0902\u0917\u0964"
+          sanskrit="आज का पंचांग"
           title="Today's Panchang"
           description={dateString}
-          emoji="\uD83E\uDED4"
+          emoji="🪔"
           typewriter
           kalash
         />
