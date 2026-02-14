@@ -6,9 +6,10 @@ import { generateMiniChart } from '@/lib/chart-svg';
 import { getMostMalefic, isBeneficForAscendant, nakshatraDetails, rashiDetails, generatePlanetAnalysis, getHouseInfo, houseSignifications, calculateDailyTimings } from '@/lib/horoscope-data';
 import { calculateDashaWithRatings, signNames, hindiSignNames } from '@/lib/kundli-calc';
 import Image from 'next/image';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { PlanetAnalysis, YogaResult, DoshaResult, GemstoneRecommendation, TransitPrediction, SadeSatiResult, DashaWithAntardasha, WeeklyPrediction, MonthlyPrediction, BhavaPrediction, PanchangaPrediction, DayHighlight, ActivityRecommendation, MonthlyPhase, AuspiciousDate, InauspiciousDate, MonthlyTransit, LifeQuestion } from '@/types';
 import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, detectCityAsync, findCityByName } from '@/lib/city-timings';
+import type { CityData } from '@/lib/city-timings';
 import { identifyYogas } from '@/lib/yoga-calc';
 import { analyzeAllDoshas } from '@/lib/dosha-calc';
 import { recommendGemstones } from '@/lib/gemstone-calc';
@@ -24,7 +25,6 @@ import { calculateGrahavastha, calculateShadbala, calculateIshtaKashta, calculat
 import { generateDashaPredictions } from '@/lib/dasha-predictions';
 import JagadhaKattam from '@/components/dashboard/JagadhaKattam';
 import DayExpandedDetail from '@/components/dashboard/DayExpandedDetail';
-import PdfReport from '@/components/dashboard/PdfReport';
 import NewsletterPreferences from '@/components/dashboard/NewsletterPreferences';
 import { downloadBirthChartPdf } from '@/lib/pdf-download';
 import { getPlanetEmoji } from '@/lib/navagraha';
@@ -38,13 +38,12 @@ function DashboardContent() {
   const [editing, setEditing] = useState(false);
   const [selectedCityName, setSelectedCityName] = useState('Delhi');
   const [citySource, setCitySource] = useState<'default' | 'geo' | 'manual'>('default');
+  const [detectedCity, setDetectedCity] = useState<CityData | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
   const [expandedSubPeriod, setExpandedSubPeriod] = useState<string | null>(null);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
-  const pdfRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const saved = localStorage.getItem('vedic-muhurat-city');
     if (saved && findCityByName(saved)) {
@@ -53,11 +52,12 @@ function DashboardContent() {
     } else {
       // Phase 1: instant timezone-based detection
       setSelectedCityName(detectCity().name);
-      // Phase 2: async IP geolocation
+      // Phase 2: browser geolocation
       detectCityAsync().then(geo => {
         if (!localStorage.getItem('vedic-muhurat-city')) {
           setSelectedCityName(geo.name);
           setCitySource('geo');
+          if (!findCityByName(geo.name)) setDetectedCity(geo);
         }
       });
     }
@@ -182,7 +182,7 @@ function DashboardContent() {
   const planetNames = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
 
   // City-aware Muhurat timings
-  const selectedCity = findCityByName(selectedCityName) || CITIES[0];
+  const selectedCity = findCityByName(selectedCityName) || (detectedCity?.name === selectedCityName ? detectedCity : null) || CITIES[0];
   const cityTiming = getCityTimingInfo(selectedCity);
   const liveDailyTimings = calculateDailyTimings(today.getDay(), chart.moonSign.index, cityTiming.sunriseMin, cityTiming.sunsetMin);
 
@@ -194,13 +194,14 @@ function DashboardContent() {
 
   const handleDetectLocation = () => {
     localStorage.removeItem('vedic-muhurat-city');
-    sessionStorage.removeItem('vedic-geoip-city');
+    sessionStorage.removeItem('vedic-geo-city');
     setCitySource('default');
     setSelectedCityName(detectCity().name);
     detectCityAsync().then(geo => {
       if (!localStorage.getItem('vedic-muhurat-city')) {
         setSelectedCityName(geo.name);
         setCitySource('geo');
+        if (!findCityByName(geo.name)) setDetectedCity(geo);
       }
     });
   };
@@ -219,10 +220,42 @@ function DashboardContent() {
   }
 
   async function handleDownloadPdf() {
-    if (!pdfRef.current || pdfLoading || !user) return;
+    if (pdfLoading || !user) return;
     setPdfLoading(true);
     try {
-      await downloadBirthChartPdf(pdfRef.current, user.name);
+      await downloadBirthChartPdf({
+        chart,
+        horoscope,
+        userName: user.name,
+        dob: user.dob,
+        tob: user.tob,
+        pob: user.pob,
+        photo: profilePhoto,
+        yogas,
+        doshas,
+        gemstones,
+        transits,
+        sadeSati,
+        enhancedDashas,
+        lifeQuestions,
+        nakshatraRemedy,
+        dasaRemediesList,
+        favourablePeriods,
+        ashtakavarga: ashtakavargaData,
+        pratyantardasha: pratyantardashaData,
+        combustion: combustionData,
+        planetaryWar: planetaryWarData,
+        longitudeTable: longitudeTableData,
+        grahavastha: grahavasthaData,
+        shadbala: shadbalaData,
+        ishtaKashta: ishtaKashtaData,
+        bhavabala: bhavabalaData,
+        shodasavarga: shodasavargaData,
+        sayanaLongitude: sayanaData,
+        bhavaTable: bhavaTableData,
+        kpTable: kpTableData,
+        dashaPredictions: dashaPredictionsData,
+      });
     } catch (err) {
       console.error('PDF generation failed:', err);
     } finally {
@@ -264,40 +297,6 @@ function DashboardContent() {
 
   return (
     <div className="py-16 md:py-20">
-      <PdfReport
-        ref={pdfRef}
-        chart={chart}
-        horoscope={horoscope}
-        userName={user.name}
-        dob={user.dob}
-        tob={user.tob}
-        pob={user.pob}
-        photo={profilePhoto}
-        yogas={yogas}
-        doshas={doshas}
-        gemstones={gemstones}
-        transits={transits}
-        sadeSati={sadeSati}
-        enhancedDashas={enhancedDashas}
-        lifeQuestions={lifeQuestions}
-        nakshatraRemedy={nakshatraRemedy}
-        dasaRemediesList={dasaRemediesList}
-        favourablePeriods={favourablePeriods}
-        ashtakavarga={ashtakavargaData}
-        pratyantardasha={pratyantardashaData}
-        combustion={combustionData}
-        planetaryWar={planetaryWarData}
-        longitudeTable={longitudeTableData}
-        grahavastha={grahavasthaData}
-        shadbala={shadbalaData}
-        ishtaKashta={ishtaKashtaData}
-        bhavabala={bhavabalaData}
-        shodasavarga={shodasavargaData}
-        sayanaLongitude={sayanaData}
-        bhavaTable={bhavaTableData}
-        kpTable={kpTableData}
-        dashaPredictions={dashaPredictionsData}
-      />
       <div className="max-w-[1200px] mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* ===== LEFT SIDEBAR ===== */}
@@ -552,6 +551,14 @@ function DashboardContent() {
                         <span className="text-text-muted text-xs">Location:</span>
                         <select value={selectedCityName} onChange={(e) => handleCityChange(e.target.value)}
                           className={`text-sm rounded px-2 py-1 focus:outline-none ${citySource === 'geo' ? 'bg-cosmic-bg border-2 border-amber-500 text-amber-400 font-medium' : 'bg-cosmic-bg border border-sign-primary/30 text-text-primary'}`}>
+                          {detectedCity && !findCityByName(detectedCity.name) && (
+                            <optgroup label="Detected Location">
+                              <option value={detectedCity.name}
+                                style={citySource === 'geo' ? { color: '#d97706', fontWeight: 'bold', background: '#1a1a2e' } : { color: '#000', background: '#fff' }}>
+                                {`📍 ${detectedCity.name}, ${detectedCity.region}`}
+                              </option>
+                            </optgroup>
+                          )}
                           <optgroup label="India">
                             {INDIA_CITIES.map(c => (
                               <option key={c.name} value={c.name}

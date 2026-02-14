@@ -212,36 +212,83 @@ export function findNearestCity(lat: number, lng: number): CityData {
   return best;
 }
 
-const SESSION_KEY = 'vedic-geoip-city';
+const SESSION_KEY = 'vedic-geo-city';
 
 /**
- * Async city detection via IP geolocation (ipapi.co).
- * Returns the nearest city from our database to the user's IP location.
- * Caches result in sessionStorage so only 1 API call per browser session.
+ * Get browser geolocation coordinates.
+ * Returns a promise that resolves with {lat, lng} or rejects on error/timeout.
+ */
+function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (err) => reject(err),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    );
+  });
+}
+
+/**
+ * Reverse geocode coordinates to a city name using OpenStreetMap Nominatim (free, no API key).
+ */
+async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+      { signal: controller.signal, headers: { 'User-Agent': 'VedicAstro/1.0' } }
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data.address;
+    // Try city → town → county → state for the display name
+    return addr?.city || addr?.town || addr?.village || addr?.county || addr?.state || null;
+  } catch { return null; }
+}
+
+/**
+ * Async city detection via browser geolocation + OpenStreetMap reverse geocoding.
+ * Returns exact city name and coordinates. No third-party paid API needed.
+ * Caches result in sessionStorage so only 1 permission prompt per browser session.
  * Falls back to timezone-based detectCity() on any error.
  */
 export async function detectCityAsync(): Promise<CityData> {
+  // Check cache first
   try {
     const cached = sessionStorage.getItem(SESSION_KEY);
     if (cached) {
-      const city = findCityByName(cached);
-      if (city) return city;
+      const parsed = JSON.parse(cached) as CityData;
+      if (parsed.name && typeof parsed.lat === 'number') return parsed;
     }
-  } catch { /* sessionStorage unavailable */ }
+  } catch { /* ignore */ }
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!res.ok) return detectCity();
-    const data = await res.json();
-    if (typeof data.latitude === 'number' && typeof data.longitude === 'number') {
-      const nearest = findNearestCity(data.latitude, data.longitude);
-      try { sessionStorage.setItem(SESSION_KEY, nearest.name); } catch { /* ignore */ }
+    const { lat, lng } = await getBrowserGeolocation();
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // Check if coordinates match a city in our database (within ~30km)
+    const nearest = findNearestCity(lat, lng);
+    const dist = haversineDistance(lat, lng, nearest.lat, nearest.lng);
+    if (dist < 30) {
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(nearest)); } catch { /* ignore */ }
       return nearest;
     }
-  } catch { /* network error or timeout */ }
+
+    // Reverse geocode for exact city name
+    const cityName = await reverseGeocode(lat, lng);
+    const city: CityData = {
+      name: cityName || nearest.name,
+      region: nearest.region,
+      lat,
+      lng,
+      tz,
+    };
+    try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
+    return city;
+  } catch { /* geolocation denied or error */ }
 
   return detectCity();
 }

@@ -35,6 +35,7 @@ export default function HoroscopesPage() {
   const [currentPeriod, setCurrentPeriod] = useState('daily');
   const [selectedCityName, setSelectedCityName] = useState('Delhi');
   const [citySource, setCitySource] = useState<'default' | 'geo' | 'manual'>('default');
+  const [detectedCity, setDetectedCity] = useState<CityData | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('vedic-muhurat-city');
@@ -44,11 +45,12 @@ export default function HoroscopesPage() {
     } else {
       // Phase 1: instant timezone-based detection
       setSelectedCityName(detectCity().name);
-      // Phase 2: async IP geolocation
+      // Phase 2: browser geolocation
       detectCityAsync().then(geo => {
         if (!localStorage.getItem('vedic-muhurat-city')) {
           setSelectedCityName(geo.name);
           setCitySource('geo');
+          if (!findCityByName(geo.name)) setDetectedCity(geo);
         }
       });
     }
@@ -86,7 +88,7 @@ export default function HoroscopesPage() {
   const healthPrediction = predictions.healthAdvice[seed % predictions.healthAdvice.length];
 
   // Calculate daily timings (Muhurat) based on selected city's sunrise/sunset
-  const selectedCity = findCityByName(selectedCityName) || CITIES[0];
+  const selectedCity = findCityByName(selectedCityName) || (detectedCity?.name === selectedCityName ? detectedCity : null) || CITIES[0];
   const cityTiming = getCityTimingInfo(selectedCity);
   const dailyTimings = calculateDailyTimings(today.getDay(), currentSignIndex, cityTiming.sunriseMin, cityTiming.sunsetMin);
 
@@ -98,13 +100,14 @@ export default function HoroscopesPage() {
 
   const handleDetectLocation = () => {
     localStorage.removeItem('vedic-muhurat-city');
-    sessionStorage.removeItem('vedic-geoip-city');
+    sessionStorage.removeItem('vedic-geo-city');
     setCitySource('default');
     setSelectedCityName(detectCity().name);
     detectCityAsync().then(geo => {
       if (!localStorage.getItem('vedic-muhurat-city')) {
         setSelectedCityName(geo.name);
         setCitySource('geo');
+        if (!findCityByName(geo.name)) setDetectedCity(geo);
       }
     });
   };
@@ -183,6 +186,14 @@ export default function HoroscopesPage() {
                           onChange={(e) => handleCityChange(e.target.value)}
                           className={`text-sm rounded px-2 py-1 focus:outline-none ${citySource === 'geo' ? 'bg-cosmic-bg border-2 border-amber-500 text-amber-400 font-medium' : 'bg-cosmic-bg border border-sign-primary/30 text-text-primary'}`}
                         >
+                          {detectedCity && !findCityByName(detectedCity.name) && (
+                            <optgroup label="Detected Location">
+                              <option value={detectedCity.name}
+                                style={citySource === 'geo' ? { color: '#d97706', fontWeight: 'bold', background: '#1a1a2e' } : { color: '#000', background: '#fff' }}>
+                                {`📍 ${detectedCity.name}, ${detectedCity.region}`}
+                              </option>
+                            </optgroup>
+                          )}
                           <optgroup label="India">
                             {INDIA_CITIES.map(c => (
                               <option key={c.name} value={c.name}
