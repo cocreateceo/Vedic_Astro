@@ -226,7 +226,7 @@ export function findNearestCity(lat: number, lng: number): CityData {
   return best;
 }
 
-const SESSION_KEY = 'vedic-geo-city-v2'; // v2: improved Nominatim zoom + state region
+const SESSION_KEY = 'vedic-geo-city-v3'; // v3: BigDataCloud + hybrid GPS/IP
 
 /**
  * Get browser geolocation coordinates.
@@ -245,34 +245,39 @@ function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
 }
 
 /**
- * Reverse geocode coordinates to the exact location name using OpenStreetMap Nominatim.
- * Uses zoom=18 (max detail) and picks the most local/specific place name.
+ * Reverse geocode via BigDataCloud (free, no API key, CORS-enabled, excellent India data).
+ * When called WITH coordinates → reverse geocodes GPS coords to exact city/town.
+ * When called WITHOUT coordinates → uses IP-based geolocation as fallback.
  */
-async function reverseGeocode(lat: number, lng: number): Promise<{ city: string | null; region: string | null }> {
+async function bigDataCloudGeocode(lat?: number, lng?: number): Promise<{ city: string | null; region: string | null; lat: number; lng: number } | null> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), 6000);
+    const params = lat !== undefined && lng !== undefined
+      ? `?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+      : '?localityLanguage=en'; // no coords = IP-based detection
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-      { signal: controller.signal, headers: { 'User-Agent': 'VedicAstro/1.0' } }
+      `https://api.bigdatacloud.net/data/reverse-geocode-client${params}`,
+      { signal: controller.signal }
     );
     clearTimeout(timeout);
-    if (!res.ok) return { city: null, region: null };
+    if (!res.ok) return null;
     const data = await res.json();
-    const addr = data.address;
-    // Pick the most specific/local place name — exact location first
-    const city = addr?.city || addr?.town || addr?.village || addr?.suburb || addr?.county || addr?.state_district || addr?.state || null;
-    // For region, prefer state (e.g. "Tamil Nadu") over just "India"
-    const region = addr?.state || addr?.country || null;
-    return { city, region };
-  } catch { return { city: null, region: null }; }
+    return {
+      city: data.locality || data.city || null,
+      region: data.principalSubdivision || data.countryName || null,
+      lat: data.latitude,
+      lng: data.longitude,
+    };
+  } catch { return null; }
 }
 
 /**
- * Async city detection via browser geolocation + OpenStreetMap reverse geocoding.
- * Always shows the user's exact location from GPS — no database matching/overriding.
- * Caches result in sessionStorage so only 1 permission prompt per browser session.
- * Falls back to timezone-based detectCity() on any error.
+ * Hybrid city detection — like Swiggy/OLX:
+ * 1. Try GPS (enableHighAccuracy) + BigDataCloud reverse geocode → exact location
+ * 2. If GPS denied/fails → BigDataCloud IP-based detection (no coords)
+ * 3. If all fails → timezone-based fallback
+ * Caches result in sessionStorage per browser session.
  */
 export async function detectCityAsync(): Promise<CityData> {
   // Check cache first
@@ -284,24 +289,30 @@ export async function detectCityAsync(): Promise<CityData> {
     }
   } catch { /* ignore */ }
 
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Phase 1: Try GPS + BigDataCloud reverse geocode
   try {
     const { lat, lng } = await getBrowserGeolocation();
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const geo = await bigDataCloudGeocode(lat, lng);
+    if (geo?.city) {
+      const city: CityData = { name: geo.city, region: geo.region || 'India', lat, lng, tz };
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
+      return city;
+    }
+  } catch { /* GPS denied or timeout — fall through to IP */ }
 
-    // Always reverse geocode for the exact location name
-    const geo = await reverseGeocode(lat, lng);
-    const fallback = detectCity(); // timezone fallback for name/region if geocode fails
-    const city: CityData = {
-      name: geo.city || fallback.name,
-      region: geo.region || fallback.region,
-      lat,
-      lng,
-      tz,
-    };
-    try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
-    return city;
-  } catch { /* geolocation denied or error */ }
+  // Phase 2: BigDataCloud IP-based detection (no GPS needed)
+  try {
+    const geo = await bigDataCloudGeocode();
+    if (geo?.city && geo.lat) {
+      const city: CityData = { name: geo.city, region: geo.region || 'India', lat: geo.lat, lng: geo.lng, tz };
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
+      return city;
+    }
+  } catch { /* ignore */ }
 
+  // Phase 3: Timezone-based fallback
   return detectCity();
 }
 
