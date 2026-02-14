@@ -226,21 +226,63 @@ export function findNearestCity(lat: number, lng: number): CityData {
   return best;
 }
 
-const SESSION_KEY = 'vedic-geo-city-v3'; // v3: BigDataCloud + hybrid GPS/IP
+const SESSION_KEY = 'vedic-geo-city-v4'; // v4: watchPosition for progressive GPS + debug
+
+const GEO_DEBUG = true; // console logging for geolocation debugging
 
 /**
- * Get browser geolocation coordinates.
- * Uses enableHighAccuracy: true to get actual GPS fix on mobile
- * instead of rough cell-tower approximation.
+ * Get browser geolocation with progressive accuracy.
+ * Uses watchPosition to start with cell tower fix and improve to GPS.
+ * Returns the best position within the timeout, preferring accuracy < 500m.
  */
-function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
+function getBrowserGeolocation(): Promise<{ lat: number; lng: number; accuracy: number }> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      (err) => reject(err),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+
+    let bestPosition: { lat: number; lng: number; accuracy: number } | null = null;
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const current = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        };
+        if (GEO_DEBUG) console.log('[VedicGeo] GPS fix:', current.lat.toFixed(4), current.lng.toFixed(4), 'accuracy:', Math.round(current.accuracy) + 'm');
+
+        // Keep the most accurate reading
+        if (!bestPosition || current.accuracy < bestPosition.accuracy) {
+          bestPosition = current;
+        }
+
+        // If accuracy is good (< 500m = likely real GPS), resolve immediately
+        if (current.accuracy < 500) {
+          navigator.geolocation.clearWatch(watchId);
+          if (GEO_DEBUG) console.log('[VedicGeo] Good GPS fix, using it');
+          resolve(bestPosition);
+        }
+      },
+      (err) => {
+        navigator.geolocation.clearWatch(watchId);
+        if (bestPosition) {
+          if (GEO_DEBUG) console.log('[VedicGeo] GPS error but have a fix, using best:', bestPosition.accuracy + 'm');
+          resolve(bestPosition);
+        } else {
+          if (GEO_DEBUG) console.log('[VedicGeo] GPS failed:', err.message);
+          reject(err);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
+
+    // After 20s, use whatever we have
+    setTimeout(() => {
+      navigator.geolocation.clearWatch(watchId);
+      if (bestPosition) {
+        if (GEO_DEBUG) console.log('[VedicGeo] GPS timeout, using best fix:', bestPosition.accuracy + 'm');
+        resolve(bestPosition);
+      }
+      // If no position at all, the error callback will handle rejection
+    }, 20000);
   });
 }
 
@@ -263,20 +305,49 @@ async function bigDataCloudGeocode(lat?: number, lng?: number): Promise<{ city: 
     clearTimeout(timeout);
     if (!res.ok) return null;
     const data = await res.json();
-    return {
+    const result = {
       city: data.locality || data.city || null,
       region: data.principalSubdivision || data.countryName || null,
       lat: data.latitude,
       lng: data.longitude,
     };
+    if (GEO_DEBUG) console.log('[VedicGeo] BigDataCloud result:', result.city, result.region, '| coords:', lat !== undefined ? 'from GPS' : 'from IP');
+    return result;
+  } catch (e) {
+    if (GEO_DEBUG) console.log('[VedicGeo] BigDataCloud error:', e);
+    return null;
+  }
+}
+
+/**
+ * Fallback: IP geolocation via ipapi.co (1000 req/day, CORS, HTTPS).
+ */
+async function ipapiGeocode(): Promise<{ city: string | null; region: string | null; lat: number; lng: number } | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const result = {
+      city: data.city || null,
+      region: data.region || data.country_name || null,
+      lat: data.latitude,
+      lng: data.longitude,
+    };
+    if (GEO_DEBUG) console.log('[VedicGeo] ipapi.co result:', result.city, result.region);
+    return result;
   } catch { return null; }
 }
 
 /**
- * Hybrid city detection — like Swiggy/OLX:
- * 1. Try GPS (enableHighAccuracy) + BigDataCloud reverse geocode → exact location
- * 2. If GPS denied/fails → BigDataCloud IP-based detection (no coords)
- * 3. If all fails → timezone-based fallback
+ * Hybrid city detection:
+ * 1. Try GPS (watchPosition for progressive accuracy) + BigDataCloud reverse geocode
+ *    - If GPS accuracy > 5km, GPS coords are cell-tower level → skip, use IP instead
+ * 2. If GPS fails/denied/inaccurate → BigDataCloud IP-based detection
+ * 3. If BigDataCloud fails → ipapi.co IP-based detection
+ * 4. If all fails → timezone-based fallback
  * Caches result in sessionStorage per browser session.
  */
 export async function detectCityAsync(): Promise<CityData> {
@@ -285,34 +356,62 @@ export async function detectCityAsync(): Promise<CityData> {
     const cached = sessionStorage.getItem(SESSION_KEY);
     if (cached) {
       const parsed = JSON.parse(cached) as CityData;
-      if (parsed.name && typeof parsed.lat === 'number') return parsed;
+      if (parsed.name && typeof parsed.lat === 'number') {
+        if (GEO_DEBUG) console.log('[VedicGeo] Using cached:', parsed.name, parsed.region);
+        return parsed;
+      }
     }
   } catch { /* ignore */ }
 
+  if (GEO_DEBUG) console.log('[VedicGeo] Starting fresh detection...');
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Phase 1: Try GPS + BigDataCloud reverse geocode
   try {
-    const { lat, lng } = await getBrowserGeolocation();
-    const geo = await bigDataCloudGeocode(lat, lng);
-    if (geo?.city) {
-      const city: CityData = { name: geo.city, region: geo.region || 'India', lat, lng, tz };
-      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
-      return city;
+    const gps = await getBrowserGeolocation();
+    if (GEO_DEBUG) console.log('[VedicGeo] GPS result:', gps.lat.toFixed(4), gps.lng.toFixed(4), 'accuracy:', Math.round(gps.accuracy) + 'm');
+
+    // Only trust GPS if accuracy is reasonable (< 5km)
+    // Cell tower positioning in India can give 10-50km accuracy → points to nearest big city
+    if (gps.accuracy < 5000) {
+      const geo = await bigDataCloudGeocode(gps.lat, gps.lng);
+      if (geo?.city) {
+        const city: CityData = { name: geo.city, region: geo.region || 'India', lat: gps.lat, lng: gps.lng, tz };
+        if (GEO_DEBUG) console.log('[VedicGeo] ✓ Using GPS location:', city.name, city.region);
+        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
+        return city;
+      }
+    } else {
+      if (GEO_DEBUG) console.log('[VedicGeo] GPS accuracy too low (' + Math.round(gps.accuracy) + 'm), skipping — using IP instead');
     }
-  } catch { /* GPS denied or timeout — fall through to IP */ }
+  } catch (e) {
+    if (GEO_DEBUG) console.log('[VedicGeo] GPS phase failed:', e);
+  }
 
   // Phase 2: BigDataCloud IP-based detection (no GPS needed)
   try {
     const geo = await bigDataCloudGeocode();
     if (geo?.city && geo.lat) {
       const city: CityData = { name: geo.city, region: geo.region || 'India', lat: geo.lat, lng: geo.lng, tz };
+      if (GEO_DEBUG) console.log('[VedicGeo] ✓ Using BigDataCloud IP:', city.name, city.region);
       try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
       return city;
     }
   } catch { /* ignore */ }
 
-  // Phase 3: Timezone-based fallback
+  // Phase 3: ipapi.co fallback
+  try {
+    const geo = await ipapiGeocode();
+    if (geo?.city && geo.lat) {
+      const city: CityData = { name: geo.city, region: geo.region || 'India', lat: geo.lat, lng: geo.lng, tz };
+      if (GEO_DEBUG) console.log('[VedicGeo] ✓ Using ipapi.co IP:', city.name, city.region);
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(city)); } catch { /* ignore */ }
+      return city;
+    }
+  } catch { /* ignore */ }
+
+  // Phase 4: Timezone-based fallback
+  if (GEO_DEBUG) console.log('[VedicGeo] All detection failed, using timezone fallback');
   return detectCity();
 }
 
