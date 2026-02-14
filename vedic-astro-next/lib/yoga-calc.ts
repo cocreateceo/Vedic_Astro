@@ -877,6 +877,160 @@ export function identifyYogas(positions: PlanetPositions, ascendantSignIndex: nu
     }
   }
 
+  // -- Nabhasa Yogas: Yava (Benefics in 1/7, Malefics in 4/10 or vice versa) --
+  // Saravali Ch. 21
+  const nabhasaBenefics = ['Jupiter', 'Venus', 'Mercury', 'Moon'];
+  const nabhasaMalefics = ['Mars', 'Saturn', 'Rahu', 'Ketu'];
+
+  const beneficsIn1or7 = nabhasaBenefics.some(b => positions[b]?.house === 1 || positions[b]?.house === 7);
+  const maleficsIn4or10 = nabhasaMalefics.some(m => positions[m]?.house === 4 || positions[m]?.house === 10);
+  const beneficsIn4or10 = nabhasaBenefics.some(b => positions[b]?.house === 4 || positions[b]?.house === 10);
+  const maleficsIn1or7 = nabhasaMalefics.some(m => positions[m]?.house === 1 || positions[m]?.house === 7);
+
+  if (beneficsIn1or7 && maleficsIn4or10) {
+    yogas.push({
+      name: 'Vajra Yoga (Nabhasa)',
+      sanskrit: 'Vajra Yoga',
+      type: 'nabhasa',
+      description: 'Benefic planets in the 1st and 7th houses, malefic planets in the 4th and 10th houses.',
+      effects: 'The native is happy at the beginning and end of life but faces difficulties in the middle period. Strong and valorous like a thunderbolt (Vajra). Gives courage and resilience to overcome obstacles.',
+      planets: [...nabhasaBenefics.filter(b => positions[b]?.house === 1 || positions[b]?.house === 7), ...nabhasaMalefics.filter(m => positions[m]?.house === 4 || positions[m]?.house === 10)],
+      strength: 'moderate',
+    });
+  } else if (beneficsIn4or10 && maleficsIn1or7) {
+    yogas.push({
+      name: 'Yava Yoga (Nabhasa)',
+      sanskrit: 'Yava Yoga',
+      type: 'nabhasa',
+      description: 'Benefic planets in the 4th and 10th houses, malefic planets in the 1st and 7th houses.',
+      effects: 'The native faces hardship early but prospers in the middle of life, shaped like a barley grain (Yava) — narrow at ends, wide in middle. Gains through perseverance and patience.',
+      planets: [...nabhasaBenefics.filter(b => positions[b]?.house === 4 || positions[b]?.house === 10), ...nabhasaMalefics.filter(m => positions[m]?.house === 1 || positions[m]?.house === 7)],
+      strength: 'moderate',
+    });
+  }
+
+  // -- Nabhasa: Sringhataka Yoga (All planets in trines 1-5-9 or derivatives) --
+  const trikonalSets = [[1, 5, 9], [2, 6, 10], [3, 7, 11], [4, 8, 12]];
+  for (const triSet of trikonalSets) {
+    const allInTri = mainPlanets.every(p => {
+      const h = positions[p]?.house;
+      return h !== undefined && triSet.includes(h);
+    });
+    if (allInTri) {
+      yogas.push({
+        name: 'Sringhataka Yoga (Nabhasa)',
+        sanskrit: 'Śṛṅghāṭaka Yoga',
+        type: 'nabhasa',
+        description: `All seven planets are placed in trine houses (${triSet.join(', ')}).`,
+        effects: 'The native is fond of quarrels, brave, and skilled in warfare. While challenging in nature, this yoga gives tremendous focus and determination. Success comes through concentrated effort in a specific domain.',
+        planets: mainPlanets,
+        strength: 'moderate',
+      });
+      break;
+    }
+  }
+
+  // -- Nabhasa: Hala Yoga (All planets in 3 consecutive houses) --
+  for (let start = 1; start <= 12; start++) {
+    const h1 = start;
+    const h2 = (start % 12) + 1;
+    const h3 = ((start + 1) % 12) + 1;
+    const threeHouses = [h1, h2, h3];
+    const allIn3 = mainPlanets.every(p => {
+      const h = positions[p]?.house;
+      return h !== undefined && threeHouses.includes(h);
+    });
+    if (allIn3) {
+      yogas.push({
+        name: 'Hala Yoga (Nabhasa)',
+        sanskrit: 'Hala Yoga',
+        type: 'nabhasa',
+        description: `All seven planets are concentrated in three consecutive houses (${threeHouses.join(', ')}).`,
+        effects: 'The native is a farmer or agriculturalist by nature, hardworking and connected to the land. This concentration creates a powerful focus of energy. Even in modern contexts, the native works tirelessly in their chosen field and gains through persistent labor.',
+        planets: mainPlanets,
+        strength: 'moderate',
+      });
+      break;
+    }
+  }
+
+  // -- Nabhasa: Sarpa Yoga (All planets in moveable + fixed signs only, with malefic emphasis) --
+  const occupiedHouses = [...new Set(mainPlanets.map(p => positions[p]?.house).filter((h): h is number => h !== undefined))];
+  const occupiedSigns = [...new Set(mainPlanets.map(p => positions[p]?.signIndex).filter((s): s is number => s !== undefined))];
+  const allMoveable = occupiedSigns.every(s => signQualities[s] === 'moveable');
+  const allFixed = occupiedSigns.every(s => signQualities[s] === 'fixed');
+
+  // Sarpa: malefics in kendras of moveable signs
+  if (allMoveable && !yogas.some(y => y.name === 'Rajju Yoga (Nabhasa)')) {
+    const maleficsInKendra = nabhasaMalefics.filter(m => {
+      const h = positions[m]?.house;
+      return h !== undefined && isInKendra(h);
+    });
+    if (maleficsInKendra.length >= 2) {
+      yogas.push({
+        name: 'Sarpa Yoga (Nabhasa)',
+        sanskrit: 'Sarpa Yoga',
+        type: 'nabhasa',
+        description: 'Malefic planets dominate Kendra houses with all planets in moveable signs.',
+        effects: 'The native is cruel, unhappy, and prone to suffering. Remedies through serpent deity worship (Naga Puja) are recommended. With proper remedies, the negative effects can be substantially reduced.',
+        planets: maleficsInKendra,
+        strength: 'weak',
+      });
+    }
+  }
+
+  // -- Nabhasa: Kedara Yoga (All 7 planets in 4 houses) --
+  if (occupiedHouses.length === 4) {
+    yogas.push({
+      name: 'Kedara Yoga (Nabhasa)',
+      sanskrit: 'Kedāra Yoga',
+      type: 'nabhasa',
+      description: `All seven planets are distributed across exactly 4 houses (${occupiedHouses.sort((a, b) => a - b).join(', ')}).`,
+      effects: 'The native is an agriculturalist or landowner, truthful, helpful to others, and contented. Steady income through hard work. Like a well-irrigated field (Kedara), the native cultivates and reaps sustained rewards.',
+      planets: mainPlanets,
+      strength: 'moderate',
+    });
+  }
+
+  // -- Nabhasa: Shoola Yoga (All 7 planets in 3 houses) --
+  if (occupiedHouses.length === 3) {
+    yogas.push({
+      name: 'Shoola Yoga (Nabhasa)',
+      sanskrit: 'Śūla Yoga',
+      type: 'nabhasa',
+      description: `All seven planets are concentrated in just 3 houses (${occupiedHouses.sort((a, b) => a - b).join(', ')}).`,
+      effects: 'The native may be sharp-tempered, poor, and valorous but quarrelsome. Like a trident (Shoola), the energy is intensely focused. This concentration can give extraordinary abilities in specific domains but creates imbalance elsewhere. Shiva worship is the recommended remedy.',
+      planets: mainPlanets,
+      strength: 'moderate',
+    });
+  }
+
+  // -- Nabhasa: Yuga Yoga (All 7 planets in 2 houses) --
+  if (occupiedHouses.length === 2) {
+    yogas.push({
+      name: 'Yuga Yoga (Nabhasa)',
+      sanskrit: 'Yuga Yoga',
+      type: 'nabhasa',
+      description: `All seven planets are concentrated in just 2 houses (${occupiedHouses.sort((a, b) => a - b).join(', ')}).`,
+      effects: 'An extremely rare yoga. The native is heretical, impoverished, and outcaste according to classical texts. In modern interpretation, the extreme concentration creates a highly unusual personality — potentially a revolutionary, ascetic, or someone who lives entirely outside conventional norms.',
+      planets: mainPlanets,
+      strength: 'strong',
+    });
+  }
+
+  // -- Nabhasa: Gola Yoga (All 7 planets in 1 house) --
+  if (occupiedHouses.length === 1) {
+    yogas.push({
+      name: 'Gola Yoga (Nabhasa)',
+      sanskrit: 'Gola Yoga',
+      type: 'nabhasa',
+      description: `All seven planets are conjunct in a single house (${occupiedHouses[0]}).`,
+      effects: 'The rarest of Nabhasa yogas. The native is strong, poor, uneducated, and dirty according to classical texts. In reality, this extreme concentration produces a deeply singular personality with extraordinary focus in one area of life. All planetary energies merge — for better or worse — into a single house theme.',
+      planets: mainPlanets,
+      strength: 'strong',
+    });
+  }
+
   // Deduplicate by name (keep strongest)
   const unique = new Map<string, YogaResult>();
   for (const y of yogas) {

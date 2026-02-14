@@ -48,16 +48,17 @@ function SocialLoginButtons() {
   return (
     <div>
       <div className="grid grid-cols-3 gap-2.5">
-        {socialProviders.map(({ name, provider, icon: Icon }) => (
+        {socialProviders.map(({ name, icon: Icon }) => (
           <button
             key={name}
             type="button"
-            onClick={() => { window.location.href = `${apiUrl}/auth/oauth/authorize?provider=${provider}`; }}
-            className="flex items-center justify-center py-2.5 rounded-lg border border-sign-primary/20 bg-cosmic-bg/20 hover:bg-sign-primary/10 hover:border-sign-primary/40 transition-all duration-200 group"
-            title={`Continue with ${name}`}
+            disabled
+            className="flex items-center justify-center py-2.5 rounded-lg border border-sign-primary/10 bg-cosmic-bg/20 opacity-40 cursor-not-allowed relative"
+            title={`${name} — Coming Soon`}
           >
             <Icon />
-            <span className="ml-2 text-text-muted text-xs group-hover:text-text-primary transition-colors">{name}</span>
+            <span className="ml-2 text-text-muted text-xs">{name}</span>
+            <span className="absolute -top-2 -right-1 text-[9px] px-1.5 py-0.5 rounded-full bg-sign-primary/20 text-sign-primary">Soon</span>
           </button>
         ))}
       </div>
@@ -90,7 +91,7 @@ function EyeOffIcon({ className }: { className?: string }) {
 
 const quotes = [
   { text: "The stars incline, they do not compel.", source: "Ancient Vedic Wisdom" },
-  { text: "Jyotish is the eye of the Vedas — the light that illuminates the path of destiny.", source: "Brihat Parashara Hora Shastra" },
+  { text: "Jyotish is the eye of the Vedas — the light that illuminates the path of destiny.", source: "Ancient Vedic Wisdom" },
   { text: "As above, so below. As within, so without.", source: "Hermetic Principle" },
 ];
 

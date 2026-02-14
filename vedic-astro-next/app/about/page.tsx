@@ -34,7 +34,7 @@ export default function AboutPage() {
           <p>
             We follow the Parashari system of Vedic astrology, which is the most widely practiced
             tradition in India. All our calculations are based on the sidereal zodiac (Lahiri Ayanamsha)
-            and follow classical texts including Brihat Parashara Hora Shastra and Phaladeepika.
+            and follow classical Vedic astrology texts.
           </p>
 
           <p className="text-text-muted text-xs border-t border-sign-primary/10 pt-4">

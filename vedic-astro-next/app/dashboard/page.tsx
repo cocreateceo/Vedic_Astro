@@ -6,7 +6,7 @@ import { generateMiniChart } from '@/lib/chart-svg';
 import { getMostMalefic, isBeneficForAscendant, nakshatraDetails, rashiDetails, generatePlanetAnalysis, getHouseInfo, houseSignifications, calculateDailyTimings } from '@/lib/horoscope-data';
 import { calculateDashaWithRatings, signNames, hindiSignNames } from '@/lib/kundli-calc';
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { PlanetAnalysis, YogaResult, DoshaResult, GemstoneRecommendation, TransitPrediction, SadeSatiResult, DashaWithAntardasha, WeeklyPrediction, MonthlyPrediction, BhavaPrediction, PanchangaPrediction, DayHighlight, ActivityRecommendation, MonthlyPhase, AuspiciousDate, InauspiciousDate, MonthlyTransit, LifeQuestion } from '@/types';
 import { CITIES, INDIA_CITIES, INTL_CITIES, getCityTimingInfo, detectCity, detectCityAsync, findCityByName } from '@/lib/city-timings';
 import type { CityData } from '@/lib/city-timings';
@@ -18,6 +18,8 @@ import { generateLifeQA } from '@/lib/qa-predictions';
 import { getNakshatraRemedies } from '@/lib/nakshatra-remedies';
 import { getRelevantDasaRemedies } from '@/lib/dasa-remedies';
 import { calculateFavourablePeriods } from '@/lib/favourable-periods';
+import { analyzeMuhurta, muhurtaEvents, getBestEventsForDay, calculatePanchaka, type MuhurtaAnalysis } from '@/lib/muhurta-calc';
+import { calculatePanchang } from '@/lib/panchang';
 import { calculateAshtakavarga } from '@/lib/ashtakavarga';
 import { calculatePratyantardasha } from '@/lib/pratyantardasha';
 import { calculateCombustion, calculatePlanetaryWar, calculateLongitudeTable } from '@/lib/calc-tables';
@@ -26,6 +28,7 @@ import { generateDashaPredictions } from '@/lib/dasha-predictions';
 import JagadhaKattam from '@/components/dashboard/JagadhaKattam';
 import DayExpandedDetail from '@/components/dashboard/DayExpandedDetail';
 import NewsletterPreferences from '@/components/dashboard/NewsletterPreferences';
+import PdfReport from '@/components/dashboard/PdfReport';
 import { downloadBirthChartPdf } from '@/lib/pdf-download';
 import { getPlanetEmoji } from '@/lib/navagraha';
 import BirthDatePicker from '@/components/ui/BirthDatePicker';
@@ -44,6 +47,8 @@ function DashboardContent() {
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
   const [expandedSubPeriod, setExpandedSubPeriod] = useState<string | null>(null);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
+  const [selectedMuhurtaEvent, setSelectedMuhurtaEvent] = useState('marriage');
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   // Redirect OAuth users without birth details to complete-profile
   useEffect(() => {
@@ -186,6 +191,28 @@ function DashboardContent() {
   ), [chart.planets]);
   const dashaPredictionsData = useMemo(() => generateDashaPredictions(enhancedDashas), [enhancedDashas]);
 
+  // Today's Panchang for Muhurta tab
+  const nakshatraOrderForMuhurta = ['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+  const todayPanchang = useMemo(() => calculatePanchang(today), []);
+  const muhurtaAnalysis = useMemo<MuhurtaAnalysis | null>(() => {
+    if (!todayPanchang || !chart.nakshatra) return null;
+    const transitMoonIdx = Math.floor(nakshatraOrderForMuhurta.indexOf(todayPanchang.nakshatra) / 2.25) % 12;
+    return analyzeMuhurta(
+      selectedMuhurtaEvent,
+      todayPanchang.nakshatra,
+      todayPanchang.tithi,
+      today.getDay(),
+      chart.nakshatra,
+      chart.moonSign.index,
+      transitMoonIdx >= 0 ? transitMoonIdx : 0,
+      todayPanchang.tithiIndex,
+    );
+  }, [selectedMuhurtaEvent, todayPanchang, chart.nakshatra, chart.moonSign.index]);
+  const muhurtaTopEvents = useMemo(() => {
+    if (!todayPanchang) return [];
+    return getBestEventsForDay(todayPanchang.nakshatra, todayPanchang.tithi, today.getDay(), todayPanchang.tithiIndex);
+  }, [todayPanchang]);
+
   const activeDoshas = doshas.filter(d => d.detected);
   const planetNames = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
 
@@ -228,42 +255,10 @@ function DashboardContent() {
   }
 
   async function handleDownloadPdf() {
-    if (pdfLoading || !user) return;
+    if (!pdfRef.current || pdfLoading || !user) return;
     setPdfLoading(true);
     try {
-      await downloadBirthChartPdf({
-        chart,
-        horoscope,
-        userName: user.name,
-        dob: user.dob,
-        tob: user.tob,
-        pob: user.pob,
-        photo: profilePhoto,
-        yogas,
-        doshas,
-        gemstones,
-        transits,
-        sadeSati,
-        enhancedDashas,
-        lifeQuestions,
-        nakshatraRemedy,
-        dasaRemediesList,
-        favourablePeriods,
-        ashtakavarga: ashtakavargaData,
-        pratyantardasha: pratyantardashaData,
-        combustion: combustionData,
-        planetaryWar: planetaryWarData,
-        longitudeTable: longitudeTableData,
-        grahavastha: grahavasthaData,
-        shadbala: shadbalaData,
-        ishtaKashta: ishtaKashtaData,
-        bhavabala: bhavabalaData,
-        shodasavarga: shodasavargaData,
-        sayanaLongitude: sayanaData,
-        bhavaTable: bhavaTableData,
-        kpTable: kpTableData,
-        dashaPredictions: dashaPredictionsData,
-      });
+      await downloadBirthChartPdf(pdfRef.current, user.name);
     } catch (err) {
       console.error('PDF generation failed:', err);
     } finally {
@@ -298,6 +293,7 @@ function DashboardContent() {
     { key: 'sub-periods', label: 'Sub-Periods' },
     { key: 'ashtaka', label: 'Ashtaka' },
     { key: 'favourable', label: 'Favourable' },
+    { key: 'muhurta', label: 'Muhurta' },
     { key: 'remedies', label: 'Remedies' },
     { key: 'gems', label: 'Gems' },
     { key: 'tables', label: 'Tables' },
@@ -305,6 +301,40 @@ function DashboardContent() {
 
   return (
     <div className="py-16 md:py-20">
+      <PdfReport
+        ref={pdfRef}
+        chart={chart}
+        horoscope={horoscope}
+        userName={user.name}
+        dob={user.dob}
+        tob={user.tob}
+        pob={user.pob}
+        photo={profilePhoto}
+        yogas={yogas}
+        doshas={doshas}
+        gemstones={gemstones}
+        transits={transits}
+        sadeSati={sadeSati}
+        enhancedDashas={enhancedDashas}
+        lifeQuestions={lifeQuestions}
+        nakshatraRemedy={nakshatraRemedy}
+        dasaRemediesList={dasaRemediesList}
+        favourablePeriods={favourablePeriods}
+        ashtakavarga={ashtakavargaData}
+        pratyantardasha={pratyantardashaData}
+        combustion={combustionData}
+        planetaryWar={planetaryWarData}
+        longitudeTable={longitudeTableData}
+        grahavastha={grahavasthaData}
+        shadbala={shadbalaData}
+        ishtaKashta={ishtaKashtaData}
+        bhavabala={bhavabalaData}
+        shodasavarga={shodasavargaData}
+        sayanaLongitude={sayanaData}
+        bhavaTable={bhavaTableData}
+        kpTable={kpTableData}
+        dashaPredictions={dashaPredictionsData}
+      />
       <div className="max-w-[1200px] mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* ===== LEFT SIDEBAR ===== */}
@@ -1091,7 +1121,7 @@ function DashboardContent() {
                     <>
                       <div className="glass-card p-8 relative overflow-hidden">
                         <h3 className="font-heading text-sign-primary mb-2">Panchanga Predictions</h3>
-                        <p className="text-text-muted text-xs mb-6">Birth-time Panchanga analysis based on classical Vedic texts (BPHS, Phaladeepika)</p>
+                        <p className="text-text-muted text-xs mb-6">Birth-time Panchanga analysis based on classical Vedic texts</p>
 
                         {/* Weekday of Birth */}
                         <div className="mb-6">
@@ -1783,6 +1813,153 @@ function DashboardContent() {
                     <p className="text-text-muted text-sm">Favourable periods data not available. Ensure birth details are provided.</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* ===== MUHURTA TAB ===== */}
+            {activeTab === 'muhurta' && (
+              <div className="space-y-6 tab-content-enter" key="muhurta">
+                {/* Event Picker */}
+                <div className="glass-card p-6">
+                  <h3 className="font-heading text-sign-primary mb-2">Personalized Muhurta Analysis</h3>
+                  <p className="text-text-muted text-xs mb-4">
+                    Check auspicious timing for any activity based on today&apos;s Panchang and your birth chart
+                    (Nakshatra: {chart.nakshatra}, Moon: {chart.moonSign.name})
+                  </p>
+                  <select
+                    value={selectedMuhurtaEvent}
+                    onChange={e => setSelectedMuhurtaEvent(e.target.value)}
+                    className="w-full p-3 rounded-lg bg-cosmic-bg/50 border border-sign-primary/20 text-text-primary text-sm focus:border-sign-primary/50 outline-none"
+                  >
+                    {muhurtaEvents.map(ev => (
+                      <option key={ev.id} value={ev.id}>{ev.name} ({ev.sanskrit})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {muhurtaAnalysis && (
+                  <>
+                    {/* Overall Score Gauge */}
+                    <div className="glass-card p-6 text-center">
+                      <div className="relative w-32 h-32 mx-auto mb-4">
+                        <svg viewBox="0 0 120 120" className="w-full h-full">
+                          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" className="text-cosmic-bg/50" strokeWidth="8" />
+                          <circle cx="60" cy="60" r="54" fill="none"
+                            stroke={muhurtaAnalysis.overallScore >= 70 ? '#4ade80' : muhurtaAnalysis.overallScore >= 50 ? '#facc15' : '#f87171'}
+                            strokeWidth="8" strokeLinecap="round"
+                            strokeDasharray={`${(muhurtaAnalysis.overallScore / 100) * 339.3} 339.3`}
+                            transform="rotate(-90 60 60)" />
+                          <text x="60" y="55" textAnchor="middle" className="fill-text-primary text-2xl font-bold" style={{ fontSize: '28px' }}>{muhurtaAnalysis.overallScore}</text>
+                          <text x="60" y="72" textAnchor="middle" className="fill-text-muted" style={{ fontSize: '10px' }}>out of 100</text>
+                        </svg>
+                      </div>
+                      <h4 className="text-text-primary font-medium mb-1">{muhurtaAnalysis.event.name}</h4>
+                      <span className={`text-sm px-3 py-1 rounded-full ${
+                        muhurtaAnalysis.overallVerdict === 'highly_auspicious' ? 'bg-green-500/20 text-green-400' :
+                        muhurtaAnalysis.overallVerdict === 'auspicious' ? 'bg-blue-500/20 text-blue-400' :
+                        muhurtaAnalysis.overallVerdict === 'moderate' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>{muhurtaAnalysis.overallVerdict.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                      <p className="text-text-muted text-xs mt-2">
+                        {muhurtaAnalysis.paksha === 'shukla' ? 'Shukla' : 'Krishna'} Paksha ({muhurtaAnalysis.paksha === 'shukla' ? 'Bright' : 'Dark'} Fortnight)
+                      </p>
+                    </div>
+
+                    {/* 5+2 Factor Breakdown */}
+                    <div className="glass-card p-6">
+                      <h3 className="font-heading text-sign-primary mb-4">Factor Breakdown</h3>
+                      <div className="space-y-4">
+                        {[
+                          { label: 'Nakshatra', verdict: muhurtaAnalysis.nakshatraVerdict, note: muhurtaAnalysis.nakshatraNote },
+                          { label: 'Tithi', verdict: muhurtaAnalysis.tithiVerdict, note: muhurtaAnalysis.tithiNote },
+                          { label: 'Vara (Weekday)', verdict: muhurtaAnalysis.varaVerdict, note: muhurtaAnalysis.varaNote },
+                          { label: 'Tarabala', verdict: muhurtaAnalysis.tarabalaVerdict, note: muhurtaAnalysis.tarabalaNote },
+                          { label: 'Chandrabala', verdict: muhurtaAnalysis.chandrabalaVerdict, note: muhurtaAnalysis.chandrabalaNote },
+                          { label: 'Paksha', verdict: muhurtaAnalysis.paksha === 'shukla' ? 'good' : 'caution', note: muhurtaAnalysis.pakshaNote },
+                          ...(muhurtaAnalysis.panchakaResult ? [{ label: 'Panchaka', verdict: muhurtaAnalysis.panchakaResult.isBad ? 'avoid' : 'good', note: muhurtaAnalysis.panchakaResult.description }] : []),
+                        ].map(factor => (
+                          <div key={factor.label} className={`p-4 rounded-lg border ${
+                            factor.verdict === 'excellent' ? 'border-green-500/30 bg-green-500/5' :
+                            factor.verdict === 'good' ? 'border-blue-500/30 bg-blue-500/5' :
+                            factor.verdict === 'neutral' ? 'border-gray-500/20 bg-gray-500/5' :
+                            'border-red-500/30 bg-red-500/5'
+                          }`}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-text-primary text-sm font-medium">{factor.label}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded capitalize ${
+                                factor.verdict === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                                factor.verdict === 'good' ? 'bg-blue-500/20 text-blue-400' :
+                                factor.verdict === 'neutral' ? 'bg-gray-500/20 text-gray-400' :
+                                'bg-red-500/20 text-red-400'
+                              }`}>{String(factor.verdict)}</span>
+                            </div>
+                            <p className="text-text-muted text-xs">{factor.note}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Recommendations & Avoid */}
+                    {muhurtaAnalysis.recommendations.length > 0 && (
+                      <div className="glass-card p-6">
+                        <h3 className="font-heading text-green-400 mb-3">Recommendations</h3>
+                        <ul className="space-y-2">
+                          {muhurtaAnalysis.recommendations.map((r, i) => (
+                            <li key={i} className="flex items-start gap-2 text-text-muted text-sm">
+                              <span className="text-green-400 mt-0.5 notranslate" translate="no">&#10003;</span>{r}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {muhurtaAnalysis.avoidReasons.length > 0 && (
+                      <div className="glass-card p-6">
+                        <h3 className="font-heading text-red-400 mb-3">Cautions</h3>
+                        <ul className="space-y-2">
+                          {muhurtaAnalysis.avoidReasons.map((r, i) => (
+                            <li key={i} className="flex items-start gap-2 text-text-muted text-sm">
+                              <span className="text-red-400 mt-0.5 notranslate" translate="no">&#10007;</span>{r}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Today's Top Events */}
+                {muhurtaTopEvents.length > 0 && (
+                  <div className="glass-card p-6">
+                    <h3 className="font-heading text-sign-primary mb-2">Today&apos;s Best Activities</h3>
+                    <p className="text-text-muted text-xs mb-4">All 18 events ranked by suitability for today</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {muhurtaTopEvents.map(({ event, score, verdict }) => (
+                        <div key={event.id}
+                          className={`p-3 rounded-lg border cursor-pointer transition-all ${selectedMuhurtaEvent === event.id ? 'border-sign-primary/50 bg-sign-primary/10' : 'border-sign-primary/10 hover:border-sign-primary/30'}`}
+                          onClick={() => setSelectedMuhurtaEvent(event.id)}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-text-primary text-sm font-medium">{event.name}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              score >= 70 ? 'bg-green-500/20 text-green-400' :
+                              score >= 50 ? 'bg-yellow-500/20 text-yellow-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>{score}/100</span>
+                          </div>
+                          <div className="w-full bg-cosmic-bg/50 rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full ${
+                              score >= 70 ? 'bg-green-500' : score >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`} style={{ width: `${score}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="glass-card p-4">
+                  <p className="text-text-muted text-xs text-center">Based on classical Muhurta Shastra &bull; 7 factors: Nakshatra, Tithi, Vara, Tarabala, Chandrabala, Paksha &amp; Panchaka</p>
+                </div>
               </div>
             )}
 

@@ -28,6 +28,13 @@ export interface NakshatraSuitability {
   avoid: string[];
 }
 
+export interface PanchakaResult {
+  remainder: number;
+  name: string;
+  isBad: boolean;
+  description: string;
+}
+
 export interface MuhurtaAnalysis {
   event: MuhurtaEvent;
   nakshatraVerdict: 'excellent' | 'good' | 'neutral' | 'avoid';
@@ -40,6 +47,9 @@ export interface MuhurtaAnalysis {
   tarabalaNote: string;
   chandrabalaVerdict: 'excellent' | 'good' | 'neutral' | 'caution';
   chandrabalaNote: string;
+  panchakaResult: PanchakaResult | null;
+  paksha: 'shukla' | 'krishna';
+  pakshaNote: string;
   overallScore: number; // 0-100
   overallVerdict: 'highly_auspicious' | 'auspicious' | 'moderate' | 'inauspicious';
   recommendations: string[];
@@ -299,6 +309,75 @@ function getOrdinal(n: number): string {
 }
 
 // ---------------------------------------------------------------------------
+// Panchaka (Five-Source Energy) — B.V. Raman Ch. III
+// ---------------------------------------------------------------------------
+
+/**
+ * Calculate Panchaka — critical for marriage, housewarming, upanayana.
+ * Formula: (Tithi# + Vara# + Nakshatra#) mod 9
+ * (Lagna# omitted as we don't have election-time lagna)
+ *
+ * Bad remainders: 1=Mrityu, 2=Agni, 4=Raja, 6=Chora, 8=Roga
+ */
+export function calculatePanchaka(
+  tithiIndex: number,    // 0-29 (Shukla 0-14, Krishna 15-29)
+  dayOfWeek: number,     // 0=Sun...6=Sat
+  nakshatraName: string, // nakshatra name
+): PanchakaResult {
+  const nakshatraIdx = nakshatraOrder.indexOf(nakshatraName);
+  // Tithi number 1-30, Vara 1-7, Nakshatra 1-27
+  const tithiNum = tithiIndex + 1;
+  const varaNum = dayOfWeek + 1;
+  const nakNum = (nakshatraIdx >= 0 ? nakshatraIdx : 0) + 1;
+
+  const sum = tithiNum + varaNum + nakNum;
+  const remainder = sum % 9;
+
+  const panchakaMap: Record<number, { name: string; isBad: boolean; desc: string }> = {
+    0: { name: 'Safe', isBad: false, desc: 'No Panchaka dosha — this combination is safe for all activities.' },
+    1: { name: 'Mrityu Panchaka', isBad: true, desc: 'Mrityu (Death) Panchaka — danger to life. Avoid marriage, upanayana, and all important ceremonies.' },
+    2: { name: 'Agni Panchaka', isBad: true, desc: 'Agni (Fire) Panchaka — risk of fire and destruction. Avoid house construction, housewarming, and marriage.' },
+    3: { name: 'Safe', isBad: false, desc: 'No Panchaka dosha — this combination is safe for all activities.' },
+    4: { name: 'Raja Panchaka', isBad: true, desc: 'Raja Panchaka — obstacles from authority. Avoid starting business, government matters, and occupation changes.' },
+    5: { name: 'Safe', isBad: false, desc: 'No Panchaka dosha — this combination is safe for all activities.' },
+    6: { name: 'Chora Panchaka', isBad: true, desc: 'Chora (Thief) Panchaka — risk of theft and evil happenings. Avoid travel, marriage, and financial transactions.' },
+    7: { name: 'Safe', isBad: false, desc: 'No Panchaka dosha — this combination is safe for all activities.' },
+    8: { name: 'Roga Panchaka', isBad: true, desc: 'Roga (Disease) Panchaka — risk of illness. Avoid marriage, house building, and medical procedures.' },
+  };
+
+  const data = panchakaMap[remainder];
+  return { remainder, name: data.name, isBad: data.isBad, description: data.desc };
+}
+
+// ---------------------------------------------------------------------------
+// Paksha (Fortnight) Detection — B.V. Raman
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect Shukla (bright/waxing) vs Krishna (dark/waning) paksha from tithi index.
+ * tithiIndex 0-14 = Shukla Paksha, 15-29 = Krishna Paksha
+ */
+function detectPaksha(tithiIndex: number): 'shukla' | 'krishna' {
+  return tithiIndex < 15 ? 'shukla' : 'krishna';
+}
+
+/**
+ * Events that strongly prefer Shukla (bright) paksha per B.V. Raman.
+ * Marriage, construction, housewarming, education, business, spiritual initiation.
+ */
+const shuklaPreferredEvents = new Set([
+  'marriage', 'construction', 'griha_pravesh', 'education', 'business',
+  'spiritual', 'upanayana', 'naming', 'annaprasana', 'property', 'vehicle',
+]);
+
+/**
+ * Events acceptable in Krishna paksha: mundan (health reasons), court cases, debt repayment.
+ */
+const krishnaAcceptableEvents = new Set([
+  'mundan', 'court', 'debt_repay', 'medical',
+]);
+
+// ---------------------------------------------------------------------------
 // Main Export: analyzeMuhurta
 // ---------------------------------------------------------------------------
 
@@ -310,6 +389,7 @@ export function analyzeMuhurta(
   birthNakshatra: string,
   birthMoonSignIndex: number,
   transitMoonSignIndex: number,
+  tithiIndex?: number, // 0-29, optional for backward compat
 ): MuhurtaAnalysis {
   const event = muhurtaEvents.find(e => e.id === eventId) || muhurtaEvents[muhurtaEvents.length - 1];
   const category = event.category;
@@ -425,6 +505,43 @@ export function analyzeMuhurta(
     avoidReasons.push('Chandrabala is weak — Moon\'s transit position does not support this activity');
   }
 
+  // 6. Panchaka (if tithiIndex provided)
+  let panchakaResult: PanchakaResult | null = null;
+  if (tithiIndex !== undefined) {
+    panchakaResult = calculatePanchaka(tithiIndex, dayOfWeek, currentNakshatra);
+    if (panchakaResult.isBad) {
+      // Panchaka is especially critical for marriage, construction, housewarming
+      const criticalEvents = ['marriage', 'construction', 'griha_pravesh', 'upanayana'];
+      const penalty = criticalEvents.includes(eventId) ? -15 : -8;
+      totalScore += penalty;
+      avoidReasons.push(`${panchakaResult.name} active — ${panchakaResult.description.split('.')[0]}`);
+    } else {
+      totalScore += 3;
+    }
+  }
+
+  // 7. Paksha (Shukla/Krishna fortnight) awareness
+  const resolvedTithiIndex = tithiIndex ?? 0;
+  const paksha = detectPaksha(resolvedTithiIndex);
+  let pakshaNote = '';
+
+  if (paksha === 'krishna') {
+    if (shuklaPreferredEvents.has(eventId)) {
+      totalScore -= 10;
+      pakshaNote = `Krishna Paksha (dark fortnight) — not recommended for ${event.name.toLowerCase()}. Shukla Paksha (bright fortnight) is strongly preferred for this activity.`;
+      avoidReasons.push('Krishna Paksha (dark fortnight) is unfavorable for this activity');
+    } else if (krishnaAcceptableEvents.has(eventId)) {
+      pakshaNote = `Krishna Paksha (dark fortnight) — acceptable for ${event.name.toLowerCase()}. Some activities can be performed in either fortnight.`;
+    } else {
+      totalScore -= 5;
+      pakshaNote = `Krishna Paksha (dark fortnight) — mildly unfavorable. Most auspicious activities prefer the bright fortnight (Shukla Paksha).`;
+    }
+  } else {
+    totalScore += 5;
+    pakshaNote = `Shukla Paksha (bright fortnight) — favorable for ${event.name.toLowerCase()}. The waxing Moon supports growth and new beginnings.`;
+    recommendations.push('Shukla Paksha (bright fortnight) supports this activity');
+  }
+
   // Clamp score
   totalScore = Math.max(0, Math.min(100, totalScore));
 
@@ -458,6 +575,9 @@ export function analyzeMuhurta(
     tarabalaNote,
     chandrabalaVerdict,
     chandrabalaNote,
+    panchakaResult,
+    paksha,
+    pakshaNote,
     overallScore: totalScore,
     overallVerdict,
     recommendations,
@@ -472,7 +592,10 @@ export function getBestEventsForDay(
   currentNakshatra: string,
   currentTithi: string,
   dayOfWeek: number,
-): { event: MuhurtaEvent; score: number }[] {
+  tithiIndex?: number,
+): { event: MuhurtaEvent; score: number; verdict: string; paksha: 'shukla' | 'krishna' }[] {
+  const paksha = tithiIndex !== undefined ? detectPaksha(tithiIndex) : 'shukla';
+
   return muhurtaEvents.map(event => {
     let score = 50;
     const category = event.category;
@@ -498,6 +621,28 @@ export function getBestEventsForDay(
     else if (vv === 'good') score += 5;
     else if (vv === 'avoid') score -= 10;
 
-    return { event, score: Math.max(0, Math.min(100, score)) };
+    // Paksha scoring
+    if (paksha === 'krishna') {
+      if (shuklaPreferredEvents.has(event.id)) score -= 10;
+      else if (!krishnaAcceptableEvents.has(event.id)) score -= 5;
+    } else {
+      score += 5;
+    }
+
+    // Panchaka scoring
+    if (tithiIndex !== undefined) {
+      const panchaka = calculatePanchaka(tithiIndex, dayOfWeek, currentNakshatra);
+      if (panchaka.isBad) {
+        const critical = ['marriage', 'construction', 'griha_pravesh', 'upanayana'];
+        score += critical.includes(event.id) ? -15 : -8;
+      }
+    }
+
+    score = Math.max(0, Math.min(100, score));
+    const verdict = score >= 75 ? 'Highly Auspicious' :
+                    score >= 55 ? 'Auspicious' :
+                    score >= 35 ? 'Moderate' : 'Inauspicious';
+
+    return { event, score, verdict, paksha };
   }).sort((a, b) => b.score - a.score);
 }
