@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import Toran from '@/components/ui/Toran';
 import AartiDiyaRow from '@/components/ui/AartiDiyaRow';
 
 export default function Footer() {
@@ -39,7 +38,6 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-sign-primary/10 bg-cosmic-bg pt-0 pb-8">
-      <Toran className="rotate-180 opacity-60 -mt-1" />
       <div className="max-w-[1200px] mx-auto px-4 pt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>

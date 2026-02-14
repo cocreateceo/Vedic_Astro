@@ -8,7 +8,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSignTheme } from '@/hooks/useSignTheme';
 import { VISUAL_THEME_KEYS, VISUAL_THEMES, SIGN_PALETTES, isVisualThemeKey, isSignKey } from '@/lib/sign-themes';
 import LanguageSelector from './LanguageSelector';
-import Toran from '@/components/ui/Toran';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -123,6 +122,19 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          {/* Mobile auth links */}
+          {menuOpen && !isLoggedIn && (
+            <li className="flex pt-2 border-t border-sign-primary/10 mt-2 w-full justify-center">
+              <Link href="/login" className="text-[0.95rem] bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg px-5 py-1.5 rounded-lg font-medium transition-all" onClick={() => setMenuOpen(false)}>Login / Sign Up</Link>
+            </li>
+          )}
+          {menuOpen && isLoggedIn && (
+            <li className="flex gap-3 pt-2 border-t border-sign-primary/10 mt-2 w-full justify-center">
+              <Link href="/dashboard" className="text-[0.95rem] text-text-primary hover:text-sign-primary transition-colors px-3 py-1.5" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <Link href="/profile" className="text-[0.95rem] text-text-primary hover:text-sign-primary transition-colors px-3 py-1.5" onClick={() => setMenuOpen(false)}>Profile</Link>
+              <button onClick={() => { logout(); setMenuOpen(false); }} className="text-[0.95rem] text-red-400 hover:text-red-300 transition-colors px-3 py-1.5">Logout</button>
+            </li>
+          )}
         </ul>
 
         {/* Right: Actions (language, theme, login) */}
@@ -260,12 +272,11 @@ export default function Navbar() {
               className="btn-premium bg-gradient-to-br from-sign-primary to-sign-dark text-cosmic-bg px-6 py-2 rounded-lg font-medium transition-all inline-block"
               onClick={() => setMenuOpen(false)}
             >
-              Login
+              Login / Sign Up
             </Link>
           )}
         </div>
       </nav>
-      <Toran className="absolute left-0 right-0 top-full opacity-70" />
     </header>
   );
 }
