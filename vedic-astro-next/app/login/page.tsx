@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -97,18 +97,8 @@ const quotes = [
 type AuthView = 'login' | 'signup' | 'verify' | 'forgot-email' | 'forgot-code' | 'forgot-success';
 
 export default function LoginPage() {
-  return (
-    <Suspense>
-      <LoginPageInner />
-    </Suspense>
-  );
-}
-
-function LoginPageInner() {
-  const searchParams = useSearchParams();
-  const initialTab = searchParams.get('tab') === 'signup' ? 'signup' : 'login';
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>(initialTab);
-  const [view, setView] = useState<AuthView>(initialTab);
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [view, setView] = useState<AuthView>('login');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -122,11 +112,15 @@ function LoginPageInner() {
   const { login, loginWithOAuthToken, register, verifyEmail: verifyEmailFn, resendVerification, forgotPassword, resetPassword } = useAuth();
   const router = useRouter();
 
-  // Handle OAuth callback token from URL
+  // Handle query params (OAuth callback + tab selection)
   useEffect(() => {
-    const oauthToken = searchParams.get('oauth_token');
-    const oauthError = searchParams.get('error');
-    const needsProfile = searchParams.get('needs_profile');
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    if (tabParam === 'signup') { setActiveTab('signup'); setView('signup'); }
+
+    const oauthToken = params.get('oauth_token');
+    const oauthError = params.get('error');
+    const needsProfile = params.get('needs_profile');
 
     if (oauthError) {
       setError(decodeURIComponent(oauthError));
@@ -206,7 +200,10 @@ function LoginPageInner() {
 
     try {
       const result = await register(data);
-      if (result.success) {
+      if (result.success && result.autoLoggedIn) {
+        setSuccess('Account created! Redirecting to dashboard...');
+        setTimeout(() => router.push('/dashboard'), 1000);
+      } else if (result.success) {
         setVerifyEmailAddr(data.email);
         setView('verify');
         setError('');

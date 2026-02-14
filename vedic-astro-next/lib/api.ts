@@ -74,6 +74,8 @@ interface LoginResponse {
 interface RegisterResponse {
   message: string;
   userId: string;
+  token?: string;
+  user?: AuthUser;
 }
 
 interface VerifyEmailResponse {

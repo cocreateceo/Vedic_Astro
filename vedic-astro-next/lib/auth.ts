@@ -66,9 +66,25 @@ export async function register(userData: {
   tob: string;
   pob: string;
   timezone: string;
-}): Promise<{ success: boolean; error?: string; userId?: string }> {
+}): Promise<{ success: boolean; error?: string; userId?: string; autoLoggedIn?: boolean }> {
   try {
     const data = await authApi.register(userData);
+
+    // Auto-login if token returned (email verification disabled)
+    if (data.token && data.user) {
+      setToken(data.token);
+      const vedicChart = calculateVedicChart(data.user.dob, data.user.tob, data.user.pob);
+      const horoscope = generatePersonalizedHoroscope(vedicChart, new Date());
+      const user: User = {
+        ...data.user,
+        vedicChart,
+        horoscope,
+        horoscopeHistory: [horoscope],
+      };
+      setCurrentUser(user);
+      return { success: true, userId: data.userId, autoLoggedIn: true };
+    }
+
     return { success: true, userId: data.userId };
   } catch (err: any) {
     return { success: false, error: err.message || 'Registration failed' };

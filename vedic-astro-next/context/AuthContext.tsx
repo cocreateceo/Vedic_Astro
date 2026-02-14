@@ -10,7 +10,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; needsVerification?: boolean; email?: string }>;
   loginWithOAuthToken: (token: string) => Promise<{ success: boolean; needsProfile?: boolean; error?: string }>;
-  register: (data: { name: string; email: string; password: string; dob: string; tob: string; pob: string; timezone: string }) => Promise<{ success: boolean; error?: string; userId?: string }>;
+  register: (data: { name: string; email: string; password: string; dob: string; tob: string; pob: string; timezone: string }) => Promise<{ success: boolean; error?: string; userId?: string; autoLoggedIn?: boolean }>;
   verifyEmail: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
   resendVerification: (email: string) => Promise<{ success: boolean; error?: string }>;
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
@@ -83,7 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleRegister = useCallback(async (data: { name: string; email: string; password: string; dob: string; tob: string; pob: string; timezone: string }) => {
-    return auth.register(data);
+    const result = await auth.register(data);
+    if (result.autoLoggedIn) {
+      const currentUser = auth.getCurrentUser();
+      if (currentUser) setUser(currentUser);
+    }
+    return result;
   }, []);
 
   const handleVerifyEmail = useCallback(async (email: string, code: string) => {
