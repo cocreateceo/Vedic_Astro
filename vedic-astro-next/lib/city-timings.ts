@@ -230,7 +230,8 @@ const SESSION_KEY = 'vedic-geo-city-v2'; // v2: improved Nominatim zoom + state 
 
 /**
  * Get browser geolocation coordinates.
- * Returns a promise that resolves with {lat, lng} or rejects on error/timeout.
+ * Uses enableHighAccuracy: true to get actual GPS fix on mobile
+ * instead of rough cell-tower approximation.
  */
 function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
   return new Promise((resolve, reject) => {
@@ -238,7 +239,7 @@ function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => reject(err),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
     );
   });
 }
