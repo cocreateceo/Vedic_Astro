@@ -38,6 +38,14 @@ export const CITIES: CityData[] = [
   { name: 'Amritsar', region: 'India', lat: 31.63, lng: 74.87, tz: 'Asia/Kolkata' },
   { name: 'Coimbatore', region: 'India', lat: 11.01, lng: 76.96, tz: 'Asia/Kolkata' },
   { name: 'Madurai', region: 'India', lat: 9.93, lng: 78.12, tz: 'Asia/Kolkata' },
+  { name: 'Tiruchirappalli', region: 'India', lat: 10.79, lng: 78.69, tz: 'Asia/Kolkata' },
+  { name: 'Salem', region: 'India', lat: 11.65, lng: 78.16, tz: 'Asia/Kolkata' },
+  { name: 'Tiruvannamalai', region: 'India', lat: 12.23, lng: 79.07, tz: 'Asia/Kolkata' },
+  { name: 'Vellore', region: 'India', lat: 12.92, lng: 79.13, tz: 'Asia/Kolkata' },
+  { name: 'Tirunelveli', region: 'India', lat: 8.73, lng: 77.70, tz: 'Asia/Kolkata' },
+  { name: 'Erode', region: 'India', lat: 11.34, lng: 77.73, tz: 'Asia/Kolkata' },
+  { name: 'Thanjavur', region: 'India', lat: 10.79, lng: 79.14, tz: 'Asia/Kolkata' },
+  { name: 'Dindigul', region: 'India', lat: 10.37, lng: 77.97, tz: 'Asia/Kolkata' },
   { name: 'Visakhapatnam', region: 'India', lat: 17.69, lng: 83.22, tz: 'Asia/Kolkata' },
   { name: 'Mysuru', region: 'India', lat: 12.30, lng: 76.66, tz: 'Asia/Kolkata' },
   { name: 'Mangaluru', region: 'India', lat: 12.87, lng: 74.84, tz: 'Asia/Kolkata' },
@@ -149,6 +157,12 @@ export const CITY_ALIASES: Record<string, string> = {
   'mysore': 'Mysuru',
   'vizag': 'Visakhapatnam',
   'new delhi': 'Delhi',
+  'trichy': 'Tiruchirappalli',
+  'trichirappalli': 'Tiruchirappalli',
+  'tiruvannamalai district': 'Tiruvannamalai',
+  'arni': 'Tiruvannamalai',
+  'tirunelveli district': 'Tirunelveli',
+  'nellai': 'Tirunelveli',
 };
 
 export function findCityByName(name: string): CityData | undefined {
@@ -212,7 +226,7 @@ export function findNearestCity(lat: number, lng: number): CityData {
   return best;
 }
 
-const SESSION_KEY = 'vedic-geo-city';
+const SESSION_KEY = 'vedic-geo-city-v2'; // v2: improved Nominatim zoom + state region
 
 /**
  * Get browser geolocation coordinates.
@@ -230,28 +244,32 @@ function getBrowserGeolocation(): Promise<{ lat: number; lng: number }> {
 }
 
 /**
- * Reverse geocode coordinates to a city name using OpenStreetMap Nominatim (free, no API key).
+ * Reverse geocode coordinates to the exact location name using OpenStreetMap Nominatim.
+ * Uses zoom=18 (max detail) and picks the most local/specific place name.
  */
-async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+async function reverseGeocode(lat: number, lng: number): Promise<{ city: string | null; region: string | null }> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
       { signal: controller.signal, headers: { 'User-Agent': 'VedicAstro/1.0' } }
     );
     clearTimeout(timeout);
-    if (!res.ok) return null;
+    if (!res.ok) return { city: null, region: null };
     const data = await res.json();
     const addr = data.address;
-    // Try city → town → county → state for the display name
-    return addr?.city || addr?.town || addr?.village || addr?.county || addr?.state || null;
-  } catch { return null; }
+    // Pick the most specific/local place name — exact location first
+    const city = addr?.city || addr?.town || addr?.village || addr?.suburb || addr?.county || addr?.state_district || addr?.state || null;
+    // For region, prefer state (e.g. "Tamil Nadu") over just "India"
+    const region = addr?.state || addr?.country || null;
+    return { city, region };
+  } catch { return { city: null, region: null }; }
 }
 
 /**
  * Async city detection via browser geolocation + OpenStreetMap reverse geocoding.
- * Returns exact city name and coordinates. No third-party paid API needed.
+ * Always shows the user's exact location from GPS — no database matching/overriding.
  * Caches result in sessionStorage so only 1 permission prompt per browser session.
  * Falls back to timezone-based detectCity() on any error.
  */
@@ -269,19 +287,12 @@ export async function detectCityAsync(): Promise<CityData> {
     const { lat, lng } = await getBrowserGeolocation();
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Check if coordinates match a city in our database (within ~30km)
-    const nearest = findNearestCity(lat, lng);
-    const dist = haversineDistance(lat, lng, nearest.lat, nearest.lng);
-    if (dist < 30) {
-      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(nearest)); } catch { /* ignore */ }
-      return nearest;
-    }
-
-    // Reverse geocode for exact city name
-    const cityName = await reverseGeocode(lat, lng);
+    // Always reverse geocode for the exact location name
+    const geo = await reverseGeocode(lat, lng);
+    const fallback = detectCity(); // timezone fallback for name/region if geocode fails
     const city: CityData = {
-      name: cityName || nearest.name,
-      region: nearest.region,
+      name: geo.city || fallback.name,
+      region: geo.region || fallback.region,
       lat,
       lng,
       tz,

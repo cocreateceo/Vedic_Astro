@@ -57,14 +57,19 @@ export function getRahuKaalTimeString(day: number): string {
   return times[day];
 }
 
-/** Approximate sunrise/sunset for a given date (default: New Delhi 28.6°N) */
-export function calculateSunTimes(date: Date): { sunrise: string; sunset: string } {
-  const lat = 28.6; // New Delhi latitude
+/** Approximate sunrise/sunset for a given date and optional location (default: New Delhi 28.6°N) */
+export function calculateSunTimes(
+  date: Date,
+  lat?: number,
+  lng?: number,
+  tz?: string
+): { sunrise: string; sunset: string; sunriseH: number; sunsetH: number } {
+  const useLat = lat ?? 28.6; // default New Delhi
   const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86400000);
 
   // Solar declination approximation
   const decl = -23.45 * Math.cos((2 * Math.PI / 365) * (dayOfYear + 10));
-  const latRad = (lat * Math.PI) / 180;
+  const latRad = (useLat * Math.PI) / 180;
   const declRad = (decl * Math.PI) / 180;
 
   // Hour angle
@@ -72,9 +77,21 @@ export function calculateSunTimes(date: Date): { sunrise: string; sunset: string
   const clampedCosH = Math.max(-1, Math.min(1, cosH));
   const haDeg = (Math.acos(clampedCosH) * 180) / Math.PI;
 
-  // Sunrise/sunset in hours (solar noon ~12:00)
-  const sunriseH = 12 - haDeg / 15;
-  const sunsetH = 12 + haDeg / 15;
+  // Solar noon with longitude correction within timezone
+  let solarNoonH = 12;
+  if (lng !== undefined && tz) {
+    try {
+      const now = new Date();
+      const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+      const tzStr = now.toLocaleString('en-US', { timeZone: tz });
+      const utcOffsetMin = Math.round((new Date(tzStr).getTime() - new Date(utcStr).getTime()) / 60000);
+      const tzMeridian = (utcOffsetMin / 60) * 15;
+      solarNoonH = 12 + (tzMeridian - lng) * 4 / 60; // 4 min per degree
+    } catch { /* fallback to 12:00 */ }
+  }
+
+  const sunriseH = solarNoonH - haDeg / 15;
+  const sunsetH = solarNoonH + haDeg / 15;
 
   function formatTime(hours: number): string {
     const h = Math.floor(hours);
@@ -84,7 +101,39 @@ export function calculateSunTimes(date: Date): { sunrise: string; sunset: string
     return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
   }
 
-  return { sunrise: formatTime(sunriseH), sunset: formatTime(sunsetH) };
+  return { sunrise: formatTime(sunriseH), sunset: formatTime(sunsetH), sunriseH, sunsetH };
+}
+
+/**
+ * Calculate location-aware Rahu Kaal from actual sunrise/sunset.
+ * Traditional method: divide daytime into 8 equal parts.
+ * Day-of-week order (Sun–Sat): 8th, 2nd, 7th, 5th, 6th, 4th, 3rd part.
+ */
+const rahuKaalPartIndex = [7, 1, 6, 4, 5, 3, 2];
+
+export function calculateLocationRahuKaal(
+  date: Date,
+  sunriseH: number,
+  sunsetH: number
+): RahuKaalData {
+  const day = date.getDay();
+  const partIdx = rahuKaalPartIndex[day];
+  const partDuration = (sunsetH - sunriseH) / 8;
+  const startH = sunriseH + partIdx * partDuration;
+  const endH = startH + partDuration;
+
+  const currentHour = date.getHours() + date.getMinutes() / 60;
+  const isActive = currentHour >= startH && currentHour < endH;
+
+  function formatTime(hours: number): string {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
+  }
+
+  return { start: formatTime(startH), end: formatTime(endH), startH, endH, isActive };
 }
 
 export { nakshatras, tithis, yogas };

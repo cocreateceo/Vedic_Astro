@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePanchang } from '@/hooks/usePanchang';
 import { generateMoonPhaseSvg } from '@/lib/moon-phase';
-import { calculateSunTimes } from '@/lib/panchang';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 import TiltCard from '@/components/ui/TiltCard';
@@ -12,12 +11,12 @@ import { getAuspiciousMarker } from '@/lib/shubh-ashubh';
 import SparkleWrap from '@/components/ui/SparkleWrap';
 
 export default function PanchangWidget() {
-  const { panchang, rahuKaal, dateString } = usePanchang();
+  const { panchang, rahuKaal, dateString, city, sunTimes } = usePanchang();
 
   if (!panchang) return null;
 
   const moonSvg = generateMoonPhaseSvg(panchang.tithiIndex);
-  const sunTimes = calculateSunTimes(new Date());
+  const locationLabel = city ? `${city.name}, ${city.region}` : '';
 
   const cards = [
     { icon: '\uD83C\uDF19', label: 'Tithi', value: panchang.tithi, markerType: 'tithi' as const },
@@ -25,13 +24,13 @@ export default function PanchangWidget() {
     { icon: '\u2638', label: 'Yoga', value: panchang.yoga, markerType: 'yoga' as const },
     { icon: '\u25D1', label: 'Karana', value: panchang.karana, markerType: 'karana' as const },
     { icon: '\u23F0', label: 'Rahu Kaal', value: rahuKaal ? `${rahuKaal.start} - ${rahuKaal.end}` : '', extra: rahuKaal ? (rahuKaal.isActive ? 'Active Now' : 'Not Active') : '', markerType: null },
-    { icon: '\u2600', label: 'Sunrise / Sunset', value: `${sunTimes.sunrise} / ${sunTimes.sunset}`, markerType: null },
+    { icon: '\u2600', label: 'Sunrise / Sunset', value: sunTimes ? `${sunTimes.sunrise} / ${sunTimes.sunset}` : '', markerType: null },
   ];
 
   return (
     <section className="py-16 md:py-24" id="panchang-section">
       <div className="max-w-[1200px] mx-auto px-4">
-        <SectionHeader sanskrit="आज का पंचांग" title="Today's Panchang" description={dateString} emoji="🪔" typewriter kalash />
+        <SectionHeader sanskrit="आज का पंचांग" title="Today's Panchang" description={locationLabel ? `${dateString} — ${locationLabel}` : dateString} emoji="🪔" typewriter kalash />
         <div className="flex justify-center mb-8">
           <div className="w-20 h-20 hover-glow rounded-full" dangerouslySetInnerHTML={{ __html: moonSvg }} />
         </div>
