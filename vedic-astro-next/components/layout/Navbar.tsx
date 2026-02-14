@@ -73,7 +73,7 @@ export default function Navbar() {
       }}
     >
       <div className="absolute bottom-[-1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-sign-primary to-transparent animate-[headerShimmer_3s_ease-in-out_infinite]" style={{ opacity: 0.8 }} />
-      <nav className="max-w-[1400px] mx-auto flex items-center px-4 lg:px-6 py-4">
+      <nav className="max-w-[1680px] mx-auto flex items-center px-4 xl:px-6 py-4">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
           <Image
@@ -90,7 +90,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="lg:hidden bg-transparent border-none cursor-pointer p-2 ml-auto"
+          className="xl:hidden bg-transparent border-none cursor-pointer p-2 ml-auto"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle navigation"
         >
@@ -101,7 +101,7 @@ export default function Navbar() {
         </button>
 
         {/* Center: Nav links */}
-        <ul className={`lg:flex flex-1 items-center justify-center gap-2 xl:gap-5 mx-2 xl:mx-8 min-w-0 ${menuOpen ? 'flex flex-col absolute top-full left-0 right-0 bg-cosmic-bg/98 p-4 border-b border-sign-primary/20 z-40' : 'hidden'}`}>
+        <ul className={`xl:flex flex-1 items-center justify-center gap-3 2xl:gap-5 mx-4 2xl:mx-8 min-w-0 ${menuOpen ? 'flex flex-col absolute top-full left-0 right-0 bg-cosmic-bg/98 p-4 border-b border-sign-primary/20 z-40' : 'hidden'}`}>
           {[
             { href: '/', label: 'Home' },
             { href: '/horoscopes', label: 'Horoscopes' },
@@ -115,7 +115,7 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 prefetch={false}
-                className={`text-[0.95rem] relative px-2 xl:px-3 py-1.5 border border-sign-primary/30 rounded-lg transition-all hover:text-sign-primary hover:border-sign-primary/60 hover:bg-sign-primary/5 whitespace-nowrap ${isActive(link.href) ? 'text-sign-primary border-sign-primary/60 bg-sign-primary/10 nav-diya' : 'text-text-primary'}`}
+                className={`text-[0.95rem] relative px-2.5 2xl:px-3 py-1.5 border border-sign-primary/30 rounded-lg transition-all hover:text-sign-primary hover:border-sign-primary/60 hover:bg-sign-primary/5 whitespace-nowrap ${isActive(link.href) ? 'text-sign-primary border-sign-primary/60 bg-sign-primary/10 nav-diya' : 'text-text-primary'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -138,7 +138,7 @@ export default function Navbar() {
         </ul>
 
         {/* Right: Actions (language, theme, login) */}
-        <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-shrink-0">
+        <div className="hidden xl:flex items-center gap-3 2xl:gap-4 flex-shrink-0">
           <LanguageSelector />
 
           {/* Theme Selector */}
@@ -149,7 +149,7 @@ export default function Navbar() {
               title="Change theme"
             >
               <span className="w-4 h-4 rounded-full border-2 border-sign-primary" style={{ background: `var(--sign-primary)` }} />
-              <span className="hidden xl:inline text-xs truncate max-w-[90px] notranslate" translate="no">
+              <span className="hidden 2xl:inline text-xs truncate max-w-[90px] notranslate" translate="no">
                 {overrideKey
                   ? isVisualThemeKey(overrideKey)
                     ? VISUAL_THEMES[overrideKey].name
