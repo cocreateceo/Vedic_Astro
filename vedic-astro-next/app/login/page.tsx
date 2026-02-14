@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -36,39 +36,31 @@ function AppleIcon() {
   );
 }
 
-function GitHubIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
-      <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-    </svg>
-  );
-}
-
 const socialProviders = [
-  { name: 'Google', icon: GoogleIcon },
-  { name: 'Facebook', icon: FacebookIcon },
-  { name: 'Apple', icon: AppleIcon },
-  { name: 'GitHub', icon: GitHubIcon },
+  { name: 'Google', provider: 'google', icon: GoogleIcon },
+  { name: 'Facebook', provider: 'facebook', icon: FacebookIcon },
+  { name: 'Apple', provider: 'apple', icon: AppleIcon },
 ];
 
 function SocialLoginButtons() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+
   return (
     <div>
-      <div className="grid grid-cols-4 gap-2.5">
-        {socialProviders.map(({ name, icon: Icon }) => (
-          <div
+      <div className="grid grid-cols-3 gap-2.5">
+        {socialProviders.map(({ name, provider, icon: Icon }) => (
+          <button
             key={name}
-            className="relative flex items-center justify-center py-2.5 rounded-lg border border-sign-primary/10 bg-cosmic-bg/20 opacity-40 cursor-not-allowed group"
-            title={`${name} — Coming Soon`}
+            type="button"
+            onClick={() => { window.location.href = `${apiUrl}/auth/oauth/authorize?provider=${provider}`; }}
+            className="flex items-center justify-center py-2.5 rounded-lg border border-sign-primary/20 bg-cosmic-bg/20 hover:bg-sign-primary/10 hover:border-sign-primary/40 transition-all duration-200 group"
+            title={`Continue with ${name}`}
           >
             <Icon />
-            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-cosmic-bg/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <span className="text-[9px] text-sign-primary font-medium uppercase tracking-wider">Soon</span>
-            </div>
-          </div>
+            <span className="ml-2 text-text-muted text-xs group-hover:text-text-primary transition-colors">{name}</span>
+          </button>
         ))}
       </div>
-      <p className="text-center text-text-muted/30 text-[10px] mt-2 mb-1">Social login coming soon</p>
       <div className="flex items-center gap-3 my-4">
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sign-primary/20 to-transparent" />
         <span className="text-text-muted/40 text-xs uppercase tracking-widest">or</span>
@@ -102,41 +94,103 @@ const quotes = [
   { text: "As above, so below. As within, so without.", source: "Hermetic Principle" },
 ];
 
+type AuthView = 'login' | 'signup' | 'verify' | 'forgot-email' | 'forgot-code' | 'forgot-success';
+
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  return (
+    <Suspense>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'signup' ? 'signup' : 'login';
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>(initialTab);
+  const [view, setView] = useState<AuthView>(initialTab);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [verifyEmail, setVerifyEmailAddr] = useState('');
+  const [verifyCode, setVerifyCode] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotSent, setForgotSent] = useState(false);
-  const { login, register } = useAuth();
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [oauthLoading, setOauthLoading] = useState(false);
+  const { login, loginWithOAuthToken, register, verifyEmail: verifyEmailFn, resendVerification, forgotPassword, resetPassword } = useAuth();
   const router = useRouter();
 
-  function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+  // Handle OAuth callback token from URL
+  useEffect(() => {
+    const oauthToken = searchParams.get('oauth_token');
+    const oauthError = searchParams.get('error');
+    const needsProfile = searchParams.get('needs_profile');
+
+    if (oauthError) {
+      setError(decodeURIComponent(oauthError));
+      // Clean URL
+      window.history.replaceState({}, '', '/login/');
+      return;
+    }
+
+    if (oauthToken) {
+      setOauthLoading(true);
+      setSuccess('Signing you in...');
+      // Clean URL immediately
+      window.history.replaceState({}, '', '/login/');
+
+      loginWithOAuthToken(oauthToken).then((result) => {
+        if (result.success) {
+          if (result.needsProfile || needsProfile === '1') {
+            router.push('/complete-profile');
+          } else {
+            router.push('/dashboard');
+          }
+        } else {
+          setError(result.error || 'OAuth login failed');
+          setSuccess('');
+          setOauthLoading(false);
+        }
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const inputClass = "w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-sign-primary/60 focus:shadow-[0_0_15px_rgba(var(--sign-glow-rgb),0.15)] transition-all duration-300";
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(''); setSuccess('');
+    setError(''); setSuccess(''); setLoading(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
     try {
-      const result = login(email, password);
+      const result = await login(email, password);
       if (result.success) {
         setSuccess('Login successful! Redirecting...');
         setTimeout(() => router.push('/dashboard'), 1000);
+      } else if (result.needsVerification) {
+        setVerifyEmailAddr(result.email || email);
+        setView('verify');
+        setError('');
+        setSuccess('Please verify your email to continue.');
       } else {
         setError(result.error || 'Invalid credentials');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
   }
 
-  function handleSignup(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(''); setSuccess('');
+    setError(''); setSuccess(''); setLoading(true);
     const form = e.currentTarget;
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
@@ -148,30 +202,312 @@ export default function LoginPage() {
       timezone: (form.elements.namedItem('timezone') as HTMLSelectElement).value,
     };
 
-    if (!data.timezone) { setError('Please select your birth place timezone'); return; }
+    if (!data.timezone) { setError('Please select your birth place timezone'); setLoading(false); return; }
 
     try {
-      const result = register(data);
+      const result = await register(data);
       if (result.success) {
-        setSuccess('Account created! Redirecting...');
-        setTimeout(() => router.push('/dashboard'), 1500);
+        setVerifyEmailAddr(data.email);
+        setView('verify');
+        setError('');
+        setSuccess('Account created! Please check your email for a verification code.');
       } else {
         setError(result.error || 'Registration failed');
       }
     } catch (err) {
       setError('An unexpected error occurred during registration. Please try again.');
       console.error('Registration error:', err);
+    } finally {
+      setLoading(false);
     }
   }
 
-  function handleForgotPassword(e: React.FormEvent) {
+  async function handleVerifyEmail(e: React.FormEvent) {
     e.preventDefault();
-    if (forgotEmail) {
-      setForgotSent(true);
+    setError(''); setSuccess(''); setLoading(true);
+    try {
+      const result = await verifyEmailFn(verifyEmail, verifyCode);
+      if (result.success) {
+        setSuccess('Email verified! Redirecting to dashboard...');
+        setTimeout(() => router.push('/dashboard'), 1500);
+      } else {
+        setError(result.error || 'Invalid verification code');
+      }
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }
 
-  const inputClass = "w-full bg-cosmic-bg/50 border border-sign-primary/20 rounded-lg px-4 py-3 text-text-primary placeholder:text-text-muted/40 focus:outline-none focus:border-sign-primary/60 focus:shadow-[0_0_15px_rgba(var(--sign-glow-rgb),0.15)] transition-all duration-300";
+  async function handleResendCode() {
+    setError(''); setSuccess(''); setLoading(true);
+    try {
+      const result = await resendVerification(verifyEmail);
+      if (result.success) {
+        setSuccess('A new verification code has been sent to your email.');
+      } else {
+        setError(result.error || 'Failed to resend code');
+      }
+    } catch {
+      setError('Failed to resend code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError(''); setSuccess(''); setLoading(true);
+    try {
+      const result = await forgotPassword(forgotEmail);
+      if (result.success) {
+        setView('forgot-code');
+        setSuccess('If an account exists with this email, a reset code has been sent.');
+      } else {
+        setError(result.error || 'Something went wrong');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError(''); setSuccess(''); setLoading(true);
+    try {
+      const result = await resetPassword(forgotEmail, resetCode, newPassword);
+      if (result.success) {
+        setView('forgot-success');
+        setSuccess('Password reset successfully!');
+      } else {
+        setError(result.error || 'Failed to reset password');
+      }
+    } catch {
+      setError('Failed to reset password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendResetCode() {
+    setError(''); setSuccess(''); setLoading(true);
+    try {
+      const result = await forgotPassword(forgotEmail);
+      if (result.success) {
+        setSuccess('A new reset code has been sent to your email.');
+      }
+    } catch {
+      setError('Failed to resend code.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function goBackToLogin() {
+    setView('login');
+    setActiveTab('login');
+    setError('');
+    setSuccess('');
+    setVerifyCode('');
+    setResetCode('');
+    setNewPassword('');
+    setForgotEmail('');
+    setLoading(false);
+  }
+
+  // ── Verification View ──────────────────────────────────────────────
+
+  function renderVerifyView() {
+    return (
+      <div className="space-y-4">
+        <div className="text-center mb-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-sign-primary/10 border border-sign-primary/20 flex items-center justify-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-sign-primary">
+              <rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          </div>
+          <h3 className="text-text-primary font-medium text-lg">Verify Your Email</h3>
+          <p className="text-text-muted/70 text-sm mt-1">
+            Enter the 6-digit code sent to <span className="text-sign-primary">{verifyEmail}</span>
+          </p>
+        </div>
+
+        {error && <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2.5 rounded-lg text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>{error}</div>}
+        {success && <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-2.5 rounded-lg text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>{success}</div>}
+
+        <form onSubmit={handleVerifyEmail} className="space-y-4">
+          <div>
+            <label className="text-text-muted text-sm block mb-1.5">Verification Code</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              pattern="[0-9]{6}"
+              required
+              value={verifyCode}
+              onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className={`${inputClass} text-center text-2xl tracking-[0.5em] font-mono`}
+              autoFocus
+            />
+          </div>
+          <button type="submit" disabled={loading || verifyCode.length !== 6} className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? 'Verifying...' : 'Verify Email'}
+          </button>
+        </form>
+
+        <div className="text-center space-y-2">
+          <button onClick={handleResendCode} disabled={loading} className="text-sign-primary/70 text-sm hover:text-sign-primary transition-colors disabled:opacity-50">
+            Resend Code
+          </button>
+          <div>
+            <button onClick={goBackToLogin} className="text-text-muted/70 text-sm hover:text-text-primary transition-colors">
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Forgot Password Views ──────────────────────────────────────────
+
+  function renderForgotEmailView() {
+    return (
+      <div className="space-y-4">
+        {error && <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2.5 rounded-lg text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>{error}</div>}
+
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <div>
+            <label className="text-text-muted text-sm block mb-1.5">Email Address</label>
+            <input
+              type="email"
+              required
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="you@example.com"
+              className={inputClass}
+            />
+          </div>
+          <button type="submit" disabled={loading} className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? 'Sending...' : 'Send Reset Code'}
+          </button>
+          <button
+            type="button"
+            onClick={goBackToLogin}
+            className="w-full text-text-muted/70 text-sm hover:text-text-primary transition-colors py-2"
+          >
+            Back to Login
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  function renderForgotCodeView() {
+    return (
+      <div className="space-y-4">
+        {error && <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2.5 rounded-lg text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>{error}</div>}
+        {success && <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-2.5 rounded-lg text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>{success}</div>}
+
+        <p className="text-text-muted/70 text-sm text-center">
+          Enter the 6-digit code sent to <span className="text-sign-primary">{forgotEmail}</span> and your new password.
+        </p>
+
+        <form onSubmit={handleResetPassword} className="space-y-4">
+          <div>
+            <label className="text-text-muted text-sm block mb-1.5">Reset Code</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              pattern="[0-9]{6}"
+              required
+              value={resetCode}
+              onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className={`${inputClass} text-center text-2xl tracking-[0.5em] font-mono`}
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="text-text-muted text-sm block mb-1.5">New Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Min. 6 characters"
+                className={`${inputClass} pr-11`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted/50 hover:text-text-muted transition-colors"
+              >
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
+          </div>
+          <button type="submit" disabled={loading || resetCode.length !== 6} className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading ? 'Resetting...' : 'Reset Password'}
+          </button>
+        </form>
+
+        <div className="text-center space-y-2">
+          <button onClick={handleResendResetCode} disabled={loading} className="text-sign-primary/70 text-sm hover:text-sign-primary transition-colors disabled:opacity-50">
+            Resend Code
+          </button>
+          <div>
+            <button onClick={goBackToLogin} className="text-text-muted/70 text-sm hover:text-text-primary transition-colors">
+              Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderForgotSuccessView() {
+    return (
+      <div className="text-center space-y-4">
+        <div className="w-16 h-16 mx-auto rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+        </div>
+        <h3 className="text-text-primary font-medium text-lg">Password Reset Successfully</h3>
+        <p className="text-text-muted/70 text-sm">
+          You can now login with your new password.
+        </p>
+        <button
+          onClick={goBackToLogin}
+          className="btn-premium bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg px-8 py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)]"
+        >
+          Back to Login
+        </button>
+      </div>
+    );
+  }
+
+  // ── Determine which view to show ──────────────────────────────────
+
+  const isForgotView = view === 'forgot-email' || view === 'forgot-code' || view === 'forgot-success';
+  const isVerifyView = view === 'verify';
+
+  const headerTitle = isForgotView ? 'Reset Password' : isVerifyView ? 'Verify Email' : 'Welcome Back';
+  const headerSubtitle = isForgotView
+    ? (view === 'forgot-email' ? 'Enter your email to receive a reset code' : view === 'forgot-code' ? 'Enter your reset code and new password' : '')
+    : isVerifyView
+      ? 'Enter the verification code from your email'
+      : activeTab === 'login'
+        ? 'Sign in to explore your celestial journey'
+        : 'Begin your journey through the stars';
 
   return (
     <div className="min-h-screen flex items-center justify-center py-20 px-4">
@@ -184,7 +520,6 @@ export default function LoginPage() {
             <div className="absolute top-10 right-10 w-32 h-32 border border-sign-primary/15 rounded-full animate-[spin_40s_linear_infinite]" />
             <div className="absolute top-16 right-16 w-20 h-20 border border-sign-secondary/10 rounded-full animate-[spin_25s_linear_infinite_reverse]" />
             <div className="absolute bottom-20 left-10 w-24 h-24 border border-sign-primary/10 rounded-full animate-[spin_35s_linear_infinite]" />
-            {/* Star dots */}
             {[
               'top-[15%] left-[20%]', 'top-[30%] right-[25%]', 'top-[60%] left-[15%]',
               'top-[45%] right-[10%]', 'bottom-[25%] left-[35%]', 'top-[20%] left-[60%]',
@@ -198,12 +533,10 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {/* Om Symbol watermark */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12rem] text-sign-primary/[0.04] font-devanagari select-none pointer-events-none">
-            ॐ
+            {'\u0950'}
           </div>
 
-          {/* Content */}
           <div className="relative z-10">
             <Link href="/" className="inline-flex items-center gap-3 mb-8 group">
               <Image
@@ -216,7 +549,7 @@ export default function LoginPage() {
               <h2 className="font-heading text-2xl text-sign-primary tracking-wider">Vedic Astro</h2>
             </Link>
             <p className="font-devanagari text-sign-primary/60 text-sm mb-6">
-              || ज्योतिषां सूर्यश्चन्द्रमसौ ||
+              || {'\u091C\u094D\u092F\u094B\u0924\u093F\u0937\u093E\u0902'} {'\u0938\u0942\u0930\u094D\u092F\u0936\u094D\u091A\u0928\u094D\u0926\u094D\u0930\u092E\u0938\u094C'} ||
             </p>
             <h3 className="font-heading text-3xl text-text-primary leading-snug mb-4">
               Unlock Your <span className="text-sign-primary">Cosmic</span> Blueprint
@@ -226,12 +559,11 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Features */}
           <div className="relative z-10 space-y-4 my-8">
             {[
-              { icon: '🐏', title: 'Personalized Kundli', desc: 'Detailed birth chart with Rashi, Navamsa & Dasha periods' },
-              { icon: '🔮', title: 'Daily Horoscopes', desc: 'Predictions based on your Moon sign & Nakshatra' },
-              { icon: '✦', title: 'Planetary Transits', desc: 'Real-time Graha positions & their impact on your life' },
+              { icon: '\uD83D\uDC0F', title: 'Personalized Kundli', desc: 'Detailed birth chart with Rashi, Navamsa & Dasha periods' },
+              { icon: '\uD83D\uDD2E', title: 'Daily Horoscopes', desc: 'Predictions based on your Moon sign & Nakshatra' },
+              { icon: '\u2726', title: 'Planetary Transits', desc: 'Real-time Graha positions & their impact on your life' },
             ].map((feature) => (
               <div key={feature.title} className="flex items-start gap-3 group">
                 <span className="text-xl mt-0.5 opacity-70 group-hover:opacity-100 transition-opacity">{feature.icon}</span>
@@ -243,83 +575,50 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {/* Quote */}
           <div className="relative z-10 border-l-2 border-sign-primary/30 pl-4 py-1">
             <p className="text-text-muted/80 text-sm italic leading-relaxed">
               &ldquo;{quotes[0].text}&rdquo;
             </p>
-            <p className="text-sign-primary/60 text-xs mt-1">— {quotes[0].source}</p>
+            <p className="text-sign-primary/60 text-xs mt-1">&mdash; {quotes[0].source}</p>
           </div>
         </div>
 
         {/* Right Panel - Auth Form */}
         <div className="p-8 md:p-10 bg-gradient-to-b from-cosmic-surface/80 to-cosmic-bg/90 backdrop-blur-sm">
           <h1 className="font-heading text-2xl text-sign-primary text-center mb-2">
-            {showForgotPassword ? 'Reset Password' : 'Welcome Back'}
+            {headerTitle}
           </h1>
-          <p className="text-text-muted/70 text-sm text-center mb-8">
-            {showForgotPassword
-              ? 'Enter your email to receive a reset link'
-              : activeTab === 'login'
-                ? 'Sign in to explore your celestial journey'
-                : 'Begin your journey through the stars'}
-          </p>
+          {headerSubtitle && (
+            <p className="text-text-muted/70 text-sm text-center mb-8">
+              {headerSubtitle}
+            </p>
+          )}
 
-          {/* Forgot Password View */}
-          {showForgotPassword ? (
-            <div className="space-y-4">
-              {forgotSent ? (
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-sign-primary/10 border border-sign-primary/20 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-sign-primary">
-                      <path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-text-primary font-medium">Check Your Email</h3>
-                  <p className="text-text-muted/70 text-sm">
-                    If an account exists for <span className="text-sign-primary">{forgotEmail}</span>, we&apos;ve sent password reset instructions.
-                  </p>
-                  <button
-                    onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(''); }}
-                    className="text-sign-primary text-sm hover:underline underline-offset-4 transition-all"
-                  >
-                    Back to Login
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleForgotPassword} className="space-y-4">
-                  <div>
-                    <label className="text-text-muted text-sm block mb-1.5">Email Address</label>
-                    <input
-                      type="email"
-                      required
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className={inputClass}
-                    />
-                  </div>
-                  <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)]">
-                    Send Reset Link
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setShowForgotPassword(false); setForgotEmail(''); }}
-                    className="w-full text-text-muted/70 text-sm hover:text-text-primary transition-colors py-2"
-                  >
-                    Back to Login
-                  </button>
-                </form>
-              )}
+          {/* OAuth Loading */}
+          {oauthLoading && (
+            <div className="flex flex-col items-center justify-center py-16 space-y-4">
+              <div className="w-12 h-12 border-2 border-sign-primary/30 border-t-sign-primary rounded-full animate-spin" />
+              <p className="text-sign-primary text-sm font-medium">Signing you in...</p>
             </div>
-          ) : (
+          )}
+
+          {/* Verify Email View */}
+          {!oauthLoading && isVerifyView && renderVerifyView()}
+
+          {/* Forgot Password Views */}
+          {!oauthLoading && view === 'forgot-email' && renderForgotEmailView()}
+          {!oauthLoading && view === 'forgot-code' && renderForgotCodeView()}
+          {!oauthLoading && view === 'forgot-success' && renderForgotSuccessView()}
+
+          {/* Normal Login/Signup */}
+          {!oauthLoading && !isVerifyView && !isForgotView && (
             <>
               {/* Tab Switcher */}
               <div className="flex mb-6 bg-cosmic-bg/40 rounded-lg p-1">
                 {(['login', 'signup'] as const).map(tab => (
                   <button
                     key={tab}
-                    onClick={() => { setActiveTab(tab); setError(''); setSuccess(''); setShowPassword(false); }}
+                    onClick={() => { setActiveTab(tab); setView(tab); setError(''); setSuccess(''); setShowPassword(false); }}
                     className={`flex-1 py-2.5 text-center text-sm font-medium rounded-md transition-all duration-300 ${
                       activeTab === tab
                         ? 'bg-sign-primary/15 text-sign-primary shadow-sm'
@@ -360,7 +659,7 @@ export default function LoginPage() {
                       <label className="text-text-muted text-sm">Password</label>
                       <button
                         type="button"
-                        onClick={() => setShowForgotPassword(true)}
+                        onClick={() => { setView('forgot-email'); setError(''); setSuccess(''); }}
                         className="text-sign-primary/70 text-xs hover:text-sign-primary transition-colors"
                       >
                         Forgot password?
@@ -384,12 +683,12 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
-                  <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)]">
-                    Sign In
+                  <button type="submit" disabled={loading} className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? 'Signing In...' : 'Sign In'}
                   </button>
                   <p className="text-center text-text-muted/50 text-xs mt-4">
                     Don&apos;t have an account?{' '}
-                    <button type="button" onClick={() => { setActiveTab('signup'); setError(''); setSuccess(''); }} className="text-sign-primary/80 hover:text-sign-primary transition-colors">
+                    <button type="button" onClick={() => { setActiveTab('signup'); setView('signup'); setError(''); setSuccess(''); }} className="text-sign-primary/80 hover:text-sign-primary transition-colors">
                       Create one
                     </button>
                   </p>
@@ -458,12 +757,12 @@ export default function LoginPage() {
                       <option value="Australia/Sydney">Australia (AEST)</option>
                     </select>
                   </div>
-                  <button type="submit" className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)]">
-                    Create Account
+                  <button type="submit" disabled={loading} className="btn-premium w-full bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg py-3 rounded-lg font-medium transition-all hover:shadow-[0_0_25px_rgba(var(--sign-glow-rgb),0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? 'Creating Account...' : 'Create Account'}
                   </button>
                   <p className="text-center text-text-muted/50 text-xs mt-2">
                     Already have an account?{' '}
-                    <button type="button" onClick={() => { setActiveTab('login'); setError(''); setSuccess(''); }} className="text-sign-primary/80 hover:text-sign-primary transition-colors">
+                    <button type="button" onClick={() => { setActiveTab('login'); setView('login'); setError(''); setSuccess(''); }} className="text-sign-primary/80 hover:text-sign-primary transition-colors">
                       Sign in
                     </button>
                   </p>

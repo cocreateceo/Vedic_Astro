@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import Link from 'next/link';
@@ -9,19 +10,23 @@ import CityAutocomplete from '@/components/ui/CityAutocomplete';
 
 function ProfileContent() {
   const { user, updateBirthDetails, logout } = useAuth();
+  const [saving, setSaving] = useState(false);
 
   if (!user) return null;
 
   const chart = user.vedicChart;
+  const hasChart = !!chart;
 
-  function handleSave(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSaving(true);
     const form = e.currentTarget;
     const dob = (form.elements.namedItem('dob') as HTMLInputElement).value;
     const tob = (form.elements.namedItem('tob') as HTMLInputElement).value;
     const pob = (form.elements.namedItem('pob') as HTMLInputElement).value;
     const tz = (form.elements.namedItem('timezone') as HTMLSelectElement).value;
-    updateBirthDetails(dob, tob, pob, tz);
+    await updateBirthDetails(dob, tob, pob, tz);
+    setSaving(false);
   }
 
   return (
@@ -33,20 +38,31 @@ function ProfileContent() {
           <h2 className="font-heading text-lg text-sign-primary mb-4">Account Info</h2>
           <div className="space-y-3 text-sm">
             <div><span className="text-text-muted">Name:</span> <span className="text-text-primary ml-2">{user.name}</span></div>
-            <div><span className="text-text-muted">Email:</span> <span className="text-text-primary ml-2">{user.email}</span></div>
+            <div>
+              <span className="text-text-muted">Email:</span>
+              <span className="text-text-primary ml-2">{user.email}</span>
+              {user.emailVerified && (
+                <span className="ml-2 inline-flex items-center gap-1 text-green-400 text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Verified
+                </span>
+              )}
+            </div>
             <div><span className="text-text-muted">Joined:</span> <span className="text-text-primary ml-2">{new Date(user.createdAt).toLocaleDateString()}</span></div>
           </div>
         </div>
 
-        <div className="glass-card p-8 mb-6">
-          <h2 className="font-heading text-lg text-sign-primary mb-4">Vedic Chart Summary</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div><span className="text-text-muted">Moon Sign:</span> <span className="text-text-primary ml-2">{chart.moonSign.symbol} {chart.moonSign.name}</span></div>
-            <div><span className="text-text-muted">Sun Sign:</span> <span className="text-text-primary ml-2">{chart.sunSign.symbol} {chart.sunSign.name}</span></div>
-            <div><span className="text-text-muted">Ascendant:</span> <span className="text-text-primary ml-2">{chart.ascendant.symbol} {chart.ascendant.name}</span></div>
-            <div><span className="text-text-muted">Nakshatra:</span> <span className="text-text-primary ml-2">{chart.nakshatra}</span></div>
+        {hasChart && (
+          <div className="glass-card p-8 mb-6">
+            <h2 className="font-heading text-lg text-sign-primary mb-4">Vedic Chart Summary</h2>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div><span className="text-text-muted">Moon Sign:</span> <span className="text-text-primary ml-2">{chart.moonSign.symbol} {chart.moonSign.name}</span></div>
+              <div><span className="text-text-muted">Sun Sign:</span> <span className="text-text-primary ml-2">{chart.sunSign.symbol} {chart.sunSign.name}</span></div>
+              <div><span className="text-text-muted">Ascendant:</span> <span className="text-text-primary ml-2">{chart.ascendant.symbol} {chart.ascendant.name}</span></div>
+              <div><span className="text-text-muted">Nakshatra:</span> <span className="text-text-primary ml-2">{chart.nakshatra}</span></div>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="glass-card p-8 mb-6">
           <h2 className="font-heading text-lg text-sign-primary mb-4">Edit Birth Details</h2>
@@ -61,7 +77,9 @@ function ProfileContent() {
                 <option value="Asia/Kolkata">India (IST)</option><option value="America/New_York">US Eastern</option><option value="Europe/London">UK (GMT)</option>
               </select>
             </div>
-            <button type="submit" className="bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg px-6 py-3 rounded-lg font-medium hover:shadow-[0_0_20px_rgba(var(--sign-glow-rgb),0.3)] transition-all">Save & Recalculate</button>
+            <button type="submit" disabled={saving} className="bg-gradient-to-r from-sign-primary to-sign-dark text-cosmic-bg px-6 py-3 rounded-lg font-medium hover:shadow-[0_0_20px_rgba(var(--sign-glow-rgb),0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              {saving ? 'Saving...' : 'Save & Recalculate'}
+            </button>
           </form>
         </div>
 

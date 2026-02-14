@@ -120,10 +120,12 @@ export interface User {
   pob: string;
   timezone: string;
   emailVerified?: boolean;
-  vedicChart: VedicChart;
+  vedicChart: VedicChart | null;
   horoscope: HoroscopeData | null;
   horoscopeHistory: HoroscopeData[];
   createdAt: string;
+  oauthProvider?: string | null;
+  profilePicture?: string | null;
 }
 
 export interface TimePeriod {

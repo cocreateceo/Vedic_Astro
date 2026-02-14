@@ -1,29 +1,14 @@
 import { User, VedicChart } from '@/types';
 import { generatePersonalizedHoroscope } from '@/lib/horoscope-data';
 import { computeFullChart, calculateNavamsaSign, signNames, hindiSignNames, signSymbols } from '@/lib/kundli-calc';
+import { authApi, getToken, setToken, clearToken } from '@/lib/api';
 
 const AUTH_KEY = 'vedic_astro_user';
-const USERS_KEY = 'vedic_astro_users';
 
 // Bump this whenever the astronomy engine is updated so cached charts get recalculated
 const CHART_ENGINE_VERSION = 2;
 
-export function initUsersStorage(): void {
-  if (typeof window === 'undefined') return;
-  if (!localStorage.getItem(USERS_KEY)) {
-    localStorage.setItem(USERS_KEY, JSON.stringify([]));
-  }
-}
-
-export function getUsers(): User[] {
-  if (typeof window === 'undefined') return [];
-  return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-}
-
-export function saveUsers(users: User[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+// ── Cached User (localStorage) ────────────────────────────────────────
 
 export function getCurrentUser(): User | null {
   if (typeof window === 'undefined') return null;
@@ -38,24 +23,42 @@ export function setCurrentUser(user: User): void {
 
 export function logout(): void {
   if (typeof window === 'undefined') return;
+  clearToken();
   localStorage.removeItem(AUTH_KEY);
 }
 
 export function isLoggedIn(): boolean {
-  return getCurrentUser() !== null;
+  return !!getToken() && getCurrentUser() !== null;
 }
 
-export function login(email: string, password: string): User | null {
-  const users = getUsers();
-  const user = users.find(u => u.email === email && u.password === password);
-  if (user) {
+// ── API-backed Auth ───────────────────────────────────────────────────
+
+export async function login(email: string, password: string): Promise<{ success: boolean; error?: string; needsVerification?: boolean; email?: string }> {
+  try {
+    const data = await authApi.login(email, password);
+    setToken(data.token);
+
+    // Compute chart client-side from birth details
+    const vedicChart = calculateVedicChart(data.user.dob, data.user.tob, data.user.pob);
+    const horoscope = generatePersonalizedHoroscope(vedicChart, new Date());
+
+    const user: User = {
+      ...data.user,
+      vedicChart,
+      horoscope,
+      horoscopeHistory: [horoscope],
+    };
     setCurrentUser(user);
-    return user;
+    return { success: true };
+  } catch (err: any) {
+    if (err.data?.needsVerification) {
+      return { success: false, error: err.message, needsVerification: true, email: err.data.email };
+    }
+    return { success: false, error: err.message || 'Login failed' };
   }
-  return null;
 }
 
-export function register(userData: {
+export async function register(userData: {
   name: string;
   email: string;
   password: string;
@@ -63,47 +66,145 @@ export function register(userData: {
   tob: string;
   pob: string;
   timezone: string;
-}): { success: boolean; error?: string; user?: User } {
-  const users = getUsers();
-
-  if (users.find(u => u.email === userData.email)) {
-    return { success: false, error: 'Email already registered. Please login.' };
+}): Promise<{ success: boolean; error?: string; userId?: string }> {
+  try {
+    const data = await authApi.register(userData);
+    return { success: true, userId: data.userId };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Registration failed' };
   }
-
-  if (userData.password.length < 6) {
-    return { success: false, error: 'Password must be at least 6 characters' };
-  }
-
-  const vedicChart = calculateVedicChart(userData.dob, userData.tob, userData.pob);
-
-  const initialHoroscope = generatePersonalizedHoroscope(vedicChart, new Date());
-
-  const newUser: User = {
-    id: Date.now(),
-    name: userData.name,
-    email: userData.email,
-    password: userData.password,
-    dob: userData.dob,
-    tob: userData.tob,
-    pob: userData.pob,
-    timezone: userData.timezone,
-    vedicChart,
-    horoscope: initialHoroscope,
-    horoscopeHistory: [initialHoroscope],
-    createdAt: new Date().toISOString()
-  };
-
-  users.push(newUser);
-  saveUsers(users);
-  setCurrentUser(newUser);
-
-  return { success: true, user: newUser };
 }
+
+export async function verifyEmail(email: string, code: string): Promise<{ success: boolean; error?: string; user?: User }> {
+  try {
+    const data = await authApi.verifyEmail(email, code);
+    setToken(data.token);
+
+    const vedicChart = calculateVedicChart(data.user.dob, data.user.tob, data.user.pob);
+    const horoscope = generatePersonalizedHoroscope(vedicChart, new Date());
+
+    const user: User = {
+      ...data.user,
+      vedicChart,
+      horoscope,
+      horoscopeHistory: [horoscope],
+    };
+    setCurrentUser(user);
+    return { success: true, user };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Verification failed' };
+  }
+}
+
+export async function resendVerification(email: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await authApi.resendVerification(email);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to resend code' };
+  }
+}
+
+export async function forgotPassword(email: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await authApi.forgotPassword(email);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to send reset code' };
+  }
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await authApi.resetPassword(email, code, newPassword);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to reset password' };
+  }
+}
+
+export async function loginWithOAuthToken(token: string): Promise<{ success: boolean; needsProfile?: boolean; error?: string }> {
+  try {
+    setToken(token);
+    const data = await authApi.getMe();
+
+    const hasBirthDetails = !!(data.user.dob && data.user.tob && data.user.pob);
+
+    if (hasBirthDetails) {
+      const vedicChart = calculateVedicChart(data.user.dob, data.user.tob, data.user.pob);
+      const horoscope = generatePersonalizedHoroscope(vedicChart, new Date());
+      const user: User = {
+        ...data.user,
+        vedicChart,
+        horoscope,
+        horoscopeHistory: [horoscope],
+      };
+      setCurrentUser(user);
+      return { success: true };
+    } else {
+      const user: User = {
+        ...data.user,
+        vedicChart: null,
+        horoscope: null,
+        horoscopeHistory: [],
+      };
+      setCurrentUser(user);
+      return { success: true, needsProfile: true };
+    }
+  } catch (err: any) {
+    clearToken();
+    return { success: false, error: err.message || 'OAuth login failed' };
+  }
+}
+
+export async function validateSession(): Promise<User | null> {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const data = await authApi.getMe();
+    // Re-compute chart from cached user if available, or compute fresh
+    const cached = getCurrentUser();
+    if (cached && cached.id === data.user.id && cached.vedicChart) {
+      return cached;
+    }
+
+    const hasBirthDetails = !!(data.user.dob && data.user.tob && data.user.pob);
+
+    if (hasBirthDetails) {
+      const vedicChart = calculateVedicChart(data.user.dob, data.user.tob, data.user.pob);
+      const horoscope = generatePersonalizedHoroscope(vedicChart, new Date());
+      const user: User = {
+        ...data.user,
+        vedicChart,
+        horoscope,
+        horoscopeHistory: [horoscope],
+      };
+      setCurrentUser(user);
+      return user;
+    } else {
+      // OAuth user without birth details
+      const user: User = {
+        ...data.user,
+        vedicChart: null,
+        horoscope: null,
+        horoscopeHistory: [],
+      };
+      setCurrentUser(user);
+      return user;
+    }
+  } catch {
+    // Token invalid/expired — clear session
+    logout();
+    return null;
+  }
+}
+
+// ── Chart Computation (stays client-side) ─────────────────────────────
 
 export function calculateVedicChart(dob: string, tob: string, pob: string): VedicChart {
   const fc = computeFullChart(dob, tob, { place: pob });
 
-  // Build planet records with navamsa (VedicChart needs navamsaSign/navamsaSignHindi)
   const planets: VedicChart['planets'] = {};
   for (const [name, p] of Object.entries(fc.positions)) {
     const navamsaSignIdx = calculateNavamsaSign(p.signIndex, p.nakshatraPada);
@@ -137,15 +238,13 @@ export function calculateVedicChart(dob: string, tob: string, pob: string): Vedi
   };
 }
 
-/** Recalculate chart if it was computed with an older engine version */
 export function migrateChartIfNeeded(): User | null {
   const currentUser = getCurrentUser();
   if (!currentUser?.vedicChart || !currentUser.dob || !currentUser.tob || !currentUser.pob) return null;
 
   if (currentUser.vedicChart.engineVersion === CHART_ENGINE_VERSION) return null;
 
-  // Recalculate with current engine
-  return updateBirthDetails(currentUser.dob, currentUser.tob, currentUser.pob, currentUser.timezone || 'Asia/Kolkata');
+  return updateBirthDetailsLocal(currentUser.dob, currentUser.tob, currentUser.pob, currentUser.timezone || 'Asia/Kolkata');
 }
 
 export function refreshHoroscope(): User | null {
@@ -164,33 +263,35 @@ export function refreshHoroscope(): User | null {
   if (history.length > 7) history.shift();
 
   const updatedUser = { ...currentUser, horoscope: newHoroscope, horoscopeHistory: history };
-
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.id === currentUser.id);
-  if (userIndex !== -1) users[userIndex] = updatedUser;
-  saveUsers(users);
   setCurrentUser(updatedUser);
   return updatedUser;
 }
 
-export function updateBirthDetails(dob: string, tob: string, pob: string, timezone: string): User | null {
+/** Local-only birth details update (recalculate chart without API) */
+function updateBirthDetailsLocal(dob: string, tob: string, pob: string, timezone: string): User | null {
   const currentUser = getCurrentUser();
   if (!currentUser) return null;
 
   const vedicChart = calculateVedicChart(dob, tob, pob);
   const newHoroscope = generatePersonalizedHoroscope(vedicChart, new Date());
-  const users = getUsers();
-  const userIndex = users.findIndex(u => u.id === currentUser.id);
 
   const updatedUser = { ...currentUser, dob, tob, pob, timezone, vedicChart, horoscope: newHoroscope, horoscopeHistory: [newHoroscope] };
-
-  if (userIndex !== -1) {
-    users[userIndex] = updatedUser;
-  } else {
-    users.push(updatedUser);
-  }
-
-  saveUsers(users);
   setCurrentUser(updatedUser);
   return updatedUser;
+}
+
+/** Update birth details via API + recalculate chart locally */
+export async function updateBirthDetails(dob: string, tob: string, pob: string, timezone: string): Promise<User | null> {
+  const currentUser = getCurrentUser();
+  if (!currentUser) return null;
+
+  // Update server-side first
+  try {
+    await authApi.updateProfile({ dob, tob, pob, timezone });
+  } catch (err) {
+    console.error('Failed to update profile on server:', err);
+    // Still update locally so the user sees their new chart
+  }
+
+  return updateBirthDetailsLocal(dob, tob, pob, timezone);
 }

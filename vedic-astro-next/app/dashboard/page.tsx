@@ -44,6 +44,14 @@ function DashboardContent() {
   const [expandedDasha, setExpandedDasha] = useState<string | null>(null);
   const [expandedSubPeriod, setExpandedSubPeriod] = useState<string | null>(null);
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
+
+  // Redirect OAuth users without birth details to complete-profile
+  useEffect(() => {
+    if (user && (!user.dob || !user.tob || !user.pob || !user.vedicChart)) {
+      window.location.href = '/complete-profile';
+    }
+  }, [user]);
+
   useEffect(() => {
     const saved = localStorage.getItem('vedic-muhurat-city');
     if (saved && findCityByName(saved)) {
@@ -71,7 +79,7 @@ function DashboardContent() {
     return () => window.removeEventListener('profile-photo-updated', onStorage);
   }, []);
 
-  if (!user) return null;
+  if (!user || !user.vedicChart) return null;
 
   const chart = user.vedicChart;
   const horoscope = user.horoscope;

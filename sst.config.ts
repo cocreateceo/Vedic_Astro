@@ -17,6 +17,17 @@ export default $config({
     // ── Secrets ──────────────────────────────────────────────────────
     const hmacSecret = new sst.Secret("HmacSecret");
 
+    // OAuth secrets
+    const googleClientId = new sst.Secret("GoogleClientId");
+    const googleClientSecret = new sst.Secret("GoogleClientSecret");
+    const facebookAppId = new sst.Secret("FacebookAppId");
+    const facebookAppSecret = new sst.Secret("FacebookAppSecret");
+    const appleServiceId = new sst.Secret("AppleServiceId");
+    const appleKeyId = new sst.Secret("AppleKeyId");
+    const appleTeamId = new sst.Secret("AppleTeamId");
+    const applePrivateKey = new sst.Secret("ApplePrivateKey");
+    const siteUrl = new sst.Secret("SiteUrl");
+
     // ── SES Email Identity ──────────────────────────────────────────
     const newsletterEmail = new sst.aws.Email("NewsletterEmail", {
       sender: "cocreateidea.com",
@@ -57,12 +68,26 @@ export default $config({
       primaryIndex: { hashKey: "id" },
     });
 
+    // Auth users table
+    const users = new sst.aws.Dynamo("Users", {
+      fields: {
+        id: "string",
+        email: "string",
+      },
+      primaryIndex: { hashKey: "id" },
+      globalIndexes: {
+        "email-index": {
+          hashKey: "email",
+        },
+      },
+    });
+
     // ── API Gateway ─────────────────────────────────────────────────
     const api = new sst.aws.ApiGatewayV2("Api", {
       cors: {
         allowOrigins: ["*"],
         allowMethods: ["GET", "POST", "OPTIONS"],
-        allowHeaders: ["Content-Type"],
+        allowHeaders: ["Content-Type", "Authorization"],
       },
     });
 
@@ -96,6 +121,62 @@ export default $config({
     api.route("POST /booking", {
       handler: "functions/booking.handler",
       link: [bookings, newsletterEmail],
+    });
+
+    // Auth routes — no newsletterEmail link (sender domain hardcoded in Lambda)
+    const authLink = [users, hmacSecret];
+
+    api.route("POST /auth/register", {
+      handler: "functions/auth/register.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/verify-email", {
+      handler: "functions/auth/verify-email.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/resend-verification", {
+      handler: "functions/auth/resend-verification.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/login", {
+      handler: "functions/auth/login.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/forgot-password", {
+      handler: "functions/auth/forgot-password.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/reset-password", {
+      handler: "functions/auth/reset-password.handler",
+      link: authLink,
+    });
+
+    api.route("GET /auth/me", {
+      handler: "functions/auth/me.handler",
+      link: authLink,
+    });
+
+    api.route("POST /auth/update-profile", {
+      handler: "functions/auth/update-profile.handler",
+      link: authLink,
+    });
+
+    // OAuth routes
+    const oauthLink = [users, hmacSecret, siteUrl, googleClientId, googleClientSecret, facebookAppId, facebookAppSecret, appleServiceId, appleKeyId, appleTeamId, applePrivateKey];
+
+    api.route("GET /auth/oauth/authorize", {
+      handler: "functions/auth/oauth-authorize.handler",
+      link: oauthLink,
+    });
+
+    api.route("GET /auth/oauth/callback", {
+      handler: "functions/auth/oauth-callback.handler",
+      link: oauthLink,
     });
 
     // ── Cron Jobs ───────────────────────────────────────────────────
