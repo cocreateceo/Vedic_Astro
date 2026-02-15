@@ -1,0 +1,12 @@
+{
+  "Comment": "SST routing + RSC rewrite",
+  "Runtime": "cloudfront-js-2.0",
+  "KeyValueStoreAssociations": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "KeyValueStoreARN": "arn:aws:cloudfront::248825820556:key-value-store/cfba5203-87fc-4b0b-9fd7-afb2386cfb3a"
+      }
+    ]
+  }
+}
